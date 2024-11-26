@@ -55,7 +55,7 @@ def data_receiver():
             try:                       
                 conn, addr = s.accept()
                 with conn:
-                    data = conn.recv(10)
+                    data = conn.recv(1024)
                     
                     if data == b"END":
                         break
@@ -66,7 +66,7 @@ def data_receiver():
                             
                         folder = data.decode()
 
-                    data = conn.recv(10)
+                    data = conn.recv(1024)
                     
                     if not os.path.exists(f"{path}Trajectories"):
                         os.mkdir(f"{path}Trajectories")
@@ -141,7 +141,7 @@ def test_manager():
 
                     for i in range(len(q[0])):
                         d = abs(q_exp[-1][i]-q[0][i])
-                        t_start.append(d/(0.15*q_p_lim[i])+1)
+                        t_start.append(d/(0.3*q_p_lim[i])+1)
 
                     msg = const_trajectory(max(t_start), q[0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0])
 
@@ -201,7 +201,7 @@ def data_sender():
             try:                       
                 conn, addr = s.accept()
                 with conn:
-                    data = conn.recv(10)
+                    data = conn.recv(1024)
                     
                     if data == b"END":
                         break
@@ -211,7 +211,7 @@ def data_sender():
                             
                         folder = data.decode()
 
-                    data = conn.recv(10)
+                    data = conn.recv(1024)
                     
                     file = open(f"{path}Trajectories/{folder}/{data.decode()}_exp.txt", "rb")
 

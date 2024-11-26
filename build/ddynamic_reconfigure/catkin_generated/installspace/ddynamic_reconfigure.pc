@@ -1,4 +1,4 @@
-prefix=/home/panda/franka_emika_ws/install
+prefix=/home/lozer/franka_emika_ws/install
 
 Name: ddynamic_reconfigure
 Description: Description of ddynamic_reconfigure

@@ -1,1 +1,3 @@
 src/libfranka/build*/
+build
+devel

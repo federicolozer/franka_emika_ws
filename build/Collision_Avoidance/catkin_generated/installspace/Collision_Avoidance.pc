@@ -1,8 +1,0 @@
-prefix=/home/panda/franka_emika_ws/install
-
-Name: Collision_Avoidance
-Description: Description of Collision_Avoidance
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: 

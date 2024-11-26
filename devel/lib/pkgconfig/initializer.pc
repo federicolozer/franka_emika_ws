@@ -1,4 +1,4 @@
-prefix=/home/panda/franka_emika_ws/devel
+prefix=/home/lozer/franka_emika_ws/devel
 
 Name: initializer
 Description: Description of initializer

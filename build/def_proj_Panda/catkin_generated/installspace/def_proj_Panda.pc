@@ -1,8 +1,0 @@
-prefix=/home/panda/franka_emika_ws/install
-
-Name: def_proj_Panda
-Description: Description of def_proj_Panda
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: 

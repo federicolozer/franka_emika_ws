@@ -1,2 +1,2 @@
 aruco_ros/aruco:aruco_ros/aruco_msgs:aruco_ros/aruco_ros:collision_avoidance:ddynamic_reconfigure:franka_ros/franka_control:franka_ros/franka_description:franka_ros/franka_example_controllers:franka_ros/franka_gazebo:franka_ros/franka_gripper:franka_ros/franka_hw:franka_ros/franka_msgs:franka_ros/franka_ros:franka_ros/franka_visualization:initializer:panda_moveit_config:path_planning:realsense-ros/realsense2_description
--DCATKIN_DEVEL_PREFIX=/home/panda/franka_emika_ws/devel -DCMAKE_INSTALL_PREFIX=/home/panda/franka_emika_ws/install -G Unix Makefiles
+-DCATKIN_DEVEL_PREFIX=/home/lozer/franka_emika_ws/devel -DCMAKE_INSTALL_PREFIX=/home/lozer/franka_emika_ws/install -G Unix Makefiles

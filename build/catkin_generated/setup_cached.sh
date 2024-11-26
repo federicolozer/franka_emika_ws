@@ -7,6 +7,10 @@
 # new environment variables
 
 # modified environment variables
-export LD_LIBRARY_PATH='/opt/ros/melodic/share/euslisp/jskeus/eus//Linux64/lib:/home/panda/franka_emika_ws/devel/lib:/opt/ros/melodic/lib:/opt/ros/melodic/share/euslisp/jskeus/eus//Linux64/lib'
-export PATH='/opt/ros/melodic/share/euslisp/jskeus/eus//Linux64/bin:/opt/ros/melodic/bin:/opt/ros/melodic/share/euslisp/jskeus/eus//Linux64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
-export PWD='/home/panda/franka_emika_ws/build'
+export CMAKE_PREFIX_PATH="/home/lozer/franka_emika_ws/devel:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/home/lozer/franka_emika_ws/devel/lib:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="/home/lozer/franka_emika_ws/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
+export PWD='/home/lozer/franka_emika_ws/build'
+export PYTHONPATH="/home/lozer/franka_emika_ws/devel/lib/python2.7/dist-packages:$PYTHONPATH"
+export ROSLISP_PACKAGE_DIRECTORIES='/home/lozer/franka_emika_ws/devel/share/common-lisp'
+export ROS_PACKAGE_PATH="/home/panda/franka_emika_ws/src:/home/lozer/franka_emika_ws/src:$ROS_PACKAGE_PATH"

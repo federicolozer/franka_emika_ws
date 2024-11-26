@@ -1,4 +1,4 @@
-prefix=/home/panda/franka_emika_ws/devel
+prefix=/home/lozer/franka_emika_ws/devel
 
 Name: path_planning
 Description: Description of path_planning

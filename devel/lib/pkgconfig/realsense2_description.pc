@@ -1,4 +1,4 @@
-prefix=/home/panda/franka_emika_ws/devel
+prefix=/home/lozer/franka_emika_ws/devel
 
 Name: realsense2_description
 Description: Description of realsense2_description

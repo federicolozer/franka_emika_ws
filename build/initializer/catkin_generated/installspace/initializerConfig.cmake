@@ -67,14 +67,14 @@ set(initializer_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(initializer_SOURCE_PREFIX /home/panda/franka_emika_ws/src/initializer)
-  set(initializer_DEVEL_PREFIX /home/panda/franka_emika_ws/devel)
+  set(initializer_SOURCE_PREFIX /home/lozer/franka_emika_ws/src/initializer)
+  set(initializer_DEVEL_PREFIX /home/lozer/franka_emika_ws/devel)
   set(initializer_INSTALL_PREFIX "")
   set(initializer_PREFIX ${initializer_DEVEL_PREFIX})
 else()
   set(initializer_SOURCE_PREFIX "")
   set(initializer_DEVEL_PREFIX "")
-  set(initializer_INSTALL_PREFIX /home/panda/franka_emika_ws/install)
+  set(initializer_INSTALL_PREFIX /home/lozer/franka_emika_ws/install)
   set(initializer_PREFIX ${initializer_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/panda/franka_emika_ws/install/lib;/home/panda/franka_emika_ws/devel/lib;/opt/ros/melodic/lib)
+    foreach(path /home/lozer/franka_emika_ws/install/lib;/opt/ros/melodic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

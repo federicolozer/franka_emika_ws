@@ -1,8 +1,0 @@
-prefix=/home/panda/franka_emika_ws/install
-
-Name: libfranka
-Description: Description of libfranka
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
