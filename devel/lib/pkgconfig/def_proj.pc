@@ -1,8 +1,0 @@
-prefix=/home/panda/franka_emika_ws/devel
-
-Name: def_proj
-Description: Description of def_proj
-Version: 0.0.0
-Cflags: -I/home/panda/franka_emika_ws/devel/include
-Libs: -L${prefix}/lib 
-Requires: 
