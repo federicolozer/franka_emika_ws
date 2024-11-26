@@ -1,8 +1,0 @@
-prefix=/home/lozer/franka_emika_ws/install
-
-Name: initializer
-Description: Description of initializer
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
