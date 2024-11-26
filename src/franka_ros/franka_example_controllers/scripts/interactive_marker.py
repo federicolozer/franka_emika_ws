@@ -75,10 +75,6 @@ if __name__ == "__main__":
     int_marker.header.frame_id = link_name
     int_marker.scale = 0.3
     int_marker.name = "equilibrium_pose"
-    int_marker.description = ("Equilibrium Pose\nBE CAREFUL! "
-                              "If you move the \nequilibrium "
-                              "pose the robot will follow it\n"
-                              "so be aware of potential collisions")
     int_marker.pose = marker_pose.pose
     # run pose publisher
     rospy.Timer(rospy.Duration(0.005),
