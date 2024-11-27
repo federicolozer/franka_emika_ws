@@ -2,10 +2,12 @@
 # coding=utf-8
 
 import rospy
+import sys
 from copy import deepcopy
 import time
 import numpy as np
 from tqdm import tqdm
+from bs4 import BeautifulSoup
 from sensor_msgs.msg import JointState
 from control_msgs.msg import FollowJointTrajectoryActionGoal, FollowJointTrajectoryActionResult
 from moveit_msgs.msg import ExecuteTrajectoryActionGoal, ExecuteTrajectoryActionResult
@@ -15,12 +17,13 @@ import Panda_trajectory_planner as planner
 status = None
 error_log = None
 q_reg = []
+q_p_lim = np.array([2.1750, 2.1750, 2.1750, 2.1750, 2.6100, 2.6100, 2.6100])
 
 
 def CallbackJointStates(data):
     global q_reg
 
-    q_reg = data.position[0:7]
+    q_reg = list(data.position[0:7])
 
 
 
@@ -46,6 +49,38 @@ def wait_execution(t_tot):
     while status == None:
         continue
     
+
+
+def homing(q_last):
+    global status, error_log, q_reg, q_p_lim
+
+    joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates)    
+    result_subscriber = rospy.Subscriber('/execute_trajectory/result', ExecuteTrajectoryActionResult, CallbackResult)
+    control_publisher = rospy.Publisher('/execute_trajectory/goal', ExecuteTrajectoryActionGoal, queue_size = 10)
+    
+    time.sleep(0.4)
+
+    q_diff = deepcopy(q_reg)
+    for i in range(len(q_diff)):
+        q_diff[i] -= q_last[i]
+        q_diff[i] = q_diff[i]/(0.2*q_p_lim[i]) + 0.1
+
+    t = [0, max(q_diff)]
+    q = [q_reg, q_last]
+
+    msg = planner.build_execute_trajectory(t, q)
+    control_publisher.publish(msg)
+
+    print("Homing\n")
+    while status == None:
+        continue
+    
+    if not status == 3:
+        print(f"Homing ended with an error:\n{error_log}")
+
+    joint_states_subscriber.unregister()
+    result_subscriber.unregister()
+
 
 
 def launch_execute_trajectory(t, q):
@@ -96,14 +131,50 @@ def launch_follow_joint_trajectory(t, q):
 
 
 if __name__ == '__main__':
+    #if len(sys.argv) > 0:
+    #    print(sys.argv[1])
+    #    if sys.argv[1] == "ext":
+    #        print("si")
+#
+    #quit()
+
     rospy.init_node('controller')
 
-    t = [0, 3, 6]
-    q = [[0, -0.785, 0, -2.356, 0, 1.571, 0.785], 
-        [1, -0.785, 0, -2.356, 0, 1.571, 0.785], 
-        [0, -0.785, 0, -2.356, 0, 1.571, 0.785]]
+    t = [0, 1.5, 3]
+    q = [[-1, -0.785, 0, -2.356, 0, 1.571, 0.785], 
+        [0, -0.785, 0, -1.756, 0, 0.871, 0.785],
+        [1, -0.785, 0, -2.356, 0, 1.571, 0.785]]
+    
+    """
+    with open("/home/lozer/franka_emika_ws/src/path_planning/data/q_robot.xml", 'r') as traj:
+        data = traj.read()
+        print(data)
+        traj_data = BeautifulSoup(data, "xml")
+        print(traj_data)
+        traj_list = traj_data.find_all('point')
+        print(traj_list)
+        quit()
 
-    launch_execute_trajectory(t, q)
+    for key in traj_list:
+        traj_time = float(key.get('time'))
+
+        while traj_time >= t_exe:
+            t_exe = time.time() - t_start
+            continue
+
+        keypoint = []
+        for i in range(15):
+            point = key.find('point', {'id':i})
+            joint = []
+            for jnt in point.text.split():
+                joint.append(jnt)
+            keypoint.append(joint)
+        
+        trajectory = keypoint"""
+
+    homing(q[0])
+    if not len(q) == 1:
+        launch_execute_trajectory(t, q)
 
     
 
