@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <launch>
 
-  <arg name="load_gripper" default="true" />
+  <arg name="load_gripper" default="false" />
 
   <include file="$(find panda_moveit_config)/launch/planning_context.launch">
     <arg name="load_gripper" value="$(arg load_gripper)" />
