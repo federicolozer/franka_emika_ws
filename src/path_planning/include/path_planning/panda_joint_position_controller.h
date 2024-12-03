@@ -12,9 +12,9 @@
 #include <ros/node_handle.h>
 #include <ros/time.h>
 
-namespace franka_example_controllers {
+namespace path_planning {
 
-class JointPositionExampleController : public controller_interface::MultiInterfaceController<
+class PandaJointPositionController : public controller_interface::MultiInterfaceController<
                                            hardware_interface::EffortJointInterface> {
  public:
   bool init(hardware_interface::RobotHW* robot_hardware, ros::NodeHandle& node_handle) override;
@@ -28,4 +28,4 @@ class JointPositionExampleController : public controller_interface::MultiInterfa
   std::array<double, 7> initial_pose_{};
 };
 
-}  // namespace franka_example_controllers
+}

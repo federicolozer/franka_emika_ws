@@ -1,6 +1,6 @@
 // Copyright (c) 2017 Franka Emika GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
-#include <franka_example_controllers/joint_position_example_controller.h>
+#include <path_planning/panda_joint_position_controller.h>
 
 #include <cmath>
 
@@ -10,22 +10,23 @@
 #include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>
 
-namespace franka_example_controllers {
+namespace path_planning {
 
-bool JointPositionExampleController::init(hardware_interface::RobotHW* robot_hardware,
+bool PandaJointPositionController::init(hardware_interface::RobotHW* robot_hardware,
                                           ros::NodeHandle& node_handle) {
   position_joint_interface_ = robot_hardware->get<hardware_interface::EffortJointInterface>();
+  std::cout << "#################### giunto position_joint_interface_ fatto!!!!!!!!!!!!!" << std::endl;
   if (position_joint_interface_ == nullptr) {
     ROS_ERROR(
-        "JointPositionExampleController: Error getting position joint interface from hardware!");
+        "PandaJointPositionController: Error getting position joint interface from hardware!");
     return false;
   }
   std::vector<std::string> joint_names;
   if (!node_handle.getParam("joint_names", joint_names)) {
-    ROS_ERROR("JointPositionExampleController: Could not parse joint names");
+    ROS_ERROR("PandaJointPositionController: Could not parse joint names");
   }
   if (joint_names.size() != 7) {
-    ROS_ERROR_STREAM("JointPositionExampleController: Wrong number of joint names, got "
+    ROS_ERROR_STREAM("PandaJointPositionController: Wrong number of joint names, got "
                      << joint_names.size() << " instead of 7 names!");
     return false;
   }
@@ -35,7 +36,7 @@ bool JointPositionExampleController::init(hardware_interface::RobotHW* robot_har
       position_joint_handles_[i] = position_joint_interface_->getHandle(joint_names[i]);
     } catch (const hardware_interface::HardwareInterfaceException& e) {
       ROS_ERROR_STREAM(
-          "JointPositionExampleController: Exception getting joint handles: " << e.what());
+          "PandaJointPositionController: Exception getting joint handles: " << e.what());
       return false;
     }
   }
@@ -43,10 +44,10 @@ bool JointPositionExampleController::init(hardware_interface::RobotHW* robot_har
   std::array<double, 7> q_start{{0, -M_PI_4, 0, -3 * M_PI_4, 0, M_PI_2, M_PI_4}};
   for (size_t i = 0; i < q_start.size(); i++) {
     if (std::abs(position_joint_handles_[i].getPosition() - q_start[i]) > 0.1) {
-      std::cout << "#################### giunto " << i << " = " << position_joint_handles_[i].getPosition() << std::endl;
-      std::cout << "#################### diff " << " = " << position_joint_handles_[i].getPosition() - q_start[i] << std::endl;
+      std::cout << "######-------############## giunto " << i << " = " << position_joint_handles_[i].getPosition() << std::endl;
+      std::cout << "#####-------############### diff " << " = " << position_joint_handles_[i].getPosition() - q_start[i] << std::endl;
       ROS_ERROR_STREAM(
-          "JointPositionExampleController: Robot is not in the expected starting position for "
+          "PandaJointPositionController: Robot is not in the expected starting position for "
           "running this example. Run `roslaunch franka_example_controllers move_to_start.launch "
           "robot_ip:=<robot-ip> load_gripper:=<has-attached-gripper>` first.");
       return false;
@@ -56,14 +57,14 @@ bool JointPositionExampleController::init(hardware_interface::RobotHW* robot_har
   return true;
 }
 
-void JointPositionExampleController::starting(const ros::Time& /* time */) {
+void PandaJointPositionController::starting(const ros::Time& /* time */) {
   for (size_t i = 0; i < 7; ++i) {
     initial_pose_[i] = position_joint_handles_[i].getPosition();
   }
   elapsed_time_ = ros::Duration(0.0);
 }
 
-void JointPositionExampleController::update(const ros::Time& /*time*/,
+void PandaJointPositionController::update(const ros::Time& /*time*/,
                                             const ros::Duration& period) {
   elapsed_time_ += period;
 
@@ -77,7 +78,7 @@ void JointPositionExampleController::update(const ros::Time& /*time*/,
   }
 }
 
-}  // namespace franka_example_controllers
+}
 
-PLUGINLIB_EXPORT_CLASS(franka_example_controllers::JointPositionExampleController,
+PLUGINLIB_EXPORT_CLASS(path_planning::PandaJointPositionController,
                        controller_interface::ControllerBase)

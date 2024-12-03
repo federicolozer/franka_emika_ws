@@ -67,7 +67,7 @@ if __name__ == "__main__":
     while not initial_pose_found:
         rospy.sleep(1)
     state_sub.unregister()
-
+    
     pose_pub = rospy.Publisher(
         "equilibrium_pose", PoseStamped, queue_size=10)
     server = InteractiveMarkerServer("equilibrium_pose_marker")

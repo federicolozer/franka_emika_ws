@@ -53,18 +53,19 @@ def wait_execution(t_tot):
 
 def homing(q_last):
     global status, error_log, q_reg, q_p_lim
-
+    import subprocess
     joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates)    
     result_subscriber = rospy.Subscriber('/execute_trajectory/result', ExecuteTrajectoryActionResult, CallbackResult)
     control_publisher = rospy.Publisher('/execute_trajectory/goal', ExecuteTrajectoryActionGoal, queue_size = 10)
-    
-    time.sleep(0.4)
+
+    while q_reg == []:
+        pass
 
     q_diff = deepcopy(q_reg)
     for i in range(len(q_diff)):
         q_diff[i] -= q_last[i]
         q_diff[i] = q_diff[i]/(0.2*q_p_lim[i]) + 0.1
-
+    
     t = [0, max(q_diff)]
     q = [q_reg, q_last]
 
@@ -73,7 +74,7 @@ def homing(q_last):
 
     print("Homing\n")
     while status == None:
-        continue
+        pass
     
     if not status == 3:
         print(f"Homing ended with an error:\n{error_log}")
@@ -140,41 +141,27 @@ if __name__ == '__main__':
 
     rospy.init_node('controller')
 
-    t = [0, 1.5, 3]
-    q = [[-1, -0.785, 0, -2.356, 0, 1.571, 0.785], 
-        [0, -0.785, 0, -1.756, 0, 0.871, 0.785],
-        [1, -0.785, 0, -2.356, 0, 1.571, 0.785]]
-    
-    """
+    t = []
+    q = []
+       
     with open("/home/lozer/franka_emika_ws/src/path_planning/data/q_robot.xml", 'r') as traj:
         data = traj.read()
-        print(data)
-        traj_data = BeautifulSoup(data, "xml")
-        print(traj_data)
-        traj_list = traj_data.find_all('point')
-        print(traj_list)
-        quit()
+        traj_data = BeautifulSoup(data, features="xml")
+        traj_list = traj_data.find_all('point')        
 
-    for key in traj_list:
-        traj_time = float(key.get('time'))
+        for point in traj_list:
+            t.append(float(point.get('time')))
 
-        while traj_time >= t_exe:
-            t_exe = time.time() - t_start
-            continue
-
-        keypoint = []
-        for i in range(15):
-            point = key.find('point', {'id':i})
-            joint = []
+            keypoint = []
             for jnt in point.text.split():
-                joint.append(jnt)
-            keypoint.append(joint)
-        
-        trajectory = keypoint"""
+                keypoint.append(float(jnt))
+            
+            q.append(keypoint)
 
-    homing(q[0])
-    if not len(q) == 1:
-        launch_execute_trajectory(t, q)
+    if len(q) > 0:
+        homing(q[0])
+        if not len(q) == 1:
+            launch_execute_trajectory(t, q)
 
     
 
