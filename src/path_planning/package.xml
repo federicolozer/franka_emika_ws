@@ -11,31 +11,13 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_export_depend>message_generation</build_export_depend>
-  <!-- Use buildtool_depend for build tool packages: -->
-  <!--   <buildtool_depend>catkin</buildtool_depend> -->
-  <!-- Use exec_depend for packages you need at runtime: -->
-  <exec_depend>message_runtime</exec_depend> 
-  <!-- Use test_depend for packages you need only for testing: -->
-  <!--   <test_depend>gtest</test_depend> -->
-  <!-- Use doc_depend for packages you need only for building documentation: -->
-  <!--   <doc_depend>doxygen</doc_depend> -->
-  
-  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>eigen</build_depend>
+  <build_depend>message_generation</build_depend>
 
-  <depend>moveit_core</depend>
+  <exec_depend>message_runtime</exec_depend> 
+
   <depend>roscpp</depend>
   <depend>rospy</depend>
-  <depend version_gte="1.11.2">pluginlib</depend>
-  <depend>control_msgs</depend>
+  <depend>std_msgs</depend>
 
-  <build_depend>actionlib</build_depend>
-  <build_depend>actionlib_msgs</build_depend>
-  <exec_depend>actionlib</exec_depend>
-  <exec_depend>actionlib_msgs</exec_depend>
-
-
-  <export>
-    <controller_interface plugin="${prefix}/panda_controllers_plugin.xml"/>
-  </export>
 </package>

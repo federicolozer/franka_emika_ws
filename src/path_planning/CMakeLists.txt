@@ -8,16 +8,13 @@ project(path_planning)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  moveit_core
-  pluginlib
-  actionlib
-  actionlib_msgs 
   roscpp
   rospy
-  control_msgs
+  std_msgs
+  message_generation
 )
 
-generate_messages(DEPENDENCIES actionlib_msgs)
+find_package(Eigen3 REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -60,11 +57,10 @@ generate_messages(DEPENDENCIES actionlib_msgs)
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  IK.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -74,10 +70,10 @@ generate_messages(DEPENDENCIES actionlib_msgs)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -109,16 +105,10 @@ generate_messages(DEPENDENCIES actionlib_msgs)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS 
-  include
- LIBRARIES 
-  path_planning
- CATKIN_DEPENDS
-  actionlib
-  control_msgs
-  moveit_core
-  roscpp
-  rospy
+  INCLUDE_DIRS include
+  LIBRARIES path_planning
+  CATKIN_DEPENDS roscpp rospy std_msgs
+  DEPENDS system_lib
 )
 
 ###########
@@ -127,38 +117,13 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
+include_directories(include
+  ${catkin_INCLUDE_DIRS}
+)
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/moveit_simple_controller_manager.cpp
-#   src/follow_joint_trajectory_controller_handle.cpp
-# )
-
-# set_target_properties(${PROJECT_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
-# target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
-# add_executable(panda_control_node
-#   src/panda_control_node.cpp
-# )
-
-# add_dependencies(
-#   ${PROJECT_NAME}
-#   ${${PROJECT_NAME}_EXPORTED_TARGETS}
-#   ${catkin_EXPORTED_TARGETS}
-# )
-
-# target_link_libraries(${PROJECT_NAME}
-#   ${Franka_LIBRARIES}
-#   ${catkin_LIBRARIES}
-# )
-
-# target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
-#   ${Franka_INCLUDE_DIRS}
-#   ${catkin_INCLUDE_DIRS}
-# )
-# target_include_directories(${PROJECT_NAME} PUBLIC
-#   include
+# add_library(IK_solver
+#   src/IK_solver.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -169,7 +134,14 @@ include_directories(include)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/path_planning_node.cpp)
+# add_executable(IK_server
+#   src/IK_server.cpp
+#   #src/IK_solver.cpp
+# )
+
+add_executable(IK_solver
+  src/IK_solver.cpp
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -182,25 +154,13 @@ include_directories(include)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+#target_link_libraries(IK_server
+#  ${catkin_LIBRARIES}
+#)
 
 #############
 ## Install ##
 #############
-
-# install(TARGETS ${PROJECT_NAME}
-#         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#         RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
-# 
-# install(FILES panda_controllers_plugin.xml
-#         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-#        )
-# install(DIRECTORY include/${PROJECT_NAME}/
-#        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#        )
 
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html

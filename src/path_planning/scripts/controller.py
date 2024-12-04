@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from sensor_msgs.msg import JointState
 from control_msgs.msg import FollowJointTrajectoryActionGoal, FollowJointTrajectoryActionResult
 from moveit_msgs.msg import ExecuteTrajectoryActionGoal, ExecuteTrajectoryActionResult
+from path_planning.srv import IK
 import Panda_trajectory_planner as planner
 
 
@@ -32,6 +33,17 @@ def CallbackResult(data):
     
     status = data.status.status
     error_log = data.result.error_code
+
+
+
+def IK_client(O_T_EE_array, q7, q_actual_array):
+    rospy.wait_for_service('IK_service')
+    try:
+        IK_solver = rospy.ServiceProxy('IK_service', IK)
+        resp = IK_solver(O_T_EE_array, q7, q_actual_array)
+        return resp
+    except rospy.ServiceException as e:
+        print(f"Service call failed: {e}")
 
 
 
@@ -141,6 +153,18 @@ if __name__ == '__main__':
 
     t = []
     q = []
+
+    
+
+    O_T_EE_array = np.array([1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.2, 0.0, 0.4, 1.0])
+    q7 = 0.1234
+    q_actual_array = np.array([0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397])
+
+    q_array = IK_client(O_T_EE_array, q7, q_actual_array)
+
+    print(q_array)
+
+    quit()
        
     with open("/home/lozer/franka_emika_ws/src/path_planning/data/q_robot.xml", 'r') as traj:
         data = traj.read()

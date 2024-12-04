@@ -53,7 +53,6 @@
     <!-- Spawn required ROS controllers -->
     <rosparam file="$(find franka_gazebo)/config/franka_hw_sim.yaml" subst_value="true" />
     <rosparam file="$(find franka_gazebo)/config/sim_controllers.yaml" subst_value="true" />
-    <rosparam file="$(find path_planning)/config/panda_controllers.yaml" subst_value="true" />
 
     <node pkg="controller_manager"
             type="spawner"
