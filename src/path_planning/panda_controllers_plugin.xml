@@ -1,7 +1,8 @@
-<library path="path_planning">
-  <class name="path_planning/PandaJointPositionController" type="path_planning::PandaJointPositionController" base_class_type="controller_interface::ControllerBase">
+<library path="lib/libpath_planning">
+  <class name="moveit_simple_controller_manager/MoveItSimpleControllerManager"
+         type="moveit_simple_controller_manager::MoveItSimpleControllerManager"
+         base_class_type="moveit_controller_manager::MoveItControllerManager">
     <description>
-      A controller that executes a short motion based on joint positions to demonstrate correct usage
     </description>
   </class>
 </library>

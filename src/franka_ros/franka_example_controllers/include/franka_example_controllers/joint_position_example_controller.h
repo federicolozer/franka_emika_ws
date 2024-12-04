@@ -15,14 +15,14 @@
 namespace franka_example_controllers {
 
 class JointPositionExampleController : public controller_interface::MultiInterfaceController<
-                                           hardware_interface::EffortJointInterface> {
+                                           hardware_interface::PositionJointInterface> {
  public:
   bool init(hardware_interface::RobotHW* robot_hardware, ros::NodeHandle& node_handle) override;
   void starting(const ros::Time&) override;
   void update(const ros::Time&, const ros::Duration& period) override;
 
  private:
-  hardware_interface::EffortJointInterface* position_joint_interface_;
+  hardware_interface::PositionJointInterface* position_joint_interface_;
   std::vector<hardware_interface::JointHandle> position_joint_handles_;
   ros::Duration elapsed_time_;
   std::array<double, 7> initial_pose_{};

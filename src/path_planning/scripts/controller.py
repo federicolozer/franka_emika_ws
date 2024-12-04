@@ -51,16 +51,14 @@ def wait_execution(t_tot):
     
 
 
-def homing(q_last):
+def homing(q_last, ttype):
     global status, error_log, q_reg, q_p_lim
-    import subprocess
-    joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates)    
-    result_subscriber = rospy.Subscriber('/execute_trajectory/result', ExecuteTrajectoryActionResult, CallbackResult)
-    control_publisher = rospy.Publisher('/execute_trajectory/goal', ExecuteTrajectoryActionGoal, queue_size = 10)
+    
+    joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates) 
 
     while q_reg == []:
         pass
-
+    print("q reg = ", q_reg)
     q_diff = deepcopy(q_reg)
     for i in range(len(q_diff)):
         q_diff[i] -= q_last[i]
@@ -69,7 +67,18 @@ def homing(q_last):
     t = [0, max(q_diff)]
     q = [q_reg, q_last]
 
-    msg = planner.build_execute_trajectory(t, q)
+    if ttype == "follow_joint":
+        result_subscriber = rospy.Subscriber('/position_joint_trajectory_controller/follow_joint_trajectory/result', FollowJointTrajectoryActionResult, CallbackResult)
+        control_publisher = rospy.Publisher('/position_joint_trajectory_controller/follow_joint_trajectory/goal', FollowJointTrajectoryActionGoal, queue_size = 10)
+
+        msg = planner.build_follow_joint_trajectory(t, q)
+
+    elif ttype == "execute":
+        result_subscriber = rospy.Subscriber('/execute_trajectory/result', ExecuteTrajectoryActionResult, CallbackResult)
+        control_publisher = rospy.Publisher('/execute_trajectory/goal', ExecuteTrajectoryActionGoal, queue_size = 10)
+
+        msg = planner.build_execute_trajectory(t, q)
+
     control_publisher.publish(msg)
 
     print("Homing\n")
@@ -84,37 +93,24 @@ def homing(q_last):
 
 
 
-def launch_execute_trajectory(t, q):
-    global status, error_log
 
-    joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates)    
-    result_subscriber = rospy.Subscriber('/execute_trajectory/result', ExecuteTrajectoryActionResult, CallbackResult)
-    control_publisher = rospy.Publisher('/execute_trajectory/goal', ExecuteTrajectoryActionGoal, queue_size = 10)
-    
-    msg = planner.build_execute_trajectory(t, q)
-    control_publisher.publish(msg)
-
-    print("Starting trajectory\n")
-    wait_execution(t[-1])
-    
-    if status == 3:
-        print("\nTrajectory executed correctly")
-    else:
-        print(f"\nTrajectory ended with an error:\n{error_log}")
-
-    joint_states_subscriber.unregister()
-    result_subscriber.unregister()
-
-
-
-def launch_follow_joint_trajectory(t, q):
+def launch_trajectory(t, q, ttype):
     global status, error_log
 
     joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates)
-    result_subscriber = rospy.Subscriber('/position_joint_trajectory_controller/follow_joint_trajectory/result', FollowJointTrajectoryActionResult, CallbackResult)
-    control_publisher = rospy.Publisher('/position_joint_trajectory_controller/follow_joint_trajectory/goal', FollowJointTrajectoryActionGoal, queue_size = 10)
+
+    if ttype == "follow_joint":
+        result_subscriber = rospy.Subscriber('/position_joint_trajectory_controller/follow_joint_trajectory/result', FollowJointTrajectoryActionResult, CallbackResult)
+        control_publisher = rospy.Publisher('/position_joint_trajectory_controller/follow_joint_trajectory/goal', FollowJointTrajectoryActionGoal, queue_size = 10)
+
+        msg = planner.build_follow_joint_trajectory(t, q)
+
+    elif ttype == "execute":
+        result_subscriber = rospy.Subscriber('/execute_trajectory/result', ExecuteTrajectoryActionResult, CallbackResult)
+        control_publisher = rospy.Publisher('/execute_trajectory/goal', ExecuteTrajectoryActionGoal, queue_size = 10)
+
+        msg = planner.build_execute_trajectory(t, q)
     
-    msg = planner.build_follow_joint_trajectory(t, q)
     control_publisher.publish(msg)
 
     print("Starting trajectory\n")
@@ -141,6 +137,8 @@ if __name__ == '__main__':
 
     rospy.init_node('controller')
 
+    ttype = "follow_joint"
+
     t = []
     q = []
        
@@ -159,9 +157,9 @@ if __name__ == '__main__':
             q.append(keypoint)
 
     if len(q) > 0:
-        homing(q[0])
+        homing(q[0], ttype)
         if not len(q) == 1:
-            launch_execute_trajectory(t, q)
+            launch_trajectory(t, q, ttype)
 
     
 

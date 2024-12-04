@@ -14,7 +14,7 @@ namespace franka_example_controllers {
 
 bool JointPositionExampleController::init(hardware_interface::RobotHW* robot_hardware,
                                           ros::NodeHandle& node_handle) {
-  position_joint_interface_ = robot_hardware->get<hardware_interface::EffortJointInterface>();
+  position_joint_interface_ = robot_hardware->get<hardware_interface::PositionJointInterface>();
   if (position_joint_interface_ == nullptr) {
     ROS_ERROR(
         "JointPositionExampleController: Error getting position joint interface from hardware!");
@@ -43,8 +43,6 @@ bool JointPositionExampleController::init(hardware_interface::RobotHW* robot_har
   std::array<double, 7> q_start{{0, -M_PI_4, 0, -3 * M_PI_4, 0, M_PI_2, M_PI_4}};
   for (size_t i = 0; i < q_start.size(); i++) {
     if (std::abs(position_joint_handles_[i].getPosition() - q_start[i]) > 0.1) {
-      std::cout << "#################### giunto " << i << " = " << position_joint_handles_[i].getPosition() << std::endl;
-      std::cout << "#################### diff " << " = " << position_joint_handles_[i].getPosition() - q_start[i] << std::endl;
       ROS_ERROR_STREAM(
           "JointPositionExampleController: Robot is not in the expected starting position for "
           "running this example. Run `roslaunch franka_example_controllers move_to_start.launch "
