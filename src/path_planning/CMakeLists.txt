@@ -139,9 +139,9 @@ add_executable(IK_server
   src/IK_solver.cpp
 )
 
-# add_executable(IK_solver
-#   src/IK_solver.cpp
-# )
+add_executable(optimizer
+  src/optimizer.cpp
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
