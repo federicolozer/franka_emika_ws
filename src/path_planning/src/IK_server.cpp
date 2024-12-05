@@ -6,16 +6,24 @@
 
 
 bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &res){
-    boost::array<float, 16> O_T_EE_array = req.O_T_EE_array;
-    Eigen::Map< Eigen::Matrix<float, 4, 4> > O_T_EE(O_T_EE_array.data());
-    float q7 = req.q7;
-    boost::array<float, 7> q_actual_array = req.q_actual_array;
+    boost::array<double, 16> O_T_EE_array;
+    for (int i=0; i<sizeof(req.O_T_EE_array)/sizeof(req.O_T_EE_array[0]); i++){
+        O_T_EE_array[i] = static_cast<double>(req.O_T_EE_array[i]);
+    }
+    Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE(O_T_EE_array.data());
 
-    std::cout << O_T_EE << std::endl;
+    double q7 = static_cast<double>(req.q7);
 
-    //boost::array<float, 7> q_array = franka_IK(O_T_EE, q7, q_actual_array);
+    boost::array<double, 7> q_actual_array;
+    for (int i=0; i<sizeof(req.q_actual_array)/sizeof(req.q_actual_array[0]); i++){
+        q_actual_array[i] = static_cast<double>(req.q_actual_array[i]);
+    }
 
-    //res.q_array = q_array;
+    //std::cout << O_T_EE << std::endl;
+
+    boost::array<double, 7> q_array = franka_IK(O_T_EE, q7, q_actual_array);
+
+    res.q_array = q_array;
     return true;
 }
 

@@ -156,34 +156,42 @@ if __name__ == '__main__':
 
     
 
-    O_T_EE_array = np.array([1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.2, 0.0, 0.4, 1.0])
-    q7 = 0.1234
+    O_T_EE_array = np.array([1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.3, 0.0, 0.4, 1.0])
+    q7 = 0.785398163397
     q_actual_array = np.array([0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397])
 
-    q_array = IK_client(O_T_EE_array, q7, q_actual_array)
 
-    print(q_array)
+    while True:
+        t = []
+        q = []
 
-    quit()
-       
-    with open("/home/lozer/franka_emika_ws/src/path_planning/data/q_robot.xml", 'r') as traj:
-        data = traj.read()
-        traj_data = BeautifulSoup(data, features="xml")
-        traj_list = traj_data.find_all('point')        
+        q7 = float(input("\nEnter q7 value: "))
 
-        for point in traj_list:
-            t.append(float(point.get('time')))
+        res = IK_client(O_T_EE_array, q7, q_actual_array)
 
-            keypoint = []
-            for jnt in point.text.split():
-                keypoint.append(float(jnt))
-            
-            q.append(keypoint)
+        t.append(1)
+        q.append(list(res.q_array))
 
-    if len(q) > 0:
-        homing(q[0], ttype)
-        if not len(q) == 1:
-            launch_trajectory(t, q, ttype)
+        print("q = ", q)
+        
+        """with open("/home/lozer/franka_emika_ws/src/path_planning/data/q_robot.xml", 'r') as traj:
+            data = traj.read()
+            traj_data = BeautifulSoup(data, features="xml")
+            traj_list = traj_data.find_all('point')        
+
+            for point in traj_list:
+                t.append(float(point.get('time')))
+
+                keypoint = []
+                for jnt in point.text.split():
+                    keypoint.append(float(jnt))
+                
+                q.append(keypoint)"""
+
+        if len(q) > 0:
+            homing(q[0], ttype)
+            if not len(q) == 1:
+                launch_trajectory(t, q, ttype)
 
     
 

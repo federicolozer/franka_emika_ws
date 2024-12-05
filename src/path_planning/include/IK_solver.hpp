@@ -15,6 +15,6 @@ void error();
 
 void error(int n, double val);
 
-boost::array<float, 7> franka_IK(Eigen::Map< Eigen::Matrix<float, 4, 4> > O_T_EE, float q7, boost::array<float, 7> q_actual_array);
+boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE, double q7, boost::array<double, 7> q_actual_array);
 
 #endif
