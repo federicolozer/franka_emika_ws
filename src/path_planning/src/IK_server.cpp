@@ -19,7 +19,7 @@ bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &r
         q_actual_array[i] = static_cast<double>(req.q_actual_array[i]);
     }
 
-    //std::cout << O_T_EE << std::endl;
+    std::cout << O_T_EE << std::endl;
 
     boost::array<double, 7> q_array = franka_IK(O_T_EE, q7, q_actual_array);
 

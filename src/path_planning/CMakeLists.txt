@@ -136,7 +136,6 @@ include_directories(include
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(IK_server
   src/IK_server.cpp
-  src/IK_solver.cpp
 )
 
 add_executable(optimizer
