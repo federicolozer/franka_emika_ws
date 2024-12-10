@@ -19,6 +19,6 @@
   <depend>roscpp</depend>
   <depend>rospy</depend>
   <depend>std_msgs</depend>
-  <depend>franka_gazebo</depend>
+  <!-- <depend>franka_gazebo</depend> -->
 
 </package>

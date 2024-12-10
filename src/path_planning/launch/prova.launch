@@ -1,9 +1,24 @@
 <?xml version="1.0" ?>
 
 <launch>
+    <arg name="robot_ip" default="172.16.0.2" />
+    <arg name="arm_id" default="panda" />
+    <arg name="load_gripper" default="false" />
+    <arg name="rviz" default="false"/>
+    <arg name="gazebo" default="true"/>
+    <arg name="debug" default="false" />
+    <arg name="world" default="worlds/empty.world" />
+    <arg name="controller" default="position_joint_trajectory_controller" />
    
-    <node name="client" pkg="path_planning" type="controller.py" output="screen" />
+    <param name="robot_description"
+            command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+                    gazebo:=true
+                    hand:=$(arg load_gripper)
+                    arm_id:=$(arg arm_id)
+                    xyz:='0 0 0'
+                    rpy:='0 0 0'">
+    </param> 
 
-    <node name="server" pkg="path_planning" type="IK_server" output="screen" />
+    <node name="FK_node" pkg="path_planning" type="fk_test" output="screen" />
 
 </launch>

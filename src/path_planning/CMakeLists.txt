@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  franka_gazebo
 )
 
 find_package(Eigen3 REQUIRED)
@@ -108,7 +109,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES path_planning
   CATKIN_DEPENDS roscpp rospy std_msgs
-  DEPENDS system_lib
+  DEPENDS #system_lib
 )
 
 ###########
@@ -156,6 +157,21 @@ add_executable(optimizer
 target_link_libraries(IK_server
   ${catkin_LIBRARIES}
 )
+
+
+
+add_executable(fk_test
+  src/fk_test.cpp
+)
+
+target_link_libraries(fk_test
+  ${catkin_LIBRARIES}
+)
+
+
+
+
+
 
 #############
 ## Install ##

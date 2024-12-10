@@ -3,6 +3,8 @@
 #include "path_planning/IK.h"
 #include <eigen3/Eigen/Dense>
 
+//#include <franka_gazebo/model_kdl.h>
+
 
 
 bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &res){

@@ -1,0 +1,5 @@
+franka_ros/franka_description
+/home/lozer/franka_emika_ws/devel/.private/franka_description/cmake.lock /home/lozer/franka_emika_ws/devel/./cmake.lock
+/home/lozer/franka_emika_ws/devel/.private/franka_description/share/franka_description/cmake/franka_descriptionConfig-version.cmake /home/lozer/franka_emika_ws/devel/share/franka_description/cmake/franka_descriptionConfig-version.cmake
+/home/lozer/franka_emika_ws/devel/.private/franka_description/share/franka_description/cmake/franka_descriptionConfig.cmake /home/lozer/franka_emika_ws/devel/share/franka_description/cmake/franka_descriptionConfig.cmake
+/home/lozer/franka_emika_ws/devel/.private/franka_description/lib/pkgconfig/franka_description.pc /home/lozer/franka_emika_ws/devel/lib/pkgconfig/franka_description.pc

@@ -1,0 +1,2 @@
+franka_ros/franka_ros
+/home/lozer/franka_emika_ws/devel/.private/franka_ros/cmake.lock /home/lozer/franka_emika_ws/devel/./cmake.lock
