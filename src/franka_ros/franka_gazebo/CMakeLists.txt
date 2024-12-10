@@ -124,13 +124,6 @@ if(CATKIN_ENABLE_TESTING)
   add_subdirectory(test)
 endif()
 
-target_include_directories(fk_test SYSTEM PUBLIC
-  ${Franka_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
-  ${orocos_kdl_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS}
-  )
-
 ## Install
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}

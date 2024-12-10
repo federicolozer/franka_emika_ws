@@ -19,6 +19,7 @@
 const double d1 = 0.3330;
 const double d3 = 0.3160;
 const double d5 = 0.3840;
+const double d7 = 0.107;
 const double d7e = 0.2104;
 const double a4 = 0.0825;
 const double a7 = 0.0880;
@@ -117,7 +118,8 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
     Eigen::Matrix3d R_EE = O_T_EE.topLeftCorner<3, 3>();
     Eigen::Vector3d z_EE = O_T_EE.block<3, 1>(0, 2);
     Eigen::Vector3d p_EE = O_T_EE.block<3, 1>(0, 3);
-    Eigen::Vector3d p_7 = p_EE - d7e * z_EE;
+    //Eigen::Vector3d p_7 = p_EE - d7e * z_EE;   if there is also the gripper
+    Eigen::Vector3d p_7 = p_EE - d7 * z_EE;
 
     Eigen::Vector3d x_EE_6;
     //x_EE_6 << std::cos(q7 - M_PI_4), -std::sin(q7 - M_PI_4), 0.0;  to remove pi/4 offset between EE and q7
@@ -136,14 +138,14 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
 
     if (L24 + L46 < L26 || L24 + L26 < L46 || L26 + L46 < L24) {
         std::cout << "Error: geometrical inconsistency." << std::endl;
-        return q_NAN;
+        //return q_NAN;
     }
 
     double theta246 = std::acos((LL24 + LL46 - LL26) / 2.0 / L24 / L46);
     q[3] = theta246 + thetaH46 + theta342 - 2.0 * M_PI;
     if (q[3] <= q_min[3] || q[3] >= q_max[3]) {
         error(3, q[3]);
-        return q_NAN;
+        //return q_NAN;
     }
 
     // IK: compute q6
@@ -174,7 +176,7 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
 
     if (q[5] <= q_min[5] || q[5] >= q_max[5]) {
         error(5, q[5]);
-        return q_NAN;
+        //return q_NAN;
     }
 
     // IK: compute q1 & q2
@@ -200,22 +202,35 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
         q[1] = std::acos(V2P[2] / L2P);
         if (is_case1_1)
         {
-            if (q[0] < 0.0)
+            std::cout << "=============== q[0] = " << q[0] << std::endl;
+            std::cout << "=============== q[1] = " << q[1] << std::endl;
+            //if (q[0] < 0.0)
+            //    q[0] += M_PI;
+            //else
+            //    q[0] -= M_PI;
+            //q[1] = -q[1];
+
+            if (q[0] < -0.2443){
                 q[0] += M_PI;
-            else
+                q[1] = -q[1];
+            }
+            else if (q[0] > 0.2443){
                 q[0] -= M_PI;
-            q[1] = -q[1];
+                q[1] = -q[1];
+            }
+            std::cout << "=============== q[0] then = " << q[0] << std::endl;
+            std::cout << "=============== q[1] then = " << q[1] << std::endl;
         }
     }
 
     if (q[0] <= q_min[0] || q[0] >= q_max[0]) {
         error(0, q[0]);
-        return q_NAN;
+        //return q_NAN;
     }
 
     if (q[1] <= q_min[1] || q[1] >= q_max[1]) {
         error(1, q[1]);
-        return q_NAN;
+        //return q_NAN;
     }
 
     // IK: compute q3
@@ -241,7 +256,7 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
 
     if (q[2] <= q_min[2] || q[2] >= q_max[2]) {
         error(2, q[2]);
-        return q_NAN;
+        //return q_NAN;
     }
 
     // IK: compute q5
@@ -258,7 +273,7 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
     q[4] = -std::atan2(V_5_H4[1], V_5_H4[0]);
     if (q[4] <= q_min[4] || q[4] >= q_max[4]) {
         error(4, q[4]);
-        return q_NAN;
+        //return q_NAN;
     }
 
     std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();

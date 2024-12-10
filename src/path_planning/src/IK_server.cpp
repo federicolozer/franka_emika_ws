@@ -2,8 +2,7 @@
 #include "ros/ros.h"
 #include "path_planning/IK.h"
 #include <eigen3/Eigen/Dense>
-
-//#include <franka_gazebo/model_kdl.h>
+#include <franka_gazebo/model_kdl.h>
 
 
 
@@ -21,9 +20,38 @@ bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &r
         q_actual_array[i] = static_cast<double>(req.q_actual_array[i]);
     }
 
+    boost::array<double, 7> q_array = franka_IK(O_T_EE, q7, q_actual_array);
+
+    
+
+
+    //----------------------------------------------------------------------------
+
+    std::cout << "Initial EE pose:" << std::endl;
     std::cout << O_T_EE << std::endl;
 
-    boost::array<double, 7> q_array = franka_IK(O_T_EE, q7, q_actual_array);
+    std::array<double, 16> identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    urdf::Model robot;
+    robot.initParam("robot_description");
+    franka_gazebo::ModelKDL model = franka_gazebo::ModelKDL(robot, "panda_link0", "panda_link8");
+
+    std::cout << "q_array_new:" << std::endl;
+    std::array<double, 7> q_array_new;
+    for (int i=0; i<sizeof(q_array)/sizeof(q_array[0]); i++){
+        q_array_new[i] = q_array[i];
+    }
+
+    std::array<double, 16> O_T_EE_array_new = model.pose(franka::Frame::kFlange, q_array_new, identity, identity);
+
+    Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE_new(O_T_EE_array_new.data());
+
+    std::cout << "Final EE pose:" << std::endl;
+    std::cout << O_T_EE_new << std::endl;
+
+    //----------------------------------------------------------------------------
+
+
+
 
     res.q_array = q_array;
     return true;

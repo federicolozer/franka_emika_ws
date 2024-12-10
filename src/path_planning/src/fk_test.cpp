@@ -3,7 +3,7 @@
 #include <Eigen/Dense>
 #include <string>
 #include <ros/ros.h>
-
+#include <chrono>
 
 
 
@@ -18,20 +18,6 @@
 
 
 /*
-class FkFixture : public ::testing::Test {
- protected:
-  std::unique_ptr<franka_gazebo::ModelKDL> model;
-  std::array<double, 16> identity;
-
-  virtual void SetUp() {
-    identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-    urdf::Model robot;
-    robot.initParam("robot_description");
-    model = std::make_unique<franka_gazebo::ModelKDL>(robot, "panda_link0", "panda_link8");
-  }
-
-  virtual void TearDown() {}
-};
 
 
 
@@ -203,18 +189,6 @@ void run_tests(){
 
 
 
-void print_mat(Eigen::Matrix4d expected, Eigen::Matrix4d actual){
-  std::cout << "Expected frame:" << std::endl;
-  std::cout << expected << std::endl << std::endl;
-  std::cout << "Actual frame:" << std::endl;
-  std::cout << actual << std::endl << std::endl;
-}
-
-
-
-
-
-
 
 
 
@@ -225,37 +199,36 @@ void print_mat(Eigen::Matrix4d expected, Eigen::Matrix4d actual){
 int main(int argc, char** argv) {
   ros::init(argc, argv, "fk_test");
   ros::NodeHandle nh;
-
-  //std::unique_ptr<franka_gazebo::ModelKDL> model;
-  //franka_gazebo::ModelKDL model;
   
-  std::array<double, 16> identity;
-
-  identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+  std::array<double, 7> q = {0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397};
+  std::array<double, 16> identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
   urdf::Model robot;
   robot.initParam("robot_description");
   //model = std::make_unique<franka_gazebo::ModelKDL>(robot, "panda_link0", "panda_link8");
   franka_gazebo::ModelKDL model = franka_gazebo::ModelKDL(robot, "panda_link0", "panda_link8");
 
-  std::array<double, 7> q = {0, 0, 0, 0, 0, 0, 0};
-  std::array<double, 16> pose = model.pose(franka::Frame::kJoint7, q, identity, identity);
-
-  Eigen::Matrix4d actual(Eigen::Matrix4d(pose.data()));
 
 
+  std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
+  std::array<double, 16> pose_J4 = model.pose(franka::Frame::kJoint4, q, identity, identity);
+  std::array<double, 16> pose_J6 = model.pose(franka::Frame::kJoint6, q, identity, identity);
+  std::array<double, 16> pose_EE = model.pose(franka::Frame::kFlange, q, identity, identity);
 
-  Eigen::Matrix4d expected;
-  expected <<
-      1,    0,    0,   0.088,
-      0,   -1,    0,       0,
-      0,    0,   -1,   1.033,
-      0,    0,    0,       1;
-
+  std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
+  std::chrono::duration<double> t_elaps = t_end - t_start;
+  std::cout << "Elapsed time for computation: " << t_elaps.count() << "s" << std::endl;
 
   
+  Eigen::Matrix4d aframe(Eigen::Matrix4d(pose_EE.data()));
+
+  std::cout << "Actual frame:" << std::endl;
+  std::cout << aframe << std::endl << std::endl;
+  
+  
+  
+  
+  
+ 
 
 
-  print_mat(expected, actual);
-
-  //return run_tests();
 }
