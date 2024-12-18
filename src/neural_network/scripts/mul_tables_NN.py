@@ -74,30 +74,14 @@ def evaluation():
     # Testing the Model
     model.eval()  # Set the model to evaluation mode
     with torch.no_grad():  # Disable gradient calculation
-        test_data = torch.tensor([[4.0, 2.0], [3.0, 3.0], [5.0, 3.0], [7.0, 7.0]])
+        test_data = torch.tensor([[4.0, 8.0], [6.0, 7.0], [5.0, 3.0], [7.0, 9.0]])
         predictions = model(test_data)  # Get predictions
 
         print()
         print("------------------")
-        print(f'Predictions:\n{predictions}')
+        print(f'Predictions:\n{torch.round(predictions)}')
         print("------------------")
-        print(f'Correct output:\n{torch.tensor([[8.0], [9.0], [15.0], [49.0]])}')
-
-
-
-def evaluation_new():
-    # Testing the Model
-    model.eval()  # Set the model to evaluation mode
-    with torch.no_grad():  # Disable gradient calculation
-        test_data = torch.tensor([[14.0, 2.0], [30.0, 4.0], [1.0, 0.0], [11.0, 11.0]])
-        predictions = model(test_data)  # Get predictions
-
-        print()
-        print("------------------")
-        print(f'Predictions:\n{predictions}')
-        print("------------------")
-        print(f'Correct output:\n{torch.tensor([[28.0], [120.0], [0.0], [121.0]])}')
-
+        print(f'Correct output:\n{test_data[:, 0]*test_data[:, 1]}')
 
 
 
@@ -123,4 +107,4 @@ if __name__ == "__main__":
     else:
         model.load_state_dict(torch.load("../data/mul_tables_NN_model.pth", weights_only=True))
 
-        evaluation_new()
+        evaluation()

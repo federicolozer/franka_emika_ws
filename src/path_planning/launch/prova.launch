@@ -10,14 +10,14 @@
     <arg name="world" default="worlds/empty.world" />
     <arg name="controller" default="position_joint_trajectory_controller" />
    
-    <!-- <param name="robot_description"
+    <param name="robot_description"
             command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
                     gazebo:=true
                     hand:=$(arg load_gripper)
                     arm_id:=$(arg arm_id)
                     xyz:='0 0 0'
                     rpy:='0 0 0'">
-    </param> -->
+    </param>
 
     <node name="FK_node" pkg="path_planning" type="fk_test" output="screen" />
 

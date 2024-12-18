@@ -9,7 +9,7 @@
 #include <eigen3/Eigen/Dense>
 #include <array>
 #include <cmath>
-#include <math.h>
+//#include <math.h>
 #include <iostream>
 #include <chrono>
 
@@ -33,8 +33,8 @@ const double thetaH46 = 1.35916951803;
 const double theta342 = 1.31542071191; 
 const double theta46H = 0.211626808766;
 
-const std::array<double, 7> q_min = { {-2.8973, -1.7628, -2.8973, -3.0718, -2.8973, -0.0175, -2.8973} };
-const std::array<double, 7> q_max = { {2.8973, 1.7628, 2.8973, -0.0698, 2.8973, 3.7525, 2.8973} };
+const std::array<double, 7> q_min = {{-2.8973, -1.7628, -2.8973, -3.0718, -2.8973, -0.0175, -2.8973}};
+const std::array<double, 7> q_max = {{2.8973, 1.7628, 2.8973, -0.0698, 2.8973, 3.7525, 2.8973}};
 
 
 
@@ -52,7 +52,7 @@ void error(int n, double val) {
 boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE, double q7, boost::array<double, 7> q_actual_array) {
     std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
 
-    const boost::array<double, 7> q_NAN = { {NAN, NAN, NAN, NAN, NAN, NAN, NAN} };
+    const boost::array<double, 7> q_NAN = {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}};
     boost::array<double, 7> q;
 
     // return NAN if input q7 is out of range
@@ -164,15 +164,19 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
     double Phi6 = std::atan2(V_6_62[1], V_6_62[0]);
     double Theta6 = std::asin(D26 / std::sqrt(V_6_62[0] * V_6_62[0] + V_6_62[1] * V_6_62[1]));
 
-    if (is_case6_0)
+    if (is_case6_0) {
         q[5] = M_PI - Theta6 - Phi6;
-    else
+    }
+    else {
         q[5] = Theta6 - Phi6;
+    }
 
-    if (q[5] <= q_min[5])
+    if (q[5] <= q_min[5]) {
         q[5] += 2.0 * M_PI;
-    else if (q[5] >= q_max[5])
+    }
+    else if (q[5] >= q_max[5]) {
         q[5] -= 2.0 * M_PI;
+    }
 
     if (q[5] <= q_min[5] || q[5] >= q_max[5]) {
         error(5, q[5]);
@@ -191,25 +195,14 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
 
     double L2P = V2P.norm();
 
-    if (std::fabs(V2P[2] / L2P) > 0.999)
-    {
+    if (std::fabs(V2P[2] / L2P) > 0.999) {
         q[0] = q_actual_array[0];
         q[1] = 0.0;
     }
-    else
-    {
+    else {
         q[0] = std::atan2(V2P[1], V2P[0]);
         q[1] = std::acos(V2P[2] / L2P);
-        if (is_case1_1)
-        {
-            std::cout << "=============== q[0] = " << q[0] << std::endl;
-            std::cout << "=============== q[1] = " << q[1] << std::endl;
-            //if (q[0] < 0.0)
-            //    q[0] += M_PI;
-            //else
-            //    q[0] -= M_PI;
-            //q[1] = -q[1];
-
+        if (is_case1_1) {
             if (q[0] < -0.2443){
                 q[0] += M_PI;
                 q[1] = -q[1];
@@ -218,8 +211,6 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
                 q[0] -= M_PI;
                 q[1] = -q[1];
             }
-            std::cout << "=============== q[0] then = " << q[0] << std::endl;
-            std::cout << "=============== q[1] then = " << q[1] << std::endl;
         }
     }
 
