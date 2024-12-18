@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(path_planning)
+project(neural_network)
 
 
 
@@ -8,16 +8,9 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
-  franka_gazebo
 )
 
 find_package(Eigen3 REQUIRED)
-
-## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  IK.srv
-)
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
@@ -32,7 +25,6 @@ catkin_package(
     roscpp 
     rospy 
     std_msgs
-    franka_gazebo
   DEPENDS #system_lib
 )
 
@@ -46,24 +38,6 @@ include_directories(include
   ${catkin_INCLUDE_DIRS}
 )
 
-# IK server
-add_executable(IK_server
-  src/IK_server.cpp
-)
-
-target_link_libraries(IK_server
-  ${catkin_LIBRARIES}
-)
-
-# fk test
-add_executable(fk_test
-  src/fk_test.cpp
-)
-
-target_link_libraries(fk_test
-  ${catkin_LIBRARIES}
-)
-
 
 
 #############
@@ -71,7 +45,7 @@ target_link_libraries(fk_test
 #############
 
 catkin_install_python(PROGRAMS
-  scripts/controller.py
-  scripts/Panda_trajectory_planner.py
+  scripts/mul_tables_NN.py
+  scripts/robot_pose_NN.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

@@ -170,8 +170,13 @@ if __name__ == '__main__':
         q_actual_array = np.array([0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397])
         #q_actual_array = np.array([0.5157262388785411,  1.2140897359597562,  1.5346381355065786, -3.0398301021734246, -1.2930720893855998, 1.332867311125138, -1.5554459725458225])
 
+        x = float(input("\nEnter x value: "))
+        O_T_EE_array[12] = x
+        y = float(input("\nEnter y value: "))
+        O_T_EE_array[13] = y
         z = float(input("\nEnter z value: "))
         O_T_EE_array[14] = z
+        q7 = float(input("\nEnter q7 value: "))
 
         res = IK_client(O_T_EE_array, q7, q_actual_array)
 

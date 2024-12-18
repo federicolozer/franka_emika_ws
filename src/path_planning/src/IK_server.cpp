@@ -5,6 +5,9 @@
 #include <franka_gazebo/model_kdl.h>
 
 
+Eigen::IOFormat MatFmt(1, 0, ", ", ";\n", "[", "]", "[", "]");
+
+
 
 bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &res){
     boost::array<double, 16> O_T_EE_array;
@@ -27,8 +30,8 @@ bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &r
 
     //----------------------------------------------------------------------------
 
-    std::cout << "Initial EE pose:" << std::endl;
-    std::cout << O_T_EE << std::endl;
+    std::cout << std::endl << "Initial EE pose:" << std::endl;
+    std::cout << std::fixed << std::setprecision(1) << O_T_EE.format(MatFmt) << std::endl << std::endl;
 
     std::array<double, 16> identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
     urdf::Model robot;
@@ -45,8 +48,8 @@ bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &r
 
     Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE_new(O_T_EE_array_new.data());
 
-    std::cout << "Final EE pose:" << std::endl;
-    std::cout << O_T_EE_new << std::endl;
+    std::cout << std::endl << "Final EE pose:" << std::endl;
+    std::cout << std::fixed << std::setprecision(1) << O_T_EE_new.format(MatFmt) << std::endl << std::endl;
 
     //----------------------------------------------------------------------------
 
@@ -62,6 +65,9 @@ bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &r
 int main(int argc, char **argv){
     ros::init(argc, argv, "IK_server");
     ros::NodeHandle n;
+
+    std::fixed;
+    std::setprecision(2);
 
     ros::ServiceServer service = n.advertiseService("IK_service", CallbackIK);
     ROS_INFO("Calculating inverse kinematics.. ");

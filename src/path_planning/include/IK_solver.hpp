@@ -138,14 +138,14 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
 
     if (L24 + L46 < L26 || L24 + L26 < L46 || L26 + L46 < L24) {
         std::cout << "Error: geometrical inconsistency." << std::endl;
-        //return q_NAN;
+        return q_NAN;
     }
 
     double theta246 = std::acos((LL24 + LL46 - LL26) / 2.0 / L24 / L46);
     q[3] = theta246 + thetaH46 + theta342 - 2.0 * M_PI;
     if (q[3] <= q_min[3] || q[3] >= q_max[3]) {
         error(3, q[3]);
-        //return q_NAN;
+        return q_NAN;
     }
 
     // IK: compute q6
@@ -176,7 +176,7 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
 
     if (q[5] <= q_min[5] || q[5] >= q_max[5]) {
         error(5, q[5]);
-        //return q_NAN;
+        return q_NAN;
     }
 
     // IK: compute q1 & q2
@@ -225,12 +225,12 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
 
     if (q[0] <= q_min[0] || q[0] >= q_max[0]) {
         error(0, q[0]);
-        //return q_NAN;
+        return q_NAN;
     }
 
     if (q[1] <= q_min[1] || q[1] >= q_max[1]) {
         error(1, q[1]);
-        //return q_NAN;
+        return q_NAN;
     }
 
     // IK: compute q3
@@ -256,7 +256,7 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
 
     if (q[2] <= q_min[2] || q[2] >= q_max[2]) {
         error(2, q[2]);
-        //return q_NAN;
+        return q_NAN;
     }
 
     // IK: compute q5
@@ -273,7 +273,7 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
     q[4] = -std::atan2(V_5_H4[1], V_5_H4[0]);
     if (q[4] <= q_min[4] || q[4] >= q_max[4]) {
         error(4, q[4]);
-        //return q_NAN;
+        return q_NAN;
     }
 
     std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
