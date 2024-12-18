@@ -18,11 +18,11 @@ int main(int argc, char** argv) {
 
     std::ofstream output;
     output.open("/home/lozer/franka_emika_ws/src/neural_network/data/poses.csv");
-    output << "x,y,z,Rx,Ry,Rz\n";
+    output << "x,y,z,Rx,Ry,Rz,q7\n";
 
     std::array<double, 7> q = {0, 0, 0, 0, 0, 0, 0};
 
-    for (int i=0; i<100; i++){
+    for (int i=0; i<110; i++){
         for (int i=1; i<7; i++){
             int diff = round((q_max[i] - q_min[i])*100);
             q[i] +=  q_min[i] + static_cast<float>(rand() % diff)/100;
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
         float Ry = euler[1];
         float Rz = euler[2]; 
 
-        output << x << "," << y << "," << z << "," << Rx << "," << Ry << "," << Rz << "\n"; 
+        output << x << "," << y << "," << z << "," << Rx << "," << Ry << "," << Rz << "," << q[6] << "\n"; 
     }
 
     output.close();
