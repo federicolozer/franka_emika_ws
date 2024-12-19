@@ -19,6 +19,6 @@
                     rpy:='0 0 0'">
     </param>
 
-    <node name="FK_node" pkg="path_planning" type="fk_test" output="screen" />
+    <node name="FK_node" pkg="path_planning" type="FK_generator" output="screen" />
 
 </launch>

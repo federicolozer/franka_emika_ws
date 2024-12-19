@@ -56,11 +56,11 @@ target_link_libraries(IK_server
 )
 
 # fk test
-add_executable(fk_test
-  src/fk_test.cpp
+add_executable(FK_generator
+  src/FK_generator.cpp
 )
 
-target_link_libraries(fk_test
+target_link_libraries(FK_generator
   ${catkin_LIBRARIES}
 )
 

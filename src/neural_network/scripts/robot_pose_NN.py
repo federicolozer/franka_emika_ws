@@ -30,7 +30,7 @@ class NN(nn.Module):
 class cDataSet(Dataset): 
     def __init__(self): 
         data = np.loadtxt('/home/lozer/franka_emika_ws/src/neural_network/data/poses.csv', delimiter=',', 
-                           dtype=np.float32, skiprows=2) 
+                           dtype=np.float32, skiprows=1) 
         
         self.inputs = torch.from_numpy(data[:, 0:6]) 
         self.outputs = torch.from_numpy(data[:, [6]]) 
@@ -48,15 +48,15 @@ class cDataSet(Dataset):
 def training(n_epoch, dataloader):
     for epoch in range(n_epoch):
         model.train()
-        for X_train, y_train in dataloader: 
-            outputs = model(X_train)
-            loss = criterion(outputs, y_train)
+        for IN_train, OUT_train in dataloader: 
+            outputs = model(IN_train)
+            loss = criterion(outputs, OUT_train)
             
             optimizer.zero_grad()
             grad = loss.backward()
             optimizer.step()
 
-        if loss.item() <= 0.01:
+        if loss.item() <= 0.0001:
             break
 
         if (epoch + 1) % 100 == 0:
@@ -64,17 +64,21 @@ def training(n_epoch, dataloader):
 
 
 
-def evaluation():
+def evaluation(dataloader, print_out=False):
     model.eval()
     with torch.no_grad():
-        test_data = torch.tensor([[4.0, 2.0], [3.0, 3.0], [5.0, 3.0], [7.0, 7.0]])
-        predictions = model(test_data)
+        for IN_train, OUT_train in dataloader: 
+            outputs = model(IN_train)
+            loss = criterion(outputs, OUT_train)
 
-        print()
-        print("------------------")
-        print(f'Predictions:\n{predictions}')
-        print("------------------")
-        print(f'Correct output:\n{torch.tensor([[8.0], [9.0], [15.0], [49.0]])}')
+            if print_out == True:
+                print(IN_train)
+
+            print()
+            print("------------------")
+            print(f'Predictions:\n{torch.transpose(outputs, 0, 1)}')
+            print("------------------")
+            print(f'Ground truth:\n{torch.transpose(OUT_train, 0, 1)}')
 
 
 
@@ -84,21 +88,29 @@ if __name__ == "__main__":
     model = NN()
 
     dataset = cDataSet() 
-    train_data, eval_data = random_split(dataset, [100, 10])
-    dataloader = DataLoader(dataset=train_data, batch_size=100, shuffle=True) 
+    train_data, eval_data, test_data = random_split(dataset, [100, 10, 1])
+    train_dataloader = DataLoader(dataset=train_data, batch_size=20, shuffle=True) 
+    eval_dataloader = DataLoader(dataset=eval_data, batch_size=10, shuffle=True) 
+    test_dataloader = DataLoader(dataset=test_data, batch_size=1, shuffle=True) 
 
     criterion = nn.MSELoss(reduction = 'mean')
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    train = int(sys.argv[1])
-    if train == 1:
+    train = sys.argv[1]
+    if train == "train":
         n_epoch = 10000
-        training(n_epoch, dataloader)
+        training(n_epoch, train_dataloader)
 
         torch.save(model.state_dict(), "/home/lozer/franka_emika_ws/src/neural_network/data/robot_pose_NN_model.pth")
 
-        evaluation()
-    else:
+        evaluation(eval_dataloader)
+
+    elif train == "eval":
+        model.load_state_dict(torch.load("/home/lozer/franka_emika_ws/src/neural_network/data/robot_pose_NN_model.pth", weights_only=False))
+
+        evaluation(eval_dataloader)
+    
+    elif train == "test":
         model.load_state_dict(torch.load("/home/lozer/franka_emika_ws/src/neural_network/data/robot_pose_NN_model.pth", weights_only=True))
 
-        evaluation_new()
+        evaluation(test_dataloader, print_out=True)

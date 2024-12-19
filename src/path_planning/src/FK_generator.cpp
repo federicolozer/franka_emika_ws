@@ -13,7 +13,7 @@ const std::array<double, 7> q_max = {{2.8973, 1.7628, 2.8973, -0.0698, 2.8973, 3
 
 
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "IK_server");
+    ros::init(argc, argv, "FK_generator");
     ros::NodeHandle n;
 
     std::ofstream output;
@@ -22,10 +22,11 @@ int main(int argc, char** argv) {
 
     std::array<double, 7> q = {0, 0, 0, 0, 0, 0, 0};
 
-    for (int i=0; i<110; i++){
-        for (int i=1; i<7; i++){
+    for (int n=0; n<111; n++) {
+        for (int i=1; i<7; i++) {
             int diff = round((q_max[i] - q_min[i])*100);
-            q[i] +=  q_min[i] + static_cast<float>(rand() % diff)/100;
+
+            q[i] =  q_min[i] + static_cast<float>(rand() % diff)/100;
         }
 
         std::array<double, 16> identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
