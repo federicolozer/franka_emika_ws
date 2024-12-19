@@ -64,9 +64,6 @@ bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &r
 
 int main(int argc, char **argv) {
     boost::array<double, 16> O_T_EE_array;
-    for (int i=0; i<sizeof(req.O_T_EE_array)/sizeof(req.O_T_EE_array[0]); i++){
-        O_T_EE_array[i] = static_cast<double>(req.O_T_EE_array[i]);
-    }
     Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE(O_T_EE_array.data());
 
     double q7 = static_cast<double>(req.q7);
