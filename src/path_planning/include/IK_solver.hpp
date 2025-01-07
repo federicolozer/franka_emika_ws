@@ -9,7 +9,6 @@
 #include <eigen3/Eigen/Dense>
 #include <array>
 #include <cmath>
-//#include <math.h>
 #include <iostream>
 #include <chrono>
 

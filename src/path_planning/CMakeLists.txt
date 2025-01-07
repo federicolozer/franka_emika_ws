@@ -64,6 +64,15 @@ target_link_libraries(FK_generator
   ${catkin_LIBRARIES}
 )
 
+# quater test
+add_executable(quater_tester
+  src/quater_tester.cpp
+)
+
+target_link_libraries(quater_tester
+  ${catkin_LIBRARIES}
+)
+
 
 
 #############
