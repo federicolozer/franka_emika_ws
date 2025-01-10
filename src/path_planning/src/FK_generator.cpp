@@ -18,11 +18,11 @@ int main(int argc, char** argv) {
 
     std::ofstream output;
     output.open("/home/lozer/franka_emika_ws/src/neural_network/data/poses.csv");
-    output << "x,y,z,Rx,Ry,Rz,q7\n";
+    output << "x,y,z,q0,q1,q2,q3,q7\n";
 
     std::array<double, 7> q = {0, 0, 0, 0, 0, 0, 0};
 
-    for (int n=0; n<111; n++) {
+    for (int n=0; n<1006; n++) {
         for (int i=1; i<7; i++) {
             int diff = round((q_max[i] - q_min[i])*100);
 
@@ -37,17 +37,18 @@ int main(int argc, char** argv) {
         std::array<double, 16> pose_EE = model.pose(franka::Frame::kFlange, q, identity, identity);
 
         Eigen::Matrix4d aframe(pose_EE.data());
-        std::array<float, 3> euler = frameToEuler(aframe);
+        Eigen::Quaterniond quater = frameToQuaternion(aframe);
 
         float x = aframe(0, 3);
         float y = aframe(1, 3);
         float z = aframe(2, 3);
 
-        float Rx = euler[0];
-        float Ry = euler[1];
-        float Rz = euler[2]; 
+        float q0 = quater.w(); 
+        float q1 = quater.x(); 
+        float q2 = quater.y(); 
+        float q3 = quater.z(); 
 
-        output << x << "," << y << "," << z << "," << Rx << "," << Ry << "," << Rz << "," << q[6] << "\n"; 
+        output << x << "," << y << "," << z << "," << q0 << "," << q1 << "," << q2 << "," << q3 << "," << q[6] << "\n"; 
     }
 
     output.close();

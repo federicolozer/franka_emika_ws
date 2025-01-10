@@ -1,6 +1,5 @@
 #include "IK_solver.hpp"
 #include "ros/ros.h"
-#include "path_planning/IK.h"
 #include <eigen3/Eigen/Dense>
 #include <franka_gazebo/model_kdl.h>
 
