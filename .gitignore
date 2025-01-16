@@ -1,5 +1,3 @@
-src/libfranka/build*/
 build
 devel
-build_isolated
-devel_isolated
+src/franka_ros

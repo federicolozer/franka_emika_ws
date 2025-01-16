@@ -45,7 +45,6 @@ include_directories(include
 #############
 
 catkin_install_python(PROGRAMS
-  scripts/mul_tables_NN.py
   scripts/robot_pose_NN.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

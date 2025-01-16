@@ -23,9 +23,7 @@ bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &r
         q_actual_array[i] = static_cast<double>(req.q_actual_array[i]);
     }
 
-    boost::array<double, 7> q_array = franka_IK(O_T_EE, q7, q_actual_array);
-
-    
+    /*boost::array<double, 7> q_array = franka_IK(O_T_EE, q7, q_actual_array);
 
 
     //----------------------------------------------------------------------------
@@ -52,6 +50,32 @@ bool CallbackIK(path_planning::IK::Request  &req, path_planning::IK::Response &r
     std::cout << std::fixed << std::setprecision(1) << O_T_EE_new.format(MatFmt) << std::endl << std::endl;
 
     //----------------------------------------------------------------------------
+    */
+
+    boost::array<boost::array<double, 7>, 4> q_array_array = franka_IK_4sol(O_T_EE, q7, q_actual_array);
+
+    std::cout << std::endl << std::endl;
+    std::cout << "q_array array:" << std::endl;
+    boost::array<double, 7> q_array_temp;
+    for (int j=0; j<4; j++) {
+        q_array_temp = q_array_array[j];
+        for (int i=0; i<sizeof(q_array_temp)/sizeof(q_array_temp[0]); i++) {
+            std::cout << q_array_temp[i] << " ";
+        }
+        std::cout << std::endl;
+    }
+    
+
+    //int n_array;
+    //std::cout << "Select q_array:";
+    //std::cin >> n_array;
+    boost::array<double, 7> q_array = q_array_array[2];
+    //std::cout << std::endl;
+
+    std::cout << "q_array:" << std::endl;
+    for (int i=0; i<sizeof(q_array)/sizeof(q_array[0]); i++) {
+        std::cout << q_array[i] << " ";
+    }
 
 
 
