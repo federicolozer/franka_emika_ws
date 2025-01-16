@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Eigen3 REQUIRED)
+find_package(PythonLibs REQUIRED)
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
@@ -36,6 +37,17 @@ catkin_package(
 
 include_directories(include
   ${catkin_INCLUDE_DIRS}
+  ${PYTHON_INCLUDE_DIRS}
+)
+
+# dataset_creator
+add_executable(dataset_creator
+  src/dataset_creator.cpp
+)
+
+target_link_libraries(dataset_creator
+  ${catkin_LIBRARIES}
+  ${PYTHON_LIBRARIES}
 )
 
 
