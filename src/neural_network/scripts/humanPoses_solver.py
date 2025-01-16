@@ -9,6 +9,9 @@ import numpy as np
 def reader():
     humanPoses = []
 
+    print("############ humn pos")
+    quit()
+
     arm = ["thumb", "finger", "hand", "inside_elbow", "outside_elbow"]
     order = []
     
