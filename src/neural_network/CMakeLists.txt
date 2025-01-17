@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(neural_network)
 
-
-
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
@@ -21,12 +19,11 @@ generate_messages(
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES path_planning
+  LIBRARIES neural_network
   CATKIN_DEPENDS 
     roscpp 
     rospy 
     std_msgs
-  DEPENDS #system_lib
 )
 
 
@@ -38,6 +35,7 @@ catkin_package(
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${PYTHON_INCLUDE_DIRS}
+  ../path_planning/include
 )
 
 # dataset_creator
@@ -48,6 +46,7 @@ add_executable(dataset_creator
 target_link_libraries(dataset_creator
   ${catkin_LIBRARIES}
   ${PYTHON_LIBRARIES}
+  ${path_planning_LIBRARIES}
 )
 
 
