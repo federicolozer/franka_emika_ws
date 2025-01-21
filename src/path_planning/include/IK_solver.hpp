@@ -48,7 +48,7 @@ void error(int n, double val) {
 }
 
 
-boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE, double q7, boost::array<double, 7> q_actual_array) {
+boost::array<double, 7> franka_IK_CC(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE, double q7, boost::array<double, 7> q_actual_array) {
     std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
 
     const boost::array<double, 7> q_NAN = {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}};
@@ -206,14 +206,13 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
         q[0] = std::atan2(V2P[1], V2P[0]);
         q[1] = std::acos(V2P[2] / L2P);
         if (is_case1_1) {
-            if (q[0] < -0.2443){
-                q[0] += M_PI;
-                q[1] = -q[1];
-            }
-            else if (q[0] > 0.2443){
-                q[0] -= M_PI;
-                q[1] = -q[1];
-            }
+            //if (q[0] < 0.0) {
+            //    q[0] += M_PI;
+            //}   
+            //else {
+            //    q[0] -= M_PI;
+            //}  
+            //q[1] = -q[1];
         }
     }
 
@@ -272,14 +271,16 @@ boost::array<double, 7> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_
 
     std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
     std::chrono::duration<double> t_elaps = t_end - t_start;
-    std::cout << "Elapsed time: " << t_elaps.count() << "s" << std::endl;
+    std::cout << std::endl << "Elapsed time: " << t_elaps.count() << "s" << std::endl;
 
     return q;
 }
 
 
 
-boost::array<boost::array<double, 7>, 4> franka_IK_4sol(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE, double q7, boost::array<double, 7> q_actual_array) {
+boost::array<boost::array<double, 7>, 4> franka_IK(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE, double q7, boost::array<double, 7> q_actual_array) {
+    std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
+    
     const boost::array< boost::array<double, 7>, 4 > q_all_NAN = {{ {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}},
                                                                 {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}},
                                                                 {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}},
@@ -466,6 +467,10 @@ boost::array<boost::array<double, 7>, 4> franka_IK_4sol(Eigen::Map< Eigen::Matri
             continue;
         }
     }
+
+    std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
+    std::chrono::duration<double> t_elaps = t_end - t_start;
+    std::cout << std::endl << "Elapsed time: " << t_elaps.count() << "s" << std::endl;
     
     return q_all;
 }

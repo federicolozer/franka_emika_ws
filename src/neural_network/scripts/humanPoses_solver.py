@@ -65,7 +65,8 @@ def solver(cPose):
 
     #yAxis = (segm_ee_finger)/np.linalg.norm(segm_ee_finger)
     zAxis = (segm_hand_ee)/np.linalg.norm(segm_hand_ee)
-    yAxis = np.array(cPose[1])-(O_ee+np.dot(segm_ee_finger, zAxis)*zAxis)
+    yAxis_tmp = np.array(cPose[1])-(O_ee+np.dot(segm_ee_finger, zAxis)*zAxis)
+    yAxis = (yAxis_tmp)/np.linalg.norm(yAxis_tmp)
     xAxis = np.cross(yAxis, zAxis)
 
     #frame_ee[0:3, 0] = xAxis
@@ -88,9 +89,6 @@ def solver(cPose):
 
     q7 = np.arccos(np.dot(segm_q7_elbow/np.linalg.norm(segm_q7_elbow), xAxis))
     res = [list(xAxis), list(yAxis), list(zAxis), list(O_ee), q7]
-
-    print("-------------")
-    print(res)
 
     return res
             

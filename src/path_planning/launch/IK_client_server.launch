@@ -2,8 +2,8 @@
 
 <launch>
    
-    <!-- <node name="client" pkg="path_planning" type="controller.py" output="screen" /> -->
+    <node name="client" pkg="path_planning" type="prova.py" output="screen" />
 
-    <node name="server" pkg="path_planning" type="IK_server" output="screen" />
+    <node name="server" pkg="path_planning" type="IK_server" output="screen" args="--fromQuater"/>
 
 </launch>

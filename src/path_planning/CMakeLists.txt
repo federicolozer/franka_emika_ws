@@ -14,7 +14,8 @@ find_package(Eigen3 REQUIRED)
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  IK.srv
+  IK_fromFrame.srv
+  IK_fromQuater.srv
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -52,15 +53,15 @@ target_link_libraries(IK_server
   ${catkin_LIBRARIES}
 )
 
-# fk test
-add_executable(FK_generator
-  src/FK_generator.cpp
-)
-
-target_link_libraries(FK_generator
-  ${catkin_LIBRARIES}
-)
-
+## fk test
+#add_executable(FK_generator
+#  src/FK_generator.cpp
+#)
+#
+#target_link_libraries(FK_generator
+#  ${catkin_LIBRARIES}
+#)
+#
 # quater test
 add_executable(quater_tester
   src/quater_tester.cpp

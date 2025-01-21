@@ -11,11 +11,8 @@
 int main() {
     std::ofstream file;
 
-    //file.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv");
-    //file << "x, y, z, Q0, Q1, Q2, Q3, q7" << std::endl;
-    //file.close();
-
-    PyObject* pInt;
+    file.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv");
+    file << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
 
 	Py_Initialize(); 
 
@@ -33,6 +30,7 @@ int main() {
 
             for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i++) {
                 frame.setZero();
+                frame(3,3) = 1;
 
                 PyObject* pPose = PyList_GetItem(pHumanPoses, i);
                 PyObject* pTuple = PyTuple_New(1);
@@ -50,27 +48,28 @@ int main() {
                             axis[k] = PyFloat_AsDouble(PyList_GetItem(pAxis, k));
                         }
 
-                        frame.block<3,1>(0,i) << axis[0], axis[1], axis[2];
+                        frame.block<3,1>(0,j) << axis[0], axis[1], axis[2];
                     }
                     PyObject* pq7 = PyList_GetItem(pList, 4);
                     double q7 = PyFloat_AsDouble(pq7);
 
                     std::cout << "q7 = " << q7 << std::endl;
 
-                    std::cout << "frame = " << frame << std::endl;
-                    
+                    std::cout << "frame = " << std::endl << frame << std::endl;
+
+                    Eigen::Quaterniond quater = frameToQuaternion(frame);
+
+                    std::cout << "quaternion = " << quater.x() << " " << quater.y() << " " << quater.z() << " " << quater.w()  << std::endl;
+
+                    file << quater.x() << "," << quater.y() << "," << quater.z() << "," << quater.w() << "," << frame(0,3) << "," << frame(1,3) << "," << frame(2,3) << "," << q7 << std::endl;
                 }
             }
         }
     }
-        
-
-    //PyRun_SimpleString("import sys");
-    //PyRun_SimpleString("sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')");
-    //PyRun_SimpleString("import humanPoses_solver");
-    //PyRun_SimpleString("humanPoses_solver.reader()");
 	
 	Py_Finalize();
+
+    file.close();
 
     return 0;
 }

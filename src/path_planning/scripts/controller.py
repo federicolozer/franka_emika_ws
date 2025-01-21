@@ -9,8 +9,10 @@ from math import pi
 from sensor_msgs.msg import JointState
 from control_msgs.msg import FollowJointTrajectoryActionGoal, FollowJointTrajectoryActionResult
 from moveit_msgs.msg import ExecuteTrajectoryActionGoal, ExecuteTrajectoryActionResult
-from path_planning.srv import IK
+from path_planning.srv import IK_fromFrame
+from path_planning.srv import IK_fromQuater
 import Panda_trajectory_planner as planner
+import csv
 
 
 status = None
@@ -34,11 +36,22 @@ def CallbackResult(data):
 
 
 
-def IK_client(O_T_EE_array, q7, q_actual_array):
+def IK_fromFrame_client(O_T_EE_array, q7, q_actual_array):
     rospy.wait_for_service('IK_service')
     try:
-        IK_solver = rospy.ServiceProxy('IK_service', IK)
+        IK_solver = rospy.ServiceProxy('IK_service', IK_fromFrame)
         resp = IK_solver(O_T_EE_array, q7, q_actual_array)
+        return resp
+    except rospy.ServiceException as e:
+        print(f"Service call failed: {e}")
+
+
+
+def IK_fromQuater_client(quater, q7, q_actual_array):
+    rospy.wait_for_service('IK_service')
+    try:
+        IK_solver = rospy.ServiceProxy('IK_service', IK_fromQuater)
+        resp = IK_solver(quater, q7, q_actual_array)
         return resp
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
@@ -142,21 +155,10 @@ if __name__ == '__main__':
     #    print(sys.argv[1])
     #    if sys.argv[1] == "ext":
     #        print("si")
-#
-    #quit()
 
     rospy.init_node('controller')
 
     ttype = "follow_joint"
-
-    t = []
-    q = []
-
-    # 0.281895,  -0.927236, 0.246513, 0, -0.741623, -0.37359, -0.557158, 0, 0.608712, -0.0257594, -0.792973, 0, -0.144822, 0.114741, 0.17244, 1 
-
-    
-    
-
 
     while True:
         t = []
@@ -165,25 +167,28 @@ if __name__ == '__main__':
         O_T_EE_array = np.array([1.0, 0.0, 0.0, 0.0, 
                                  0.0, -1.0, 0.0, 0.0, 
                                  0.0, 0.0, -1.0, 0.0, 
-                                 0.7, 0.0, 0.4, 1.0])
+                                 0.7, 0.2, 0.2, 1.0])
         #O_T_EE_array = np.array([0.281895,  -0.927236, 0.246513, 0, -0.741623, -0.37359, -0.557158, 0, 0.608712, -0.0257594, -0.792973, 0, -0.144822, 0.114741, 0.17244, 1])
         q7 = pi/4
         q_actual_array = np.array([0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397])
         #q_actual_array = np.array([0.5157262388785411,  1.2140897359597562,  1.5346381355065786, -3.0398301021734246, -1.2930720893855998, 1.332867311125138, -1.5554459725458225])
 
-        #x = float(input("\nEnter x value: "))
-        #O_T_EE_array[12] = x
+        x = float(input("\nEnter x value: "))
+        O_T_EE_array[12] = x
         #y = float(input("\nEnter y value: "))
         #O_T_EE_array[13] = y
         #z = float(input("\nEnter z value: "))
         #O_T_EE_array[14] = z
-        q7 = float(input("\nEnter q7 value: ")) + pi/4
+        #q7 = float(input("\nEnter q7 value: ")) + pi/4
 
-        res = IK_client(O_T_EE_array, q7, q_actual_array)
+        res = IK_fromFrame_client(O_T_EE_array, q7, q_actual_array)
+
+        if np.isnan(res.q_array).any():
+            print("\nResponse not valid")
+            continue
 
         t.append(1)
         q.append(list(res.q_array))
-        print("q = ", q)
         
         """with open("/home/lozer/franka_emika_ws/src/path_planning/data/q_robot.xml", 'r') as traj:
             data = traj.read()
@@ -198,6 +203,7 @@ if __name__ == '__main__':
                     keypoint.append(float(jnt))
                 
                 q.append(keypoint)"""
+        
 
         if len(q) > 0:
             homing(q[0], ttype)

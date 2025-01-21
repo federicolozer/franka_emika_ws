@@ -61,8 +61,7 @@ Eigen::Matrix4d eulerToFrame(const std::array<float, 3> euler, const float x, co
 
 
 Eigen::Quaterniond frameToQuaternion(const Eigen::Matrix4d frame) {
-    Eigen::AngleAxisd aa;
-    aa = frame.block<3, 3>(0, 0);
+    Eigen::AngleAxisd aa(frame.block<3, 3>(0, 0));
     Eigen::Quaterniond quater(aa);
 
     return quater;
