@@ -27,19 +27,26 @@ int main() {
         PyObject* pFuncReader = PyObject_GetAttrString(pModule, "reader");
         if(pFuncReader && PyCallable_Check(pFuncReader)) {
             PyObject* pHumanPoses = PyObject_CallObject(pFuncReader, NULL);
-
+            
             for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i++) {
-                frame.setZero();
-                frame(3,3) = 1;
+                frame = Eigen::Matrix4d::Identity();
 
                 PyObject* pPose = PyList_GetItem(pHumanPoses, i);
                 PyObject* pTuple = PyTuple_New(1);
                 PyTuple_SetItem(pTuple, 0, pPose);
 
+                PyObject* pFuncCheck = PyObject_GetAttrString(pModule, "check");
+                PyObject* pResult = PyObject_CallObject(pFuncCheck, pTuple);
+                bool result = PyObject_IsTrue(pResult);
+
+                if (result == false) {
+                    continue;
+                }
+
                 PyObject* pFuncSolver = PyObject_GetAttrString(pModule, "solver");
                 if(pFuncSolver && PyCallable_Check(pFuncSolver)) {
                     PyObject* pList = PyObject_CallObject(pFuncSolver, pTuple);
-
+                    
                     for (int j=0; j<4; j++) {
                         PyObject* pAxis = PyList_GetItem(pList, j);
                         std::array<double, 3> axis;
@@ -51,7 +58,7 @@ int main() {
                         frame.block<3,1>(0,j) << axis[0], axis[1], axis[2];
                     }
                     PyObject* pq7 = PyList_GetItem(pList, 4);
-                    double q7 = PyFloat_AsDouble(pq7);
+                    double q7 = PyFloat_AsDouble(pq7) - M_PI_2;
 
                     std::cout << "q7 = " << q7 << std::endl;
 

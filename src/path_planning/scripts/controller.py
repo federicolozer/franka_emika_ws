@@ -47,11 +47,11 @@ def IK_fromFrame_client(O_T_EE_array, q7, q_actual_array):
 
 
 
-def IK_fromQuater_client(quater, q7, q_actual_array):
+def IK_fromQuater_client(quater, O_EE, q7, q_actual_array):
     rospy.wait_for_service('IK_service')
     try:
         IK_solver = rospy.ServiceProxy('IK_service', IK_fromQuater)
-        resp = IK_solver(quater, q7, q_actual_array)
+        resp = IK_solver(quater, O_EE, q7, q_actual_array)
         return resp
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")

@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
             quater = np.array([float(row[0]), float(row[1]), float(row[2]), float(row[3])])
             O_EE = np.array([float(row[4]), float(row[5]), float(row[6])])
-            q7 = -pi/4 -pi/2 + float(row[7])
+            q7 = float(row[7]) - pi/4
 
             res = IK_fromQuater_client(quater, O_EE, q7, q_actual_array)
 
@@ -76,7 +76,8 @@ if __name__ == '__main__':
                     q_array.append(array)
 
             
-            print(q_array)
+            print("q_array_list = ", q_array_list)
+            print("q_array = ", q_array)
 
             if len(q_array) >= 1:
                 t.append(2)
