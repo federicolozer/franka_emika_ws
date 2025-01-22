@@ -9,8 +9,7 @@ from math import pi
 from sensor_msgs.msg import JointState
 from control_msgs.msg import FollowJointTrajectoryActionGoal, FollowJointTrajectoryActionResult
 from moveit_msgs.msg import ExecuteTrajectoryActionGoal, ExecuteTrajectoryActionResult
-from path_planning.srv import IK_fromFrame
-from path_planning.srv import IK_fromQuater
+from path_planning.srv import IK_fromFrame, IK_fromQuater
 import Panda_trajectory_planner as planner
 import csv
 

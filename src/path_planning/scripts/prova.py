@@ -9,8 +9,7 @@ from math import pi
 #from sensor_msgs.msg import JointState
 #from control_msgs.msg import FollowJointTrajectoryActionGoal, FollowJointTrajectoryActionResult
 #from moveit_msgs.msg import ExecuteTrajectoryActionGoal, ExecuteTrajectoryActionResult
-from path_planning.srv import IK_fromFrame
-from path_planning.srv import IK_fromQuater
+from path_planning.srv import IK_fromFrame, IK_fromQuater
 import controller
 import csv
 import time
@@ -46,8 +45,7 @@ if __name__ == '__main__':
 
     ttype = "follow_joint"
 
-    t = []
-    q = []
+    
     #quater = np.array([0.79, 0.17, 0.57, 0.17])
     #O_EE = np.array([0.1, 0.1, 0.1])
     #q7 = pi/4
@@ -61,6 +59,9 @@ if __name__ == '__main__':
             if doOnce:
                 doOnce = False
                 continue
+
+            t = []
+            q = []
 
             quater = np.array([float(row[0]), float(row[1]), float(row[2]), float(row[3])])
             O_EE = np.array([float(row[4]), float(row[5]), float(row[6])])

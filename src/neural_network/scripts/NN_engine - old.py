@@ -29,7 +29,7 @@ class NN(nn.Module):
 
 class cDataSet(Dataset): 
     def __init__(self): 
-        data = np.loadtxt('/home/lozer/franka_emika_ws/src/neural_network/data/poses.csv', delimiter=',', 
+        data = np.loadtxt('/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv', delimiter=',', 
                            dtype=np.float32, skiprows=1) 
         
         self.inputs = torch.from_numpy(data[:, 0:7]) 
@@ -46,6 +46,7 @@ class cDataSet(Dataset):
 
 
 def training(n_epoch, dataloader):
+    prev_loss = 1
     for epoch in range(n_epoch):
         model.train()
         for IN_train, OUT_train in dataloader: 
@@ -58,6 +59,11 @@ def training(n_epoch, dataloader):
 
         if loss.item() <= 0.0001:
             break
+
+        if abs(loss.item() - prev_loss) <= 0.00000001:
+            break
+
+        prev_loss = loss.item()
 
         if (epoch + 1) % 100 == 0:
             print(f'Epoch [{epoch + 1}/{n_epoch}], Loss: {loss.item():.4f}')
@@ -80,7 +86,7 @@ def evaluation(dataloader, print_out=False):
             print("------------------")
             print(f'Predictions:\n{torch.transpose(outputs, 0, 1)}')
             print("------------------")
-            print(f'Ground truth:\n{torch.transpose(OUT_train, 0, 1)}')
+            print(f'Real data:\n{torch.transpose(OUT_train, 0, 1)}')
 
 
 
@@ -90,29 +96,30 @@ if __name__ == "__main__":
     model = NN()
 
     dataset = cDataSet() 
-    train_data, eval_data, test_data = random_split(dataset, [1000, 5, 1])
-    train_dataloader = DataLoader(dataset=train_data, batch_size=100, shuffle=True) 
-    eval_dataloader = DataLoader(dataset=eval_data, batch_size=5, shuffle=True) 
+
+    train_data, eval_data, test_data = random_split(dataset, [len(dataset)-1, 0, 1])
+    train_dataloader = DataLoader(dataset=train_data, batch_size=len(dataset)-1, shuffle=True) 
+    #eval_dataloader = DataLoader(dataset=eval_data, batch_size=5, shuffle=True) 
     test_dataloader = DataLoader(dataset=test_data, batch_size=1, shuffle=True) 
 
     criterion = nn.MSELoss(reduction = 'mean')
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     train = sys.argv[1]
-    if train == "train":
+    if train == "--train":
         n_epoch = 10000
         training(n_epoch, train_dataloader)
 
         torch.save(model.state_dict(), "/home/lozer/franka_emika_ws/src/neural_network/data/robot_pose_NN_model.pth")
 
-        evaluation(eval_dataloader, print_out=True)
+        #evaluation(eval_dataloader, print_out=True)
 
-    elif train == "eval":
+    elif train == "--eval":
         model.load_state_dict(torch.load("/home/lozer/franka_emika_ws/src/neural_network/data/robot_pose_NN_model.pth", weights_only=False))
 
-        evaluation(eval_dataloader)
+        #evaluation(eval_dataloader)
     
-    elif train == "test":
+    elif train == "--test":
         model.load_state_dict(torch.load("/home/lozer/franka_emika_ws/src/neural_network/data/robot_pose_NN_model.pth", weights_only=False))
 
         evaluation(test_dataloader, print_out=True)

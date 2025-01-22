@@ -86,16 +86,10 @@ def solver(cPose):
     base_frame[0:3, 1] = deepcopy(yAxis)
     base_frame[0:3, 2] = deepcopy(zAxis)
     base_frame[0:3, 3] = cPose[5]
+    
 
     eeToBase_frame = np.dot(np.linalg.inv(base_frame), ee_frame)
-
-    print("--------------")
-    print(ee_frame)
-    print("--------------")
-    print(base_frame)
-    print("--------------")
-    print(eeToBase_frame)
-
+    eeToBase_frame[2, 3] += 0.33
     
     res = [list(eeToBase_frame[0:3, 0]), list(eeToBase_frame[0:3, 1]), list(eeToBase_frame[0:3, 2]), list(eeToBase_frame[0:3, 3]), q7]
 
