@@ -1,14 +1,14 @@
+#include "cast_tools.hpp"
 #include <eigen3/Eigen/Dense>
 #include <array>
 #include <cmath>
 #include <iostream>
 #include <fstream>
 #include <Python.h>
-#include "tools.hpp"
 
 
 
-int main() {
+int main(int argc, char** argv) {
     std::ofstream file;
 
     file.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv");

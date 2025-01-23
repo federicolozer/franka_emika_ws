@@ -1,5 +1,5 @@
 #include "IK_solver.hpp"
-#include "tools.hpp"
+#include "cast_tools.hpp"
 #include "ros/ros.h"
 #include "path_planning/IK_fromFrame.h"
 #include "path_planning/IK_fromQuater.h"
@@ -75,7 +75,7 @@ bool CallbackIK_fromQuater(path_planning::IK_fromQuater::Request &req, path_plan
 
 
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     ros::init(argc, argv, "IK_server");
     ros::NodeHandle n;
 

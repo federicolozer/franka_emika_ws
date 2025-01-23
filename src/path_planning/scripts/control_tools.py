@@ -5,19 +5,18 @@ import rospy
 from copy import deepcopy
 import numpy as np
 from tqdm import tqdm
-from math import pi
 from sensor_msgs.msg import JointState
 from control_msgs.msg import FollowJointTrajectoryActionGoal, FollowJointTrajectoryActionResult
 from moveit_msgs.msg import ExecuteTrajectoryActionGoal, ExecuteTrajectoryActionResult
 from path_planning.srv import IK_fromFrame, IK_fromQuater
 import Panda_trajectory_planner as planner
-import csv
 
 
 status = None
 error_log = None
 q_reg = []
 q_p_lim = np.array([2.1750, 2.1750, 2.1750, 2.1750, 2.6100, 2.6100, 2.6100])
+
 
 
 def CallbackJointStates(data):
@@ -75,10 +74,14 @@ def wait_execution(t_tot):
 
 def homing(q_last, ttype):
     global status, error_log, q_reg, q_p_lim
+
+    print("############# homing")
+    print(ttype)
     
     joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates) 
 
     while q_reg == []:
+        print(q_reg)
         pass
 
     q_diff = deepcopy(q_reg)
@@ -88,12 +91,13 @@ def homing(q_last, ttype):
     
     t = [0, max(q_diff)]
     q = [q_reg, q_last]
-
+    print(q)
     if ttype == "follow_joint":
         result_subscriber = rospy.Subscriber('/position_joint_trajectory_controller/follow_joint_trajectory/result', FollowJointTrajectoryActionResult, CallbackResult)
         control_publisher = rospy.Publisher('/position_joint_trajectory_controller/follow_joint_trajectory/goal', FollowJointTrajectoryActionGoal, queue_size = 10)
 
         msg = planner.build_follow_joint_trajectory(t, q)
+        print(msg)
 
     elif ttype == "execute":
         result_subscriber = rospy.Subscriber('/execute_trajectory/result', ExecuteTrajectoryActionResult, CallbackResult)
@@ -116,7 +120,7 @@ def homing(q_last, ttype):
 
 
 
-def launch_trajectory(t, q, ttype):
+def exec_trajectory(t, q, ttype):
     global status, error_log
 
     joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates)
@@ -148,14 +152,26 @@ def launch_trajectory(t, q, ttype):
 
 
 
+def launch_trajectory(t, q, ttype):
+    print("############# launching trajectory")
+    if len(q) > 0:
+            homing(q[0], ttype)
+            if not len(q) == 1:
+                exec_trajectory(t, q, ttype)
 
-if __name__ == '__main__':
+
+
+
+
+
+
+"""
     #if len(sys.argv) > 0:
     #    print(sys.argv[1])
     #    if sys.argv[1] == "ext":
     #        print("si")
 
-    rospy.init_node('controller')
+    #rospy.init_node('controller')
 
     ttype = "follow_joint"
 
@@ -171,6 +187,16 @@ if __name__ == '__main__':
         q7 = pi/4
         q_actual_array = np.array([0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397])
         #q_actual_array = np.array([0.5157262388785411,  1.2140897359597562,  1.5346381355065786, -3.0398301021734246, -1.2930720893855998, 1.332867311125138, -1.5554459725458225])
+
+        quater = np.array([1,1,1,1])
+        O_EE = np.array([0,0,0])
+
+
+        IKine(O_T_EE_array, q7, q_actual_array)
+        IKine(quater, O_EE, q7, q_actual_array)
+        quit()
+
+
 
         x = float(input("\nEnter x value: "))
         O_T_EE_array[12] = x
@@ -189,7 +215,7 @@ if __name__ == '__main__':
         t.append(1)
         q.append(list(res.q_array))
         
-        """with open("/home/lozer/franka_emika_ws/src/path_planning/data/q_robot.xml", 'r') as traj:
+        with open("/home/lozer/franka_emika_ws/src/path_planning/data/q_robot.xml", 'r') as traj:
             data = traj.read()
             traj_data = BeautifulSoup(data, features="xml")
             traj_list = traj_data.find_all('point')        
@@ -201,13 +227,10 @@ if __name__ == '__main__':
                 for jnt in point.text.split():
                     keypoint.append(float(jnt))
                 
-                q.append(keypoint)"""
+                q.append(keypoint)
         
 
-        if len(q) > 0:
-            homing(q[0], ttype)
-            if not len(q) == 1:
-                launch_trajectory(t, q, ttype)
+        launch_trajectory(t, q, ttype)"""
         
         
 
