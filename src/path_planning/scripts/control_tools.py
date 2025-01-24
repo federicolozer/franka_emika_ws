@@ -34,22 +34,22 @@ def CallbackResult(data):
 
 
 
-def IK_fromFrame_client(O_T_EE_array, q7, q_actual_array):
+def IK_fromFrame_client(O_T_EE_array, q7, q_actual_array, horz):
     rospy.wait_for_service('IK_service')
     try:
         IK_solver = rospy.ServiceProxy('IK_service', IK_fromFrame)
-        resp = IK_solver(O_T_EE_array, q7, q_actual_array)
+        resp = IK_solver(O_T_EE_array, q7, q_actual_array, horz)
         return resp
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
 
 
 
-def IK_fromQuater_client(quater, O_EE, q7, q_actual_array):
+def IK_fromQuater_client(quater, O_EE, q7, q_actual_array, horz):
     rospy.wait_for_service('IK_service')
     try:
         IK_solver = rospy.ServiceProxy('IK_service', IK_fromQuater)
-        resp = IK_solver(quater, O_EE, q7, q_actual_array)
+        resp = IK_solver(quater, O_EE, q7, q_actual_array, horz)
         return resp
     except rospy.ServiceException as e:
         print(f"Service call failed: {e}")
@@ -74,14 +74,10 @@ def wait_execution(t_tot):
 
 def homing(q_last, ttype):
     global status, error_log, q_reg, q_p_lim
-
-    print("############# homing")
-    print(ttype)
     
     joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates) 
 
     while q_reg == []:
-        print(q_reg)
         pass
 
     q_diff = deepcopy(q_reg)
@@ -91,13 +87,12 @@ def homing(q_last, ttype):
     
     t = [0, max(q_diff)]
     q = [q_reg, q_last]
-    print(q)
+    
     if ttype == "follow_joint":
         result_subscriber = rospy.Subscriber('/position_joint_trajectory_controller/follow_joint_trajectory/result', FollowJointTrajectoryActionResult, CallbackResult)
         control_publisher = rospy.Publisher('/position_joint_trajectory_controller/follow_joint_trajectory/goal', FollowJointTrajectoryActionGoal, queue_size = 10)
 
         msg = planner.build_follow_joint_trajectory(t, q)
-        print(msg)
 
     elif ttype == "execute":
         result_subscriber = rospy.Subscriber('/execute_trajectory/result', ExecuteTrajectoryActionResult, CallbackResult)
@@ -153,7 +148,6 @@ def exec_trajectory(t, q, ttype):
 
 
 def launch_trajectory(t, q, ttype):
-    print("############# launching trajectory")
     if len(q) > 0:
             homing(q[0], ttype)
             if not len(q) == 1:

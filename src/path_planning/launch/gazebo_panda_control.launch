@@ -9,6 +9,7 @@
     <arg name="debug" default="false" />
     <arg name="world" default="worlds/empty.world" />
     <arg name="controller" default="position_joint_trajectory_controller" />
+    <arg name="horz" default="false" />
 
     <arg name="initial_joint_positions"
     default="-J $(arg arm_id)_joint1 0
@@ -29,16 +30,32 @@
         <arg name="use_sim_time" value="true"/>
     </include>
 
-    <param name="robot_description"
-            command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
-                    gazebo:=true
-                    hand:=$(arg load_gripper)
-                    arm_id:=$(arg arm_id)
-                    xyz:='0 0 0'
-                    rpy:='0 0 0'">
-    </param>   
+    <group if="$(arg horz)">
+        <param name="robot_description"
+                command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+                        gazebo:=true
+                        hand:=$(arg load_gripper)
+                        arm_id:=$(arg arm_id)
+                        
+                        xyz:='0 0 0.7'
+                        rpy:='0 1.57079632679 0'">
+        </param>
+    </group>
+
+    <group unless="$(arg horz)">
+        <param name="robot_description"
+                command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+                        gazebo:=true
+                        hand:=$(arg load_gripper)
+                        arm_id:=$(arg arm_id)
+                        
+                        xyz:='0 0 0'
+                        rpy:='0 0 0'">
+        </param>
+    </group>
 
     <param name="m_ee" value="0.76" if="$(arg load_gripper)" />
+    <param name="horz" value="$(arg horz)" />
 
     <node name="$(arg arm_id)_model_spawner"
             pkg="gazebo_ros"

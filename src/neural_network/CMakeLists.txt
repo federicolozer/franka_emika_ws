@@ -56,6 +56,6 @@ target_link_libraries(dataset_creator
 #############
 
 catkin_install_python(PROGRAMS
-  scripts/robot_pose_NN.py
+  scripts/NN_engine.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

@@ -32,6 +32,7 @@ catkin_package(
     rospy 
     std_msgs
     franka_gazebo
+    xacro
 )
 
 
@@ -78,7 +79,11 @@ target_link_libraries(quater_tester
 #############
 
 catkin_install_python(PROGRAMS
-  scripts/controller.py
+  scripts/control_tools.py
   scripts/Panda_trajectory_planner.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY robots
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

@@ -2,6 +2,7 @@ float32[4] quaternion
 float32[3] O_EE
 float32 q7
 float32[7] q_actual_array
+bool horz
 ---
 float32[7] q_array_1
 float32[7] q_array_2

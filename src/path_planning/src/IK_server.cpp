@@ -16,7 +16,26 @@ bool CallbackIK_fromFrame(path_planning::IK_fromFrame::Request &req, path_planni
     for (int i=0; i<sizeof(req.O_T_EE_array)/sizeof(req.O_T_EE_array[0]); i++) {
         O_T_EE_array[i] = static_cast<double>(req.O_T_EE_array[i]);
     }
-    Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE(O_T_EE_array.data());
+    
+    Eigen::Matrix<double, 4, 4> O_T_EE_tmp;
+
+    bool horz = req.horz;
+    if (horz) {
+        Eigen::Matrix<double, 4, 4> O_T_EE_rot(O_T_EE_array.data());
+        std::cout << "O_T_EE = " << std::endl << O_T_EE_rot << std::endl;
+        Eigen::Matrix<double, 4, 4> baseToWall_rot;
+        baseToWall_rot << 0.0, 0.0, 1.0, 0.0, 
+                            0.0, 1.0, 0.0, 0.0, 
+                            -1.0, 0.0, 0.0, 0.7, 
+                            0.0, 0.0, 0.0, 1.0;
+        std::cout << "baseToWall_rot = " << std::endl << baseToWall_rot << std::endl;
+        O_T_EE_tmp = baseToWall_rot.inverse()*O_T_EE_rot;
+        std::cout << "dot product = " << std::endl << O_T_EE_tmp << std::endl;
+    }
+    else {
+        O_T_EE_tmp = Eigen::Matrix<double, 4, 4>(O_T_EE_array.data());
+    }
+    Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE(O_T_EE_tmp.data());
 
     double q7 = static_cast<double>(req.q7);
 
@@ -24,6 +43,7 @@ bool CallbackIK_fromFrame(path_planning::IK_fromFrame::Request &req, path_planni
     for (int i=0; i<sizeof(req.q_actual_array)/sizeof(req.q_actual_array[0]); i++) {
         q_actual_array[i] = static_cast<double>(req.q_actual_array[i]);
     }
+
 
     boost::array<boost::array<double, 7>, 4> q_array_list = franka_IK(O_T_EE, q7, q_actual_array);
 
