@@ -42,10 +42,18 @@ void error() {
 }
 
 
+
+void error(int n) {
+    std::cout << "Error: Nan elements in the arrays in position " << n << std::endl;
+}
+
+
+
 void error(int n, double val) {
     std::cout << "Error: q" << n + 1 << " outside constraints." << std::endl;
     std::cout << "Actual joint value " << val << " must be included in range [" << q_min[n] << ", " << q_max[n] << "]." << std::endl;
 }
+
 
 
 boost::array<double, 7> franka_IK_CC(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE, double q7, boost::array<double, 7> q_actual_array) {
@@ -140,7 +148,7 @@ boost::array<double, 7> franka_IK_CC(Eigen::Map< Eigen::Matrix<double, 4, 4> > O
     double L26 = std::sqrt(LL26);
 
     if (L24 + L46 < L26 || L24 + L26 < L46 || L26 + L46 < L24) {
-        std::cout << "Error: geometrical inconsistency." << std::endl;
+        error();
         return q_NAN;
     }
 
@@ -288,11 +296,15 @@ boost::array<boost::array<double, 7>, 4> franka_IK(Eigen::Map< Eigen::Matrix<dou
     const boost::array<double, 7> q_NAN = {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}};
     boost::array< boost::array<double, 7>, 4 > q_all = q_all_NAN;
         
-    if (q7 <= q_min[6] || q7 >= q_max[6])
+    if (q7 <= q_min[6] || q7 >= q_max[6]) {
+        error(6, q7);
         return q_all_NAN;
-    else
-        for (int i = 0; i < 4; i++)
+    }
+    else {
+        for (int i = 0; i < 4; i++) {
             q_all[i][6] = q7;
+        }
+    }
     
     // compute p_6
     Eigen::Matrix3d R_EE = O_T_EE.topLeftCorner<3, 3>();
@@ -320,16 +332,23 @@ boost::array<boost::array<double, 7>, 4> franka_IK(Eigen::Map< Eigen::Matrix<dou
     double LL26 = V26[0]*V26[0] + V26[1]*V26[1] + V26[2]*V26[2];
     double L26 = std::sqrt(LL26);
     
-    if (L24 + L46 < L26 || L24 + L26 < L46 || L26 + L46 < L24)
+    if (L24 + L46 < L26 || L24 + L26 < L46 || L26 + L46 < L24) {
+        error();
         return q_all_NAN;
+    }
+        
     
     double theta246 = std::acos((LL24 + LL46 - LL26)/2.0/L24/L46);
     double q4 = theta246 + thetaH46 + theta342 - 2.0*M_PI;
-    if (q4 <= q_min[3] || q4 >= q_max[3])
+    if (q4 <= q_min[3] || q4 >= q_max[3]) {
+        error(3, q4);
         return q_all_NAN;
-    else
-        for (int i = 0; i < 4; i++)
+    }
+    else {
+        for (int i = 0; i < 4; i++) {
             q_all[i][3] = q4;
+        }
+    }
     
     // compute q6
     double theta462 = std::acos((LL26 + LL46 - LL24)/2.0/L26/L46);
@@ -346,31 +365,32 @@ boost::array<boost::array<double, 7>, 4> franka_IK(Eigen::Map< Eigen::Matrix<dou
 
     double Phi6 = std::atan2(V_6_62[1], V_6_62[0]);
     double Theta6 = std::asin(D26/std::sqrt(V_6_62[0]*V_6_62[0] + V_6_62[1]*V_6_62[1]));
-    
+
     std::array<double, 2> q6;
     q6[0] = M_PI - Theta6 - Phi6;
     q6[1] = Theta6 - Phi6;
     
-    for (int i = 0; i < 2; i++)
-    {
-        if (q6[i] <= q_min[5])
+    for (int i = 0; i < 2; i++) {
+        if (q6[i] <= q_min[5]) {
             q6[i] += 2.0*M_PI;
-        else if (q6[i] >= q_max[5])
+        }
+        else if (q6[i] >= q_max[5]) {
             q6[i] -= 2.0*M_PI;
+        }
         
-        if (q6[i] <= q_min[5] || q6[i] >= q_max[5])
-        {
+        if (q6[i] <= q_min[5] || q6[i] >= q_max[5]) {
             q_all[2*i] = q_NAN;
             q_all[2*i + 1] = q_NAN;
         }
-        else
-        {
+        else {
             q_all[2*i][5] = q6[i];
             q_all[2*i + 1][5] = q6[i];
         }
     }
-    if (std::isnan(q_all[0][5]) && std::isnan(q_all[2][5]))
+    if (std::isnan(q_all[0][5]) && std::isnan(q_all[2][5])) {
+        error(5);
         return q_all_NAN;
+    }
 
     // compute q1 & q2
     double thetaP26 = 3.0*M_PI_2 - theta462 - theta246 - theta342;
@@ -380,8 +400,7 @@ boost::array<boost::array<double, 7>, 4> franka_IK(Eigen::Map< Eigen::Matrix<dou
     std::array< Eigen::Vector3d, 4 > z_5_all;
     std::array< Eigen::Vector3d, 4 > V2P_all;
     
-    for (int i = 0; i < 2; i++)
-    {
+    for (int i = 0; i < 2; i++) {
         Eigen::Vector3d z_6_5;
         z_6_5 << std::sin(q6[i]), std::cos(q6[i]), 0.0;
         Eigen::Vector3d z_5 = R_6*z_6_5;
@@ -394,31 +413,29 @@ boost::array<boost::array<double, 7>, 4> franka_IK(Eigen::Map< Eigen::Matrix<dou
         
         double L2P = V2P.norm();
         
-        if (std::fabs(V2P[2]/L2P) > 0.999)
-        {
+        if (std::fabs(V2P[2]/L2P) > 0.999) {
             q_all[2*i][0] = q_actual_array[0];
             q_all[2*i][1] = 0.0;
             q_all[2*i + 1][0] = q_actual_array[0];
             q_all[2*i + 1][1] = 0.0;
         }
-        else
-        {
+        else {
             q_all[2*i][0] = std::atan2(V2P[1], V2P[0]);
             q_all[2*i][1] = std::acos(V2P[2]/L2P);
-            if (q_all[2*i][0] < 0)
+            if (q_all[2*i][0] < 0) {
                 q_all[2*i + 1][0] = q_all[2*i][0] + M_PI;
-            else
+            }
+            else {
                 q_all[2*i + 1][0] = q_all[2*i][0] - M_PI;
+            }
             q_all[2*i + 1][1] = -q_all[2*i][1];
         }
     }
     
-    for (int i = 0; i < 4; i++)
-    {
-        if ( q_all[i][0] <= q_min[0] || q_all[i][0] >= q_max[0]
-             || q_all[i][1] <= q_min[1] || q_all[i][1] >= q_max[1] )
-        {
+    for (int i = 0; i < 4; i++) {
+        if ( q_all[i][0] <= q_min[0] || q_all[i][0] >= q_max[0] || q_all[i][1] <= q_min[1] || q_all[i][1] >= q_max[1] ) {
             q_all[i] = q_NAN;
+            error(0, q_all[i][0]);
             continue;
         }
 
@@ -443,9 +460,9 @@ boost::array<boost::array<double, 7>, 4> franka_IK(Eigen::Map< Eigen::Matrix<dou
         Eigen::Vector3d x_2_3 = R_2.transpose()*x_3;
         q_all[i][2] = std::atan2(x_2_3[2], x_2_3[0]);
         
-        if (q_all[i][2] <= q_min[2] || q_all[i][2] >= q_max[2])
-        {
+        if (q_all[i][2] <= q_min[2] || q_all[i][2] >= q_max[2]) {
             q_all[i] = q_NAN;
+            error(2, q_all[i][2]);
             continue;
         }
         
@@ -461,9 +478,9 @@ boost::array<boost::array<double, 7>, 4> franka_IK(Eigen::Map< Eigen::Matrix<dou
         Eigen::Vector3d V_5_H4 = R_5.transpose()*VH4;
         
         q_all[i][4] = -std::atan2(V_5_H4[1], V_5_H4[0]);
-        if (q_all[i][4] <= q_min[4] || q_all[i][4] >= q_max[4])
-        {
+        if (q_all[i][4] <= q_min[4] || q_all[i][4] >= q_max[4]) {
             q_all[i] = q_NAN;
+            error(4, q_all[i][4]);
             continue;
         }
     }

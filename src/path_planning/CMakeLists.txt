@@ -54,23 +54,6 @@ target_link_libraries(IK_server
   ${catkin_LIBRARIES}
 )
 
-## fk test
-#add_executable(FK_generator
-#  src/FK_generator.cpp
-#)
-#
-#target_link_libraries(FK_generator
-#  ${catkin_LIBRARIES}
-#)
-#
-# quater test
-add_executable(quater_tester
-  src/quater_tester.cpp
-)
-
-target_link_libraries(quater_tester
-  ${catkin_LIBRARIES}
-)
 
 
 
@@ -79,6 +62,7 @@ target_link_libraries(quater_tester
 #############
 
 catkin_install_python(PROGRAMS
+  scripts/main.py
   scripts/control_tools.py
   scripts/Panda_trajectory_planner.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

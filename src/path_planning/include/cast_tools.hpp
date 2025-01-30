@@ -69,17 +69,17 @@ Eigen::Quaterniond frameToQuaternion(const Eigen::Matrix4d frame) {
 
 
 
-Eigen::Matrix4d quaternionToFrame(Eigen::Quaterniond quater, const float x, const float y, const float z) {
+Eigen::Matrix4d quaternionToFrame(Eigen::Quaterniond quater, const double x, const double y, const double z) {
     Eigen::Matrix4d frame;
     frame << 0, 0, 0, 0,
              0, 0, 0, 0,
              0, 0, 0, 0,
              0, 0, 0, 1;
 
-    float q0 = quater.w();
-    float q1 = quater.x();
-    float q2 = quater.y();
-    float q3 = quater.z();
+    double q0 = quater.w();
+    double q1 = quater.x();
+    double q2 = quater.y();
+    double q3 = quater.z();
 
     frame(0, 0) = pow(q0, 2) + pow(q1, 2) - pow(q2, 2) - pow(q3, 2);
     frame(1, 0) = 2*q1*q2 + 2*q0*q3;
