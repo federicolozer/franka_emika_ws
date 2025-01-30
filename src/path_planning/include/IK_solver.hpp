@@ -271,7 +271,7 @@ boost::array<double, 7> franka_IK_CC(Eigen::Map< Eigen::Matrix<double, 4, 4> > O
 
     std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
     std::chrono::duration<double> t_elaps = t_end - t_start;
-    std::cout << std::endl << "Elapsed time: " << t_elaps.count() << "s" << std::endl;
+    std::cout << std::endl << "Elapsed time for IK solver: " << t_elaps.count() << "s" << std::endl;
 
     return q;
 }
@@ -470,7 +470,7 @@ boost::array<boost::array<double, 7>, 4> franka_IK(Eigen::Map< Eigen::Matrix<dou
 
     std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
     std::chrono::duration<double> t_elaps = t_end - t_start;
-    std::cout << std::endl << "Elapsed time: " << t_elaps.count() << "s" << std::endl;
+    std::cout << std::endl << "Elapsed time for IK solver: " << t_elaps.count() << "s" << std::endl;
     
     return q_all;
 }

@@ -126,18 +126,13 @@ def solution(dataloader, print_out=False):
 
 
 
-def neural_network(inputData):
+def neural_network(mod, inputData):
     global model, dataset, model_path
 
-    model = NN()
+    model = mod    
     torch.set_default_dtype(torch.float32)
     dataloader = torch.tensor(inputData, dtype=torch.float32)
     sol = None
-
-    dataset = DS(1)
-    
-    print("my dataloader = ", dataloader)
-    print(type(dataloader))
 
     if not model_path:
         raise ValueError('incorrect neural network model path')
