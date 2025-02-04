@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.10.2)
 project(neural_network)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -57,5 +57,6 @@ target_link_libraries(dataset_creator
 
 catkin_install_python(PROGRAMS
   scripts/NN_engine.py
+  scripts/humanPoses_solver.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

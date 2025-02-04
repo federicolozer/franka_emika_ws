@@ -10,35 +10,43 @@ from copy import deepcopy
 def reader():
     humanPoses = []
 
+    prefix = "Arm"
     arm = ["thumb", "finger", "hand", "inside_elbow", "outside_elbow", "right_shoulder", "left_shoulder"]
-    order = []
     
-    with open('/home/lozer/franka_emika_ws/src/neural_network/data/tracking.csv') as file:
+    order = dict()
+    for i in arm:
+        #order[f"{prefix}_{i}"] = None
+        order[prefix + "_" + i] = None
+    
+    with open('/home/lozer/franka_emika_ws/src/neural_network/data/Take 2025-01-31 10.32.23 AM.csv') as file:
         reader = csv.reader(file)
         
         cnt = 0
         for row in reader:
-            if cnt < 2:
-                pass
-            elif cnt == 2:
+            if cnt == 3:
                 for i in range(2, len(row)-2, 3):
-                    order.append(arm.index(row[i]))
-            else:
-                cnt2 = 0
+                    if row[i] in order:
+                        order[row[i]] = i
+                    else:
+                        continue
+
+            elif cnt >=7:
                 pose = [None, None, None, None, None, None, None]
 
                 for i in range(2, len(row)-2, 3):
                     if row[i] == "" or row[i+1] == "" or row[i+2] == "":
-                        cnt2 += 1
                         continue
 
                     item = [float(row[i]), float(row[i+1]), float(row[i+2])]
-                    pose[order[cnt2]] = item
-                    cnt2 += 1
+                    pose[list(order.values()).index(i)] = item
 
                 humanPoses.append(pose)
+            else:
+                pass
 
             cnt += 1
+    
+    print(order)
     
     return humanPoses
 
@@ -94,7 +102,10 @@ def solver(cPose):
     res = [list(eeToBase_frame[0:3, 0]), list(eeToBase_frame[0:3, 1]), list(eeToBase_frame[0:3, 2]), list(eeToBase_frame[0:3, 3]), q7]
 
     return res
-            
+
+
+if __name__ == "__main__":
+    reader()      
 
 
 

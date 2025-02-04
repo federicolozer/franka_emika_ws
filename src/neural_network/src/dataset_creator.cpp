@@ -11,6 +11,8 @@
 int main(int argc, char** argv) {
     std::ofstream file;
 
+    std::cout << "-----------------" << std::endl;
+
     file.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv");
     file << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
 
@@ -18,18 +20,26 @@ int main(int argc, char** argv) {
 
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')");
-	PyObject* pName = PyUnicode_FromString("humanPoses_solver");
+    PyObject* pName = PyUnicode_FromString("humanPoses_solver");
+    std::cout << "pname = " << pName << std::endl;
 	PyObject* pModule = PyImport_Import(pName);
 
+
+    
     Eigen::Matrix4d frame;
+    std::cout << "pmodule = " << pModule << std::endl;
 
     if (pModule) {
+        std::cout << "pmodule ok" << std::endl;
         PyObject* pFuncReader = PyObject_GetAttrString(pModule, "reader");
+        std::cout << "reader object" << std::endl;
         if(pFuncReader && PyCallable_Check(pFuncReader)) {
+            std::cout << "launching reader" << std::endl;
             PyObject* pHumanPoses = PyObject_CallObject(pFuncReader, NULL);
-            
+            std::cout << "reader executed" << std::endl;
             for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i++) {
                 frame = Eigen::Matrix4d::Identity();
+                std::cout << "frame = " << frame << std::endl;
 
                 PyObject* pPose = PyList_GetItem(pHumanPoses, i);
                 PyObject* pTuple = PyTuple_New(1);
