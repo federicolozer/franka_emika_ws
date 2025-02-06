@@ -154,17 +154,9 @@ def solver(cPose):
     xAxis_tmp = np.array(cPose[5])-(cPose[6]+np.dot(segm_shoulder_shoulder, zAxis)*zAxis)
     xAxis = (xAxis_tmp)/np.linalg.norm(xAxis_tmp)
     yAxis = -np.cross(xAxis, zAxis)
-    
-    #base_frame[0:3, 0] = deepcopy(xAxis)
-    #base_frame[0:3, 1] = deepcopy(yAxis)
-    #base_frame[0:3, 2] = deepcopy(zAxis)
-    #base_frame[0:3, 3] = cPose[5]    
 
-    eeToBase_frame = np.dot(np.linalg.inv(base_frame), ee_frame)
-    #eeToBase_frame[2, 3] += 0.33
-
-    plotter(cPose, frames=[base_frame, eeToBase_frame])
-    res = [list(eeToBase_frame[0:3, 0]), list(eeToBase_frame[0:3, 1]), list(eeToBase_frame[0:3, 2]), list(eeToBase_frame[0:3, 3]), q7]
+    plotter(cPose, frames=[base_frame, ee_frame])
+    res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7]
 
     return res
 
