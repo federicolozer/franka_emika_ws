@@ -160,11 +160,11 @@ def solver(cPose):
     #base_frame[0:3, 2] = deepcopy(zAxis)
     #base_frame[0:3, 3] = cPose[5]    
 
-    eeToBase_frame = np.dot(np.linalg.inv(base_frame), ee_frame)
+    #eeToBase_frame = np.dot(np.linalg.inv(base_frame), ee_frame)
     #eeToBase_frame[2, 3] += 0.33
 
-    plotter(cPose, frames=[base_frame, eeToBase_frame])
-    res = [list(eeToBase_frame[0:3, 0]), list(eeToBase_frame[0:3, 1]), list(eeToBase_frame[0:3, 2]), list(eeToBase_frame[0:3, 3]), q7]
+    plotter(cPose, frames=[base_frame, ee_frame])
+    res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7]
 
     return res
 
