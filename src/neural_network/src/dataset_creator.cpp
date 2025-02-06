@@ -29,8 +29,7 @@ int main(int argc, char** argv) {
         PyObject* pFuncReader = PyObject_GetAttrString(pModule, "reader");
         if(pFuncReader && PyCallable_Check(pFuncReader)) {
             PyObject* pHumanPoses = PyObject_CallObject(pFuncReader, NULL);
-            //for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i++) {
-            for (Py_ssize_t i=0; i<2; i++) {
+            for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i++) {
                 frame = Eigen::Matrix4d::Identity();
 
                 PyObject* pPose = PyList_GetItem(pHumanPoses, i);
