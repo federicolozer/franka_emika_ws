@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 	PyObject* pModule = PyImport_Import(pName);
 
     Eigen::Matrix4d frame;
-    std::cout << pModule << std::endl;
+    
     if (pModule) {
         PyObject* pFuncReader = PyObject_GetAttrString(pModule, "reader");
         if(pFuncReader && PyCallable_Check(pFuncReader)) {
