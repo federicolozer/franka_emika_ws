@@ -13,17 +13,17 @@ boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899,
 boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater, std::array<double, 3> O_EE, double q7, bool horz) {  
     std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
     
-    
-
     std::cout << "quater = " << quater.x() << " " << quater.y() << " " << quater.z() << " " << quater.w() << " " << std::endl;
-
     std::cout << "O_EE = " << O_EE[0] << " " << O_EE[1] << " " << O_EE[2] << " " << std::endl;
-
-        
 
     Eigen::Matrix4d O_T_EE_mat = quaternionToFrame(quater, O_EE[0], O_EE[1], O_EE[2]);
 
     Eigen::Matrix<double, 4, 4> O_T_EE_tmp;
+
+    std::array<float, 3> euler = frameToEuler(O_T_EE_mat); //-----------------------
+    const char* msg = "rosrun gazebo_ros spawn_model -file /home/lozer/franka_emika_ws/src/path_planning/data/frame/model.sdf -sdf -model frame -x -0 -y 0 -z 0 -R 0 -P 0 -Y 0";
+    
+    system(msg);
 
     if (horz) {
         Eigen::Matrix<double, 4, 4> O_T_EE_rot(O_T_EE_mat.data());
@@ -56,16 +56,15 @@ boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater
 
 
 
-void cpp_server() {
+void server() {
+    // Socket initialization
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-    // specifying the address
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(8081);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
 
-    // binding socket.
     bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
     listen(serverSocket, 5);
 
@@ -73,14 +72,11 @@ void cpp_server() {
 
     std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
 
-
-
-    // Allocate buffer and read the data
+    // Recostructing message
     double* buffer = new double[9];
     read(new_socket, buffer, 72);
 
     std::cout << "buffer = " << buffer[0] << " " << buffer[1] << " " << buffer[2] << " " << buffer[3] << " " << buffer[4] << " " << buffer[5] << " " << buffer[6] << " " << buffer[7] << " " << buffer[8] << " " << std::endl;
-
 
     std::array<double, 4> quaternion;
     for (int i=0; i<4; i++) {
@@ -89,7 +85,6 @@ void cpp_server() {
     Eigen::Quaterniond quater(quaternion.data());
 
     std::cout << "quaternion = " << quater.x() << " " << quater.y() << " " << quater.z() << " " << quater.w() << " " << std::endl;
-
 
     std::array<double, 3> O_EE;
     for (int i=0; i<3; i++) {
@@ -103,9 +98,6 @@ void cpp_server() {
     bool horz = buffer[8];
 
     boost::array<boost::array<double, 7>, 4> q_array_list = IK_fromQuater(quater, O_EE, q7, horz);
-
-
-    
 
     std::vector<boost::array<double, 7>> q_array;
 
@@ -132,26 +124,14 @@ void cpp_server() {
         send(new_socket, 0, 1, 0);
     }
     
-
     close(new_socket);
 
     std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
     std::chrono::duration<double> t_elaps = t_end - t_start;
     std::cout << std::endl << "Elapsed time for IK server: " << t_elaps.count() << "s" << std::endl;
 
-    
-    
     close(serverSocket);
-
-    
 }
-
-
-
-
-
-
-
 
 
 
@@ -164,7 +144,7 @@ int main(int argc, char** argv) {
     std::setprecision(2);
 
     std::cout << "Ready" << std::endl;
-    cpp_server();
+    server();
 
     return 0;
 }

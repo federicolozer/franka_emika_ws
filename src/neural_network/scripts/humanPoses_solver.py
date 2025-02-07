@@ -89,6 +89,7 @@ def reader():
                     pose[pos] = item
 
                 humanPoses.append(pose)
+                break
             else:
                 pass
 
@@ -147,7 +148,7 @@ def solver(cPose):
     xAxis = (xAxis_tmp)/np.linalg.norm(xAxis_tmp)
     yAxis = -np.cross(xAxis, zAxis)
 
-    #plotter(cPose, frames=[base_frame, ee_frame])
+    plotter(cPose, frames=[base_frame, ee_frame])
     res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7]
 
     return res

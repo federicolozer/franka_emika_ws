@@ -17,7 +17,7 @@ import struct
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
-def new_IK_fromQuater_client(data):
+def IK_fromQuater_client(data):
 
     print("data = ", data)
     data = np.array(data, dtype=np.double)
@@ -37,14 +37,16 @@ def new_IK_fromQuater_client(data):
 
 if __name__ == '__main__':    
     rospy.init_node('controller')
-    horz = rospy.get_param('/horz')
+    horz = False
+    if not rospy.search_param('/horz') == None:
+        horz = rospy.get_param('/horz')
 
     ttype = "follow_joint"
 
     with open('/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv') as file:
         reader = csv.reader(file)
 
-        row = list(reader)[3]
+        row = list(reader)[1]
 
         t = []
         q = []
@@ -68,14 +70,13 @@ if __name__ == '__main__':
         #q7 = float(q7_tmp[0]) - pi/4
         #print("\nq7 = ", q7)
 
-        q7 = -0.17050180633796952
 
         t2 = time.time()
 
         #res = controller.IK_fromQuater_client(quater, O_EE, q7, q_actual_array, horz)
 
-        data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), q7, int(horz)]
-        response = new_IK_fromQuater_client(data)
+        data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), float(row[7]), int(horz)]
+        response = IK_fromQuater_client(data)
 
         print("\n----------------")
         t3 = time.time()

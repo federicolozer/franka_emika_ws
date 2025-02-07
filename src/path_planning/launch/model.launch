@@ -1,0 +1,15 @@
+<launch>
+  <arg name="name" default="frame" />
+
+  <!-- send table urdf to param server -->
+  <!-- <param name="table_description" command="sdf $(find path_planning)/data/$(arg name).sdf" /> -->
+
+  <!-- push table_description to factory and spawn robot in gazebo -->
+    <node name="$(arg name)_spawner" 
+      pkg="gazebo_ros" 
+      type="spawn_model" 
+      args="-file $(find path_planning)/data/$(arg name)/model.sdf -sdf -model $(arg name)
+      -x -0 -y 0 -z 0 -R 0 -P 0 -Y 0"
+    />
+  
+  </launch>
