@@ -67,15 +67,17 @@ if __name__ == '__main__':
         #t1 = time.time()
         #print("time elapsed for having a solution: ", t1-t0, "s")
     #
-        #q7 = float(q7_tmp[0]) - pi/4
-        #print("\nq7 = ", q7)
+        q7 = pi/4 - float(row[7])  #  - pi/4 +0.1
+        print("\nq7 = ", float(row[7]))
+        print("\npi/4 = ", pi/4)
+        print("\nq7 adjusted = ", q7)
 
 
         t2 = time.time()
 
         #res = controller.IK_fromQuater_client(quater, O_EE, q7, q_actual_array, horz)
 
-        data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), float(row[7]), int(horz)]
+        data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), -float(row[5]), float(row[6])+0.1, q7, int(horz)]
         response = IK_fromQuater_client(data)
 
         print("\n----------------")
@@ -87,6 +89,7 @@ if __name__ == '__main__':
 
 
         q_array = list(response)
+        #q_array = [-1.7623606392141309, 1.0066890508374107, 0.9714105572606898, -1.9972501746915912, -0.5232118417432983, 2.2464632219400054, -0.40214716339744827]
         print("q_array = ", q_array)
         print("len q_array = ", len(q_array))
 

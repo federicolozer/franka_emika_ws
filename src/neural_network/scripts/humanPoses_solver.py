@@ -89,7 +89,6 @@ def reader():
                     pose[pos] = item
 
                 humanPoses.append(pose)
-                break
             else:
                 pass
 
@@ -110,8 +109,7 @@ def solver(cPose):
     base_frame = np.identity(4)
     ee_frame = np.identity(4)
 
-    ref = deepcopy([cPose[5][0], -cPose[5][2], cPose[5][1]])
-
+    ref = deepcopy([cPose[5][0], -cPose[5][2], cPose[5][1]-0.6]) #mod
 
     for i in range(len(cPose)):
         cPose[i] = deepcopy([cPose[i][0]-ref[0], -cPose[i][2]-ref[1], cPose[i][1]-ref[2]+0.333])
@@ -119,7 +117,7 @@ def solver(cPose):
                             [0, -1, 0],
                             [0, 0, 1]])
 
-        cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
+        cPose[i] = deepcopy(np.dot(rMat, 0.6*np.array(cPose[i])))#mod
 
     O_ee = (np.array(cPose[0])+np.array(cPose[1]))/2
     elbow = (np.array(cPose[3])+np.array(cPose[4]))/2
@@ -141,14 +139,14 @@ def solver(cPose):
 
     O_q7 = cPose[2]+(np.dot(segm_hand_elbow, segm_hand_ee)/np.linalg.norm(segm_hand_ee))*zAxis
     segm_q7_elbow = elbow-O_q7
-    q7 = np.arccos(np.dot(segm_q7_elbow/np.linalg.norm(segm_q7_elbow), xAxis))
+    q7 = np.arccos(np.dot(segm_q7_elbow/np.linalg.norm(segm_q7_elbow), -yAxis))
 
     zAxis = np.array([0, 0, 1])
     xAxis_tmp = np.array(cPose[5])-(cPose[6]+np.dot(segm_shoulder_shoulder, zAxis)*zAxis)
     xAxis = (xAxis_tmp)/np.linalg.norm(xAxis_tmp)
     yAxis = -np.cross(xAxis, zAxis)
 
-    plotter(cPose, frames=[base_frame, ee_frame])
+    #plotter(cPose, frames=[base_frame, ee_frame])
     res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7]
 
     return res

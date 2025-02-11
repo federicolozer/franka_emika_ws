@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
                         frame.block<3,1>(0,j) << axis[0], axis[1], axis[2];
                     }
                     PyObject* pq7 = PyList_GetItem(pList, 4);
-                    double q7 = PyFloat_AsDouble(pq7) - M_PI_2;
+                    double q7 = PyFloat_AsDouble(pq7);
 
                     std::cout << "q7 = " << q7 << std::endl;
 
