@@ -7,6 +7,11 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from math import sin, cos, asin, acos
+import os
+
+path = "/home/lozer/franka_emika_ws/src/neural_network/data/tracking_data"
+base_height = 0.7
+
 
 
 def plotter(markers, segments= None, frames=None):
@@ -31,6 +36,9 @@ def plotter(markers, segments= None, frames=None):
     ax.set_xlabel('X-axis')
     ax.set_ylabel('Y-axis')
     ax.set_zlabel('Z-axis')
+    ax.set_xlim(-0.2, 0.8)
+    ax.set_ylim(-0.5, 0.5)
+    ax.set_zlim(0, 1)
 
     if not segments == None:
         for segment in segments:
@@ -65,36 +73,36 @@ def reader():
         order[prefix + "_" + arm[i]] = None
         arm[i] = prefix + "_" + arm[i]
 
-    
-    with open('/home/lozer/franka_emika_ws/src/neural_network/data/Take 2025-01-31 10.32.23 AM.csv') as file:
-        reader = csv.reader(file)
-        
-        cnt = 0
-        for row in reader:
-            if cnt == 3:
-                for i in range(2, len(row)-2, 3):
-                    if row[i] in order:
-                        order[row[i]] = i
+    for folder in os.walk(path):
+        for file in folder[2]:
+            with open(path+"/"+file) as file:
+                reader = csv.reader(file)
+                
+                cnt = 0
+                for row in reader:
+                    if cnt == 3:
+                        for i in range(2, len(row)-2, 3):
+                            if row[i] in order:
+                                order[row[i]] = i
+                            else:
+                                continue
+                    
+                    elif cnt >=7:
+                        pose = [None, None, None, None, None, None]
+
+                        for i in range(2, len(row)-2, 3):
+                            if row[i] == "" or row[i+1] == "" or row[i+2] == "":
+                                continue
+
+                            item = [float(row[i]), float(row[i+1]), float(row[i+2])]
+                            pos = arm.index(list(order.keys())[list(order.values()).index(i)])
+                            pose[pos] = item
+
+                        humanPoses.append(pose)
                     else:
-                        continue
-            
-            elif cnt >=7:
-                pose = [None, None, None, None, None, None]
+                        pass
 
-                for i in range(2, len(row)-2, 3):
-                    if row[i] == "" or row[i+1] == "" or row[i+2] == "":
-                        continue
-
-                    item = [float(row[i]), float(row[i+1]), float(row[i+2])]
-                    pos = arm.index(list(order.keys())[list(order.values()).index(i)])
-                    pose[pos] = item
-
-                humanPoses.append(pose)
-                break
-            else:
-                pass
-
-            cnt += 1
+                    cnt += 1
     
     return humanPoses
 
@@ -107,34 +115,21 @@ def check(cPose):
 
 
 
-def adjust(ee_frame, q7, ah_segm, bh_segm):
+def adjust(ee_frame, q7, ah, bh):
     #ah = 0.345
     #bh = 0.302
-    ah = np.linalg.norm(ah_segm)
-    bh = np.linalg.norm(bh_segm)
-    ar = 0.472/1.217
-    br = 0.316/1.217
+    ar = 0.594
+    br = 0.316
+    ratio = (ar+br)/(ah+bh)
+    ratio = 1.4
 
-
-    #print("sei dentri ta funzion")
-    #print("ah = ", ah)
-    #print("bh = ", bh)
-    #print("ee_frame = ", ee_frame[0:3, 3])
-    #print("ee_frame = ", np.linalg.norm(ee_frame[0:3, 3]))
-#
-    #print(ee_frame[0, 3])
     #print(cos(q7)*ah) 
     #print(acos(ee_frame[0, 3] - cos(q7)*ah)/bh)
     #print(cos(asin((-sin(acos((ee_frame[0, 3] - cos(q7)*ah)/bh))*bh + sin(q7)*(ah + ar))/br)))
     #q7 = acos((ee_frame[0, 3] - cos(asin((-sin(acos((ee_frame[0, 3] - cos(q7)*ah)/bh))*bh + sin(q7)*(ah + ar))/br))*br)/ar) 
-
-
-
-
-
-    ee_frame[0:3, 3] *= 1.217
-    print(ee_frame)
-    print(q7)
+    
+    ee_frame[0:2, 3] *= ratio
+    ee_frame[2, 3] = ((ee_frame[2, 3]-base_height)*ratio)+base_height
 
     return ee_frame, q7
 
@@ -143,16 +138,17 @@ def adjust(ee_frame, q7, ah_segm, bh_segm):
 def solver(cPose):
     base_frame = np.identity(4)
     ee_frame = np.identity(4)
+    rMat = np.array([[1, 0, 0],
+                    [0, 0, -1],
+                    [0, 1, 0]])
 
-    ref = deepcopy([cPose[5][0], -cPose[5][2], cPose[5][1]])
+    ref = deepcopy([cPose[5][0], cPose[5][1], cPose[5][2]])
+    #ref = deepcopy(np.dot(rMat, np.array(ref)))
 
     for i in range(len(cPose)):
-        cPose[i] = deepcopy([cPose[i][0]-ref[0], -cPose[i][2]-ref[1], cPose[i][1]-ref[2]+0.333])
-        rMat = np.array([[-1, 0, 0],
-                            [0, -1, 0],
-                            [0, 0, 1]])
-
+        cPose[i] = deepcopy([cPose[i][0]-ref[0], cPose[i][1]-ref[1], cPose[i][2]-ref[2]])
         cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
+        cPose[i][2] += base_height
 
     O_ee = (np.array(cPose[0])+np.array(cPose[1]))/2
     elbow = (np.array(cPose[3])+np.array(cPose[4]))/2
@@ -181,17 +177,10 @@ def solver(cPose):
     #xAxis = (xAxis_tmp)/np.linalg.norm(xAxis_tmp)
     #yAxis = -np.cross(xAxis, zAxis)
 
-    print("prime da funzion")
-    print(ee_frame)
-    print(q7)
-
-    ee_frame, q7 = adjust(ee_frame, q7, segm_q7_elbow, segm_elbow_shoulder)
-
-    print("risultaaz finai")
-    print(ee_frame)
-    print(q7)
-
     #plotter(cPose, frames=[base_frame, ee_frame])
+
+    ee_frame, q7 = adjust(ee_frame, q7, np.linalg.norm(segm_hand_elbow)+np.linalg.norm(segm_hand_ee), np.linalg.norm(segm_elbow_shoulder))
+
     res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7]
 
     return res

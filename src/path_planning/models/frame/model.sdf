@@ -1,0 +1,135 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='frame'>
+    <link name='x_axis'>
+      <pose frame=''>0.1 0 0 0 1.57079632679 0</pose>
+      <inertial>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.145833</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.145833</iyy>
+          <iyz>0</iyz>
+          <izz>0.125</izz>
+        </inertia>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.005</radius>
+            <length>0.2</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <name>Gazebo/Grey</name>
+          </script>
+          <ambient>1 0 0 1</ambient>
+          <diffuse>1 0 0 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>0 0 0 1</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+    </link>
+
+    <link name='y_axis'>
+      <pose frame=''>0 0.1 0 1.57079632679 0 0</pose>
+      <inertial>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.145833</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.145833</iyy>
+          <iyz>0</iyz>
+          <izz>0.125</izz>
+        </inertia>
+        <pose frame=''>0 0.1 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.005</radius>
+            <length>0.2</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <name>Gazebo/Grey</name>
+          </script>
+          <ambient>0 1 0 1</ambient>
+          <diffuse>0 1 0 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>0 0 0 1</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+    </link>
+
+    <link name='z_axis'>
+      <pose frame=''>0 0 0.1 0 -0 0</pose>
+      <inertial>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.145833</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.145833</iyy>
+          <iyz>0</iyz>
+          <izz>0.125</izz>
+        </inertia>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <gravity>1</gravity>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.005</radius>
+            <length>0.2</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <lighting>1</lighting>
+          <script>
+            <name>Gazebo/Grey</name>
+          </script>
+          <ambient>0 0 1 1</ambient>
+          <diffuse>0 0 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>0 0 0 1</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+    </link>
+    <static>1</static>
+    <allow_auto_disable>1</allow_auto_disable>
+  </model>
+</sdf>

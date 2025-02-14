@@ -46,7 +46,7 @@ if __name__ == '__main__':
     with open('/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv') as file:
         reader = csv.reader(file)
 
-        row = list(reader)[5]
+        row = list(reader)[200]
 
         t = []
         q = []
@@ -67,17 +67,13 @@ if __name__ == '__main__':
         #t1 = time.time()
         #print("time elapsed for having a solution: ", t1-t0, "s")
     #
-        q7 = pi/4 - float(row[7])
-        print("\nq7 = ", float(row[7]))
-        print("\npi/4 = ", pi/4)
-        print("\nq7 adjusted = ", q7)
-
+        print(row)
 
         t2 = time.time()
 
         #res = controller.IK_fromQuater_client(quater, O_EE, q7, q_actual_array, horz)
 
-        data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), 0.6*float(row[4]), 0.6*float(row[5]), float(row[6])+0.7, pi/4-float(row[7]), int(horz)]
+        data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), pi/4-float(row[7]), int(horz)]
         response = IK_fromQuater_client(data)
 
         print("\n----------------")

@@ -11,6 +11,7 @@
     <arg name="controller" default="position_joint_trajectory_controller" />
     <arg name="horz" default="false" />
     <arg name="use_gui" default="false" />
+    <arg name="base_height" default="0.7" />
 
     <arg name="initial_joint_positions"
     default="-J $(arg arm_id)_joint1 0
@@ -30,7 +31,7 @@
                         gazebo:=true
                         hand:=$(arg load_gripper)
                         arm_id:=$(arg arm_id)
-                        xyz:='-0.333 0 0.7'
+                        xyz:='-0.333 0 $(arg base_height)'
                         rpy:='0 1.57079632679 0'">
         </param>
     </group>

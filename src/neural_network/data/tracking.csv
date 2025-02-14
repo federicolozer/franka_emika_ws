@@ -1,8 +1,0 @@
-fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd,fdfdfd
-n,time,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker,marker
-,,finger,finger,finger,thumb,thumb,thumb,inside_elbow,inside_elbow,inside_elbow,hand,hand,hand,outside_elbow,outside_elbow,outside_elbow,right_shoulder,right_shoulder,right_shoulder,left_shoulder,left_shoulder,left_shoulder
-1,0.001,0.75,0,0,0.65,0,0,0.2,0,0.1,0.7,0,0.1,0.2,0,0.1,-0.1,0,0.2,-0.5,0.4,0.2
-2,0.002,0.75,0,0,0.65,0,0,0.2,0,0.1,0.7,0,0.1,,,,-0.1,0,0.2,-0.5,0.4,0.2
-3,0.003,0.65,0,0,0.55,0,0,0.2,-0.1,0.1,0.6,0,0.1,0.2,-0.1,0.1,-0.1,0,0.2,-0.5,0.4,0.2
-4,0.004,0.55,0,0,0.45,0,0,0.2,-0.2,0.1,0.5,0,0.1,0.2,-0.2,0.1,-0.1,0,0.2,-0.5,0.4,0.2
-5,0.005,0.53,0,0,0.43,0,0,0.2,-0.2,0.1,0.48,0,0.1,0.2,-0.25,0.1,-0.1,0,0.2,-0.5,0.4,0.2
