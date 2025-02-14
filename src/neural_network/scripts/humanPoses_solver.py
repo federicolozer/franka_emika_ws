@@ -6,6 +6,7 @@ import numpy as np
 from copy import deepcopy
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from math import sin, cos, asin, acos
 
 
 def plotter(markers, segments= None, frames=None):
@@ -56,7 +57,7 @@ def reader():
     humanPoses = []
 
     prefix = "Arm"
-    arm = ["thumb", "finger", "hand", "inside_elbow", "outside_elbow", "right_shoulder", "left_shoulder"]
+    arm = ["thumb", "finger", "hand", "inside_elbow", "outside_elbow", "shoulder"]
     
     order = dict()
     for i in range(len(arm)):
@@ -78,7 +79,7 @@ def reader():
                         continue
             
             elif cnt >=7:
-                pose = [None, None, None, None, None, None, None]
+                pose = [None, None, None, None, None, None]
 
                 for i in range(2, len(row)-2, 3):
                     if row[i] == "" or row[i+1] == "" or row[i+2] == "":
@@ -89,6 +90,7 @@ def reader():
                     pose[pos] = item
 
                 humanPoses.append(pose)
+                break
             else:
                 pass
 
@@ -105,11 +107,44 @@ def check(cPose):
 
 
 
+def adjust(ee_frame, q7, ah_segm, bh_segm):
+    #ah = 0.345
+    #bh = 0.302
+    ah = np.linalg.norm(ah_segm)
+    bh = np.linalg.norm(bh_segm)
+    ar = 0.472/1.217
+    br = 0.316/1.217
+
+
+    #print("sei dentri ta funzion")
+    #print("ah = ", ah)
+    #print("bh = ", bh)
+    #print("ee_frame = ", ee_frame[0:3, 3])
+    #print("ee_frame = ", np.linalg.norm(ee_frame[0:3, 3]))
+#
+    #print(ee_frame[0, 3])
+    #print(cos(q7)*ah) 
+    #print(acos(ee_frame[0, 3] - cos(q7)*ah)/bh)
+    #print(cos(asin((-sin(acos((ee_frame[0, 3] - cos(q7)*ah)/bh))*bh + sin(q7)*(ah + ar))/br)))
+    #q7 = acos((ee_frame[0, 3] - cos(asin((-sin(acos((ee_frame[0, 3] - cos(q7)*ah)/bh))*bh + sin(q7)*(ah + ar))/br))*br)/ar) 
+
+
+
+
+
+    ee_frame[0:3, 3] *= 1.217
+    print(ee_frame)
+    print(q7)
+
+    return ee_frame, q7
+
+
+
 def solver(cPose):
     base_frame = np.identity(4)
     ee_frame = np.identity(4)
 
-    ref = deepcopy([cPose[5][0], -cPose[5][2], cPose[5][1]-0.6]) #mod
+    ref = deepcopy([cPose[5][0], -cPose[5][2], cPose[5][1]])
 
     for i in range(len(cPose)):
         cPose[i] = deepcopy([cPose[i][0]-ref[0], -cPose[i][2]-ref[1], cPose[i][1]-ref[2]+0.333])
@@ -117,7 +152,7 @@ def solver(cPose):
                             [0, -1, 0],
                             [0, 0, 1]])
 
-        cPose[i] = deepcopy(np.dot(rMat, 0.6*np.array(cPose[i])))#mod
+        cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
 
     O_ee = (np.array(cPose[0])+np.array(cPose[1]))/2
     elbow = (np.array(cPose[3])+np.array(cPose[4]))/2
@@ -125,7 +160,7 @@ def solver(cPose):
     segm_ee_finger = np.array(cPose[1])-O_ee
     segm_hand_ee = O_ee-np.array(cPose[2])
     segm_hand_elbow = elbow-np.array(cPose[2])
-    segm_shoulder_shoulder = np.array(cPose[5])-np.array(cPose[6])
+    segm_elbow_shoulder = np.array(cPose[5])-elbow
 
     zAxis = (segm_hand_ee)/np.linalg.norm(segm_hand_ee)
     yAxis_tmp = np.array(cPose[1])-(O_ee+np.dot(segm_ee_finger, zAxis)*zAxis)
@@ -139,12 +174,22 @@ def solver(cPose):
 
     O_q7 = cPose[2]+(np.dot(segm_hand_elbow, segm_hand_ee)/np.linalg.norm(segm_hand_ee))*zAxis
     segm_q7_elbow = elbow-O_q7
-    q7 = np.arccos(np.dot(segm_q7_elbow/np.linalg.norm(segm_q7_elbow), -yAxis))
+    q7 = np.arccos(np.dot(segm_q7_elbow/np.linalg.norm(segm_q7_elbow), -xAxis))
 
-    zAxis = np.array([0, 0, 1])
-    xAxis_tmp = np.array(cPose[5])-(cPose[6]+np.dot(segm_shoulder_shoulder, zAxis)*zAxis)
-    xAxis = (xAxis_tmp)/np.linalg.norm(xAxis_tmp)
-    yAxis = -np.cross(xAxis, zAxis)
+    #zAxis = np.array([0, 0, 1])
+    #xAxis_tmp = np.array(cPose[5])-(cPose[6]+np.dot(segm_shoulder_shoulder, zAxis)*zAxis)
+    #xAxis = (xAxis_tmp)/np.linalg.norm(xAxis_tmp)
+    #yAxis = -np.cross(xAxis, zAxis)
+
+    print("prime da funzion")
+    print(ee_frame)
+    print(q7)
+
+    ee_frame, q7 = adjust(ee_frame, q7, segm_q7_elbow, segm_elbow_shoulder)
+
+    print("risultaaz finai")
+    print(ee_frame)
+    print(q7)
 
     #plotter(cPose, frames=[base_frame, ee_frame])
     res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7]

@@ -35,6 +35,8 @@ boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater
 
     Eigen::Matrix4d O_T_EE_mat = quaternionToFrame(quater, O_EE[0], O_EE[1], O_EE[2]);
 
+    printFrame(O_T_EE_mat); //display frame in gazebo
+
     Eigen::Matrix4d O_T_EE_tmp;   
 
     if (horz) {
@@ -56,8 +58,6 @@ boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater
 
     std::cout << "O_T_EE = " << std::endl << O_T_EE << std::endl;
 
-    printFrame(O_T_EE_tmp); //display frame in gazebo
-    
     boost::array<boost::array<double, 7>, 4> q_array_list = franka_IK(O_T_EE, q7, q_actual_array);
 
     std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
