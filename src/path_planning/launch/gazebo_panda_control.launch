@@ -4,14 +4,15 @@
     <arg name="robot_ip" default="172.16.0.2" />
     <arg name="arm_id" default="panda" />
     <arg name="load_gripper" default="true" />
-    <arg name="rviz" default="false"/>
-    <arg name="gazebo" default="true"/>
+    <arg name="rviz" default="false" />
+    <arg name="gazebo" default="true" />
     <arg name="debug" default="false" />
     <arg name="world" default="worlds/empty.world" />
     <arg name="controller" default="position_joint_trajectory_controller" />
-    <arg name="horz" default="false" />
+    <arg name="mode" default="vert" />
     <arg name="use_gui" default="false" />
     <arg name="base_height" default="0.7" />
+    <arg name="first_joint_length" default="0.333" />
 
     <arg name="initial_joint_positions"
     default="-J $(arg arm_id)_joint1 0
@@ -25,18 +26,10 @@
                 -J $(arg arm_id)_finger_joint2 0.001"
     />
 
-    <group if="$(arg horz)">
-        <param name="robot_description"
-                command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
-                        gazebo:=true
-                        hand:=$(arg load_gripper)
-                        arm_id:=$(arg arm_id)
-                        xyz:='-0.333 0 $(arg base_height)'
-                        rpy:='0 1.57079632679 0'">
-        </param>
-    </group>
+    <param name="m_ee" value="0.76" if="$(arg load_gripper)" />
+    <param name="mode" value="$(arg mode)" />
 
-    <group unless="$(arg horz)">
+    <group if="$(eval mode == 'vert')">
         <param name="robot_description"
                 command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
                         gazebo:=true
@@ -47,8 +40,39 @@
         </param>
     </group>
 
-    <param name="m_ee" value="0.76" if="$(arg load_gripper)" />
-    <param name="horz" value="$(arg horz)" />
+    <group if="$(eval mode == 'horz')">
+        <param name="robot_description"
+                command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+                        gazebo:=true
+                        hand:=$(arg load_gripper)
+                        arm_id:=$(arg arm_id)
+                        xyz:='-$(arg first_joint_length) 0 $(arg base_height)'
+                        rpy:='0 1.57079632679 0'">
+        </param>
+    </group>
+
+    <group if="$(eval mode == 'horz_rev')">
+        <param name="robot_description"
+                command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+                        gazebo:=true
+                        hand:=$(arg load_gripper)
+                        arm_id:=$(arg arm_id)
+                        xyz:='-$(arg first_joint_length) 0 $(arg base_height)'
+                        rpy:='0 -1.57079632679 3.141592653589'">
+        </param>
+    </group>
+
+    <group if="$(eval mode == 'ceil')">
+        <arg name="height" value="$(eval arg('first_joint_length')+arg('base_height'))" />
+        <param name="robot_description"
+                command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+                        gazebo:=true
+                        hand:=$(arg load_gripper)
+                        arm_id:=$(arg arm_id)
+                        xyz:='0 0 $(arg height)'
+                        rpy:='0 3.141592653589 3.141592653589'">
+        </param>
+    </group>
     
     <rosparam file="$(find franka_gazebo)/config/franka_hw_sim.yaml" subst_value="true" />
     <rosparam file="$(find franka_gazebo)/config/sim_controllers.yaml" subst_value="true" />

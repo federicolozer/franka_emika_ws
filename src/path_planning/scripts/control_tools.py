@@ -34,6 +34,18 @@ def CallbackResult(data):
 
 
 
+def readJointStates():
+    joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates) 
+
+    while q_reg == []:
+        pass
+
+    joint_states_subscriber.unregister()
+
+    return q_reg
+    
+
+
 def IK_fromFrame_client(O_T_EE_array, q7, q_actual_array, horz):
     rospy.wait_for_service('IK_service')
     try:
@@ -75,12 +87,7 @@ def wait_execution(t_tot):
 def homing(q_last, ttype):
     global status, error_log, q_reg, q_p_lim
     
-    joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates) 
-
-    while q_reg == []:
-        pass
-
-    q_diff = deepcopy(q_reg)
+    q_diff = readJointStates()
     for i in range(len(q_diff)):
         q_diff[i] -= q_last[i]
         q_diff[i] = q_diff[i]/(0.2*q_p_lim[i]) + 0.1
@@ -109,7 +116,6 @@ def homing(q_last, ttype):
     if not status == 3:
         print(f"Homing ended with an error:\n{error_log}")
 
-    joint_states_subscriber.unregister()
     result_subscriber.unregister()
 
 
@@ -117,8 +123,6 @@ def homing(q_last, ttype):
 
 def exec_trajectory(t, q, ttype):
     global status, error_log
-
-    joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates)
 
     if ttype == "follow_joint":
         result_subscriber = rospy.Subscriber('/position_joint_trajectory_controller/follow_joint_trajectory/result', FollowJointTrajectoryActionResult, CallbackResult)
@@ -142,7 +146,6 @@ def exec_trajectory(t, q, ttype):
     else:
         print(f"\nTrajectory ended with an error:\n{error_log}")
 
-    joint_states_subscriber.unregister()
     result_subscriber.unregister()
 
 

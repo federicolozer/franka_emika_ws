@@ -116,12 +116,12 @@ def check(cPose):
 
 
 def adjust(ee_frame, q7, ah, bh):
-    #ah = 0.345
-    #bh = 0.302
+    ah = 0.345
+    bh = 0.302
     ar = 0.594
     br = 0.316
     ratio = (ar+br)/(ah+bh)
-    ratio = 1.4
+    #ratio = 1.4
 
     #print(cos(q7)*ah) 
     #print(acos(ee_frame[0, 3] - cos(q7)*ah)/bh)

@@ -16,28 +16,35 @@ import struct
 
 
 
-
 def IK_fromQuater_client(data):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('localhost', 8081))
+    client_socket.connect(('localhost', 8080))
 
-    print("data = ", data)
+    msg = b"data"
+    client_socket.send(msg)
+
     data = np.array(data, dtype=np.double)
-
+    print("data = ", data)
     request = data.tobytes()
-
     
-    client_socket.sendall(request)
-     
-    res1 = np.frombuffer(client_socket.recv(56), dtype=np.double)
+    client_socket.send(request)
+
+    response = []
+    for i in range(4):
+        res = np.frombuffer(client_socket.recv(56), dtype=np.double)
+        print(f"--- res{i} = ", res)
+        if np.isnan(res).any() == False:
+            response.append(res)
+
+    """res1 = np.frombuffer(client_socket.recv(56), dtype=np.double)
     res2 = np.frombuffer(client_socket.recv(56), dtype=np.double)
     res3 = np.frombuffer(client_socket.recv(56), dtype=np.double)
     res4 = np.frombuffer(client_socket.recv(56), dtype=np.double)
 
-    print("res1 = ", res1)
-    print("res2 = ", res2)
-    print("res3 = ", res3)
-    print("res4 = ", res4)
+    print("--- res1 = ", res1)
+    print("--- res2 = ", res2)
+    print("--- res3 = ", res3)
+    print("--- res4 = ", res4)
 
     response = []
 
@@ -48,7 +55,7 @@ def IK_fromQuater_client(data):
     elif np.isnan(res3).any() == False:
         response.append(res3)
     elif np.isnan(res4).any() == False:
-        response.append(res4)
+        response.append(res4)"""
         
     client_socket.close()
 
@@ -56,11 +63,27 @@ def IK_fromQuater_client(data):
 
 
 
+def endTransmission():
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('localhost', 8080))
+
+    request = b"stop"
+    client_socket.send(request)
+    
+
+
+
 if __name__ == '__main__':    
     rospy.init_node('controller')
-    horz = False
-    if not rospy.search_param('/horz') == None:
-        horz = rospy.get_param('/horz')
+    mode = 0
+    if not rospy.search_param('/mode') == None:
+        param = rospy.get_param('/mode')
+        if param == "horz":
+            mode = 1
+        elif param == "horz_rev":
+            mode = 2
+        elif param == "ceil":
+            mode = 3
 
     ttype = "follow_joint"
 
@@ -70,6 +93,7 @@ if __name__ == '__main__':
 
             rw = input("Select row...\n")
             if rw == "stop":
+                endTransmission()
                 break
 
             row = list(reader)[int(rw)]
@@ -93,30 +117,27 @@ if __name__ == '__main__':
             #t1 = time.time()
             #print("time elapsed for having a solution: ", t1-t0, "s")
         #
-            print(row)
 
             t2 = time.time()
 
             #res = controller.IK_fromQuater_client(quater, O_EE, q7, q_actual_array, horz)
 
-            data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), pi/4-float(row[7]), int(horz)]
+            data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), pi/4-float(row[7]), mode]
             response = IK_fromQuater_client(data)
 
             print("\n----------------")
             t3 = time.time()
-            print("time elapsed for IK: ", t3-t2, "s\n")
+            print("time elapsed for IK: ", t3-t2, "s")
+            print("\n----------------")
 
-            print("----- response = ", response)
-            
             if response == []:
                 print("No response found")
                 quit()
 
             q_array = list(response[0])
-            #q_array = [-1.7623606392141309, 1.0066890508374107, 0.9714105572606898, -1.9972501746915912, -0.5232118417432983, 2.2464632219400054, -0.40214716339744827]
             print("q_array = ", q_array)
-            print("len q_array = ", len(q_array))
-
+            q_curr = controller.readJointStates()
+            print("q_curr = ", q_curr)
             if not len(q_array) == 0:
                 t.append(2)
                 q.append(q_array)
