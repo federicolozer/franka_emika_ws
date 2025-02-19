@@ -20,8 +20,7 @@ def IK_fromQuater_client(data):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect(('localhost', 8080))
 
-    msg = b"data"
-    client_socket.send(msg)
+    client_socket.send(b"1")
 
     data = np.array(data, dtype=np.double)
     print("data = ", data)
@@ -67,8 +66,25 @@ def endTransmission():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect(('localhost', 8080))
 
-    request = b"stop"
-    client_socket.send(request)
+    client_socket.send(b"0")
+
+    client_socket.close()
+
+
+
+def optMove(q_array_list):
+    q_array = list(q_array_list[0])
+    do_once = True
+    for array in q_array_list:
+        if do_once:
+            do_once = False
+            continue
+        
+        if array[0] < q_array[0]:
+            q_array = list(array)
+    
+    return q_array
+
     
 
 
@@ -92,7 +108,7 @@ if __name__ == '__main__':
             reader = csv.reader(file)
 
             rw = input("Select row...\n")
-            if rw == "stop":
+            if rw == "quit":
                 endTransmission()
                 break
 
@@ -122,7 +138,7 @@ if __name__ == '__main__':
 
             #res = controller.IK_fromQuater_client(quater, O_EE, q7, q_actual_array, horz)
 
-            data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), pi/4-float(row[7]), mode]
+            data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), pi/4-float(row[7]), float(mode)]
             response = IK_fromQuater_client(data)
 
             print("\n----------------")
@@ -134,7 +150,7 @@ if __name__ == '__main__':
                 print("No response found")
                 quit()
 
-            q_array = list(response[0])
+            q_array =  optMove(response)
             print("q_array = ", q_array)
             q_curr = controller.readJointStates()
             print("q_curr = ", q_curr)
@@ -145,6 +161,7 @@ if __name__ == '__main__':
                 controller.launch_trajectory(t, q, ttype)
 
                 time.sleep(5)
+
         
     
     

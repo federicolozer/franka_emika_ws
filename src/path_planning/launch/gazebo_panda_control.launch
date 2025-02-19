@@ -47,7 +47,7 @@
                         hand:=$(arg load_gripper)
                         arm_id:=$(arg arm_id)
                         xyz:='-$(arg first_joint_length) 0 $(arg base_height)'
-                        rpy:='0 1.57079632679 0'">
+                        rpy:='0 -1.57079632679 3.14159265359'">
         </param>
     </group>
 
@@ -58,7 +58,7 @@
                         hand:=$(arg load_gripper)
                         arm_id:=$(arg arm_id)
                         xyz:='-$(arg first_joint_length) 0 $(arg base_height)'
-                        rpy:='0 -1.57079632679 3.141592653589'">
+                        rpy:='0 1.57079632679 0'">
         </param>
     </group>
 
@@ -70,7 +70,7 @@
                         hand:=$(arg load_gripper)
                         arm_id:=$(arg arm_id)
                         xyz:='0 0 $(arg height)'
-                        rpy:='0 3.141592653589 3.141592653589'">
+                        rpy:='0 3.14159265359 3.14159265359'">
         </param>
     </group>
     

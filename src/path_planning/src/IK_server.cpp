@@ -33,14 +33,26 @@ boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater
     
     //std::cout << "quater = " << quater.x() << " " << quater.y() << " " << quater.z() << " " << quater.w() << " " << std::endl;
     //std::cout << "O_EE = " << O_EE[0] << " " << O_EE[1] << " " << O_EE[2] << " " << std::endl;
-
+    
     Eigen::Matrix4d O_T_EE_mat = quaternionToFrame(quater, O_EE[0], O_EE[1], O_EE[2]);
 
     printFrame(O_T_EE_mat); //display frame in gazebo
 
     Eigen::Matrix4d O_T_EE_tmp;   
 
-    if (mode == 1) {
+    if (mode == 1) { // horz
+        Eigen::Matrix4d O_T_EE_rot(O_T_EE_mat.data());
+        std::cout << "O_T_EE = " << std::endl << O_T_EE_rot << std::endl;
+        Eigen::Matrix4d baseToWall_rot;
+        baseToWall_rot << 0.0, 0.0, 1.0, -0.333, 
+                            0.0, -1.0, 0.0, 0.0, 
+                            1.0, 0.0, 0.0, 0.7, 
+                            0.0, 0.0, 0.0, 1.0;
+        std::cout << "baseToWall_rot = " << std::endl << baseToWall_rot << std::endl;
+        O_T_EE_tmp = baseToWall_rot.inverse()*O_T_EE_rot;
+        std::cout << "dot product = " << std::endl << O_T_EE_tmp << std::endl;
+    }
+    else if (mode == 2) { // horz_rev
         Eigen::Matrix4d O_T_EE_rot(O_T_EE_mat.data());
         //std::cout << "O_T_EE = " << std::endl << O_T_EE_rot << std::endl;
         Eigen::Matrix4d baseToWall_rot;
@@ -52,19 +64,7 @@ boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater
         O_T_EE_tmp = baseToWall_rot.inverse()*O_T_EE_rot;
         //std::cout << "dot product = " << std::endl << O_T_EE_tmp << std::endl;
     }
-    else if (mode == 2) {
-        Eigen::Matrix4d O_T_EE_rot(O_T_EE_mat.data());
-        //std::cout << "O_T_EE = " << std::endl << O_T_EE_rot << std::endl;
-        Eigen::Matrix4d baseToWall_rot;
-        baseToWall_rot << 0.0, 0.0, 1.0, -0.333, 
-                            0.0, -1.0, 0.0, 0.0, 
-                            1.0, 0.0, 0.0, 0.7, 
-                            0.0, 0.0, 0.0, 1.0;
-        //std::cout << "baseToWall_rot = " << std::endl << baseToWall_rot << std::endl;
-        O_T_EE_tmp = baseToWall_rot.inverse()*O_T_EE_rot;
-        //std::cout << "dot product = " << std::endl << O_T_EE_tmp << std::endl;
-    }
-    else if (mode == 3) {
+    else if (mode == 3) { // ceil
         Eigen::Matrix4d O_T_EE_rot(O_T_EE_mat.data());
         //std::cout << "O_T_EE = " << std::endl << O_T_EE_rot << std::endl;
         Eigen::Matrix4d baseToWall_rot;
@@ -112,30 +112,17 @@ void server() {
         std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
 
         // Recostructing message
-        char msg[4];
-        recv(new_socket, msg, sizeof(msg));
+        char msg;
+        recv(new_socket, &msg, 1, 0);
 
-        std::cout << "msg = " << std::endl << msg << "--" << std::endl;
-
-        char end_msg[5] = "stop";
-        std::cout << "end_msg = " << std::endl << end_msg <<  "--" << std::endl;
-        if (msg == end_msg) {
+        if (msg == '0') {
+            std::cout << "Server shut down" << std::endl;
             close(new_socket);
             break;
         }
 
         double* buffer = new double[9];
-        recv(new_socket, buffer, sizeof(buffer));
-
-        std::cout << "buffer = " << std::endl << buffer[0] << std::endl;
-        std::cout << "buffer = " << std::endl << buffer[1] << std::endl;
-        std::cout << "buffer = " << std::endl << buffer[2] << std::endl;
-        std::cout << "buffer = " << std::endl << buffer[3] << std::endl;
-        std::cout << "buffer = " << std::endl << buffer[4] << std::endl;
-        std::cout << "buffer = " << std::endl << buffer[5] << std::endl;
-        std::cout << "buffer = " << std::endl << buffer[6] << std::endl;
-        std::cout << "buffer = " << std::endl << buffer[7] << std::endl;
-        std::cout << "buffer = " << std::endl << buffer[8] << std::endl;
+        recv(new_socket, buffer, 72, 0);
 
         std::array<double, 4> quaternion;
         for (int i=0; i<4; i++) {

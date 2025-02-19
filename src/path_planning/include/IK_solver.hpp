@@ -335,8 +335,7 @@ boost::array<boost::array<double, 7>, 4> franka_IK(Eigen::Map< Eigen::Matrix<dou
     if (L24 + L46 < L26 || L24 + L26 < L46 || L26 + L46 < L24) {
         error();
         return q_all_NAN;
-    }
-        
+    }  
     
     double theta246 = std::acos((LL24 + LL46 - LL26)/2.0/L24/L46);
     double q4 = theta246 + thetaH46 + theta342 - 2.0*M_PI;

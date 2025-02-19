@@ -61,5 +61,6 @@
         "set": "cpp",
         "string": "cpp",
         "string_view": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "/home/lozer/franka_emika_ws/src/neural_network"
 }
