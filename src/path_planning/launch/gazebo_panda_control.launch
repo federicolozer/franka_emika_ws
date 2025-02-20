@@ -89,7 +89,7 @@
         <arg name="world_name" value="$(arg world)"/>
         <arg name="paused" value="true"/>
         <arg name="gui" value="true"/>
-        <arg name="use_sim_time" value="false"/>
+        <arg name="use_sim_time" value="true"/>
     </include> 
 
     <node name="$(arg arm_id)_model_spawner"

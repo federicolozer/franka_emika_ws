@@ -19,6 +19,8 @@
         args="set /gazebo gravity_z 9.8"
     /> -->
 
+    <!-- rosrun dynamic_reconfigure dynparam set /gazebo "{'gravity_x':0, 'gravity_y':0, 'gravity_z':9.8}" -->
+    
     <node name="server" pkg="path_planning" type="IK_server" output="screen"/>
     <node name="client" pkg="path_planning" type="main.py" output="screen" />
 </launch>
