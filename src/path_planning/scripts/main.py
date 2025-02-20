@@ -13,6 +13,9 @@ import csv
 import time
 import socket
 import struct
+from gazebo_msgs.srv import SetPhysicsProperties, GetPhysicsProperties
+from geometry_msgs.msg import Vector3
+from std_srvs.srv import Empty
 
 
 
@@ -74,14 +77,14 @@ def endTransmission():
 
 def optMove(q_array_list):
     q_array = list(q_array_list[0])
-    do_once = True
-    for array in q_array_list:
-        if do_once:
-            do_once = False
-            continue
-        
-        if array[0] < q_array[0]:
-            q_array = list(array)
+    #do_once = True
+    #for array in q_array_list:
+    #    if do_once:
+    #        do_once = False
+    #        continue
+    #    
+    #    if array[0] < q_array[0]:
+    #        q_array = list(array)
     
     return q_array
 
@@ -91,15 +94,36 @@ def optMove(q_array_list):
 
 if __name__ == '__main__':    
     rospy.init_node('controller')
+    #pause_physics = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
+    #pause_physics.call()
+    #set_physics = rospy.ServiceProxy("/gazebo/set_physics_properties", SetPhysicsProperties)
+    #get_physics = rospy.ServiceProxy("/gazebo/get_physics_properties", GetPhysicsProperties)
+
+    gravity = Vector3()
     mode = 0
     if not rospy.search_param('/mode') == None:
         param = rospy.get_param('/mode')
         if param == "horz":
             mode = 1
+            gravity.x = -9.8
         elif param == "horz_rev":
             mode = 2
+            gravity.x = -9.8
         elif param == "ceil":
             mode = 3
+            gravity.z = 9.8
+
+    #print(set_physics.call(gravity=gravity))
+    #print(get_physics.call())
+    #time.sleep(2)
+    #unpause_physics = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
+    #unpause_physics.call()
+#
+    #time.sleep(2)
+    #q_curr = controller.readJointStates()
+    #print("q_curr = ", q_curr)
+    #
+    #quit()
 
     ttype = "follow_joint"
 
@@ -134,33 +158,35 @@ if __name__ == '__main__':
             #print("time elapsed for having a solution: ", t1-t0, "s")
         #
 
-            t2 = time.time()
-
-            #res = controller.IK_fromQuater_client(quater, O_EE, q7, q_actual_array, horz)
+            t0 = time.time()
 
             data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), pi/4-float(row[7]), float(mode)]
             response = IK_fromQuater_client(data)
 
             print("\n----------------")
-            t3 = time.time()
-            print("time elapsed for IK: ", t3-t2, "s")
-            print("\n----------------")
+            t1 = time.time()
+            print("Elapsed time for IK client: ", t1-t0, "s")
+            print("----------------")
+#
+            #if response == []:
+            #    print("No response found")
+            #    quit()
 
-            if response == []:
-                print("No response found")
-                quit()
-
-            q_array =  optMove(response)
+            #q_array = [0, 0, 0, 0, 0, pi-0.2, pi/4] #optMove(response)
+            q_array = optMove(response)
             print("q_array = ", q_array)
-            q_curr = controller.readJointStates()
-            print("q_curr = ", q_curr)
+            
             if not len(q_array) == 0:
                 t.append(2)
                 q.append(q_array)
+                print("launching trajectory")
 
                 controller.launch_trajectory(t, q, ttype)
 
                 time.sleep(5)
+
+            q_curr = controller.readJointStates()
+            print("q_curr = ", q_curr)
 
         
     

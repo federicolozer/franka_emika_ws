@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <cmath>
 
 
 boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};
@@ -12,15 +13,12 @@ boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899,
 
 void printFrame(Eigen::Matrix4d O_T_EE_tmp) {
     std::array<float, 3> euler = frameToEuler(O_T_EE_tmp); 
-    std::string msg1 = "rosrun gazebo_ros spawn_model -file /home/lozer/franka_emika_ws/src/path_planning/models/frame/model.sdf -sdf -model frame ";
+    std::string msg1 = "rosrun gazebo_ros spawn_model -file /home/lozer/franka_emika_ws/src/path_planning/data/models/frame/model.sdf -sdf -model frame ";
     std::stringstream ss;
     ss << "-x " << O_T_EE_tmp(0, 3) << " -y " << O_T_EE_tmp(1, 3) << " -z " << O_T_EE_tmp(2, 3) << " -R " << euler[0]<<  " -P " << euler[1] << " -Y " << euler[2];
     std::string msg2 = ss.str();
 
-    std::cout << "----------------------" << std::endl;
-    std::cout << (msg1+msg2).c_str() << std::endl;
-
-    //rosrun gazebo_ros spawn_model -file /home/lozer/franka_emika_ws/src/path_planning/models/human/model.sdf -sdf -model human
+    //rosrun gazebo_ros spawn_model -file /home/lozer/franka_emika_ws/src/path_planning/data/models/human/model.sdf -sdf -model human
     
     system("rosservice call gazebo/delete_model '{model_name: frame}'");
     system((msg1+msg2).c_str());
@@ -29,66 +27,44 @@ void printFrame(Eigen::Matrix4d O_T_EE_tmp) {
 
 
 boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater, std::array<double, 3> O_EE, double q7, int mode) {  
-    std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
-    
-    //std::cout << "quater = " << quater.x() << " " << quater.y() << " " << quater.z() << " " << quater.w() << " " << std::endl;
-    //std::cout << "O_EE = " << O_EE[0] << " " << O_EE[1] << " " << O_EE[2] << " " << std::endl;
-    
     Eigen::Matrix4d O_T_EE_mat = quaternionToFrame(quater, O_EE[0], O_EE[1], O_EE[2]);
-
-    printFrame(O_T_EE_mat); //display frame in gazebo
-
     Eigen::Matrix4d O_T_EE_tmp;   
 
     if (mode == 1) { // horz
         Eigen::Matrix4d O_T_EE_rot(O_T_EE_mat.data());
-        std::cout << "O_T_EE = " << std::endl << O_T_EE_rot << std::endl;
         Eigen::Matrix4d baseToWall_rot;
-        baseToWall_rot << 0.0, 0.0, 1.0, -0.333, 
-                            0.0, -1.0, 0.0, 0.0, 
-                            1.0, 0.0, 0.0, 0.7, 
+        baseToWall_rot << 0.0, 0.0, 1.0, -0.333,
+                            0.0, -1.0, 0.0, 0.0,
+                            1.0, 0.0, 0.0, 0.7,
                             0.0, 0.0, 0.0, 1.0;
-        std::cout << "baseToWall_rot = " << std::endl << baseToWall_rot << std::endl;
         O_T_EE_tmp = baseToWall_rot.inverse()*O_T_EE_rot;
-        std::cout << "dot product = " << std::endl << O_T_EE_tmp << std::endl;
     }
     else if (mode == 2) { // horz_rev
         Eigen::Matrix4d O_T_EE_rot(O_T_EE_mat.data());
-        //std::cout << "O_T_EE = " << std::endl << O_T_EE_rot << std::endl;
         Eigen::Matrix4d baseToWall_rot;
-        baseToWall_rot << 0.0, 0.0, 1.0, -0.333, 
-                            0.0, 1.0, 0.0, 0.0, 
-                            -1.0, 0.0, 0.0, 0.7, 
+        baseToWall_rot << 0.0, 0.0, 1.0, -0.333,
+                            0.0, 1.0, 0.0, 0.0,
+                            -1.0, 0.0, 0.0, 0.7,
                             0.0, 0.0, 0.0, 1.0;
-        //std::cout << "baseToWall_rot = " << std::endl << baseToWall_rot << std::endl;
         O_T_EE_tmp = baseToWall_rot.inverse()*O_T_EE_rot;
-        //std::cout << "dot product = " << std::endl << O_T_EE_tmp << std::endl;
     }
     else if (mode == 3) { // ceil
         Eigen::Matrix4d O_T_EE_rot(O_T_EE_mat.data());
-        //std::cout << "O_T_EE = " << std::endl << O_T_EE_rot << std::endl;
         Eigen::Matrix4d baseToWall_rot;
-        baseToWall_rot << 1.0, 0.0, 0.0, 0, 
-                            0.0, -1.0, 0.0, 0.0, 
-                            0.0, 0.0, -1.0, 1.033, 
+        baseToWall_rot << 1.0, 0.0, 0.0, 0.0,
+                            0.0, -1.0, 0.0, 0.0,
+                            0.0, 0.0, -1.0, 1.033,
                             0.0, 0.0, 0.0, 1.0;
-        //std::cout << "baseToWall_rot = " << std::endl << baseToWall_rot << std::endl;
         O_T_EE_tmp = baseToWall_rot.inverse()*O_T_EE_rot;
-        //std::cout << "dot product = " << std::endl << O_T_EE_tmp << std::endl;
     }
     else {
         O_T_EE_tmp = Eigen::Matrix4d(O_T_EE_mat.data());
     }
     Eigen::Map< Eigen::Matrix4d > O_T_EE(O_T_EE_tmp.data());
 
-    //std::cout << "O_T_EE = " << std::endl << O_T_EE << std::endl;
-
+    printFrame(O_T_EE_mat); //display frame in gazebo
     boost::array<boost::array<double, 7>, 4> q_array_list = franka_IK(O_T_EE, q7, q_actual_array);
 
-    std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
-    std::chrono::duration<double> t_elaps = t_end - t_start;
-    std::cout << std::endl << "Elapsed time for IK server: " << t_elaps.count() << "s" << std::endl;
-    
     return q_array_list;
 }
 
@@ -153,7 +129,9 @@ void server() {
 
         std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
         std::chrono::duration<double> t_elaps = t_end - t_start;
+        std::cout << std::endl << "----------------" << std::endl;
         std::cout << std::endl << "Elapsed time for IK server: " << t_elaps.count() << "s" << std::endl;
+        std::cout << "----------------" << std::endl;
     }
     
     close(serverSocket);

@@ -89,31 +89,31 @@
         <arg name="world_name" value="$(arg world)"/>
         <arg name="paused" value="true"/>
         <arg name="gui" value="true"/>
-        <arg name="use_sim_time" value="true"/>
-    </include>
+        <arg name="use_sim_time" value="false"/>
+    </include> 
 
     <node name="$(arg arm_id)_model_spawner"
-            pkg="gazebo_ros"
-            type="spawn_model"
-            args="-param robot_description -urdf -model $(arg arm_id) -unpause
-                $(arg initial_joint_positions)"
+        pkg="gazebo_ros"
+        type="spawn_model"
+        args="-param robot_description -urdf -model $(arg arm_id) -unpause
+            $(arg initial_joint_positions)"
     />
 
     <node pkg="controller_manager"
-            type="spawner"
-            name="$(arg arm_id)_gripper_spawner"
-            if="$(arg load_gripper)"
-            args="franka_gripper"
-            respawn="false"
+        type="spawner"
+        name="$(arg arm_id)_gripper_spawner"
+        if="$(arg load_gripper)"
+        args="franka_gripper"
+        respawn="false"
     />
 
     <node pkg="controller_manager"
-            type="spawner"
-            name="$(arg arm_id)_controller_spawner"
-            respawn="false" output="screen"
-            args="--wait-for initialized franka_state_controller $(arg controller)"
+        type="spawner"
+        name="$(arg arm_id)_controller_spawner"
+        respawn="false" output="screen"
+        args="--wait-for initialized franka_state_controller $(arg controller)"
     />
-
+    
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
     <node name="joint_state_publisher" type="joint_state_publisher" pkg="joint_state_publisher">

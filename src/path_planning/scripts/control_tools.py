@@ -86,12 +86,13 @@ def wait_execution(t_tot):
 
 def homing(q_last, ttype):
     global status, error_log, q_reg, q_p_lim
+    print("1")
     
     q_diff = readJointStates()
     for i in range(len(q_diff)):
         q_diff[i] -= q_last[i]
         q_diff[i] = q_diff[i]/(0.2*q_p_lim[i]) + 0.1
-    
+    print("2")
     t = [0, max(q_diff)]
     q = [q_reg, q_last]
     
@@ -106,7 +107,7 @@ def homing(q_last, ttype):
         control_publisher = rospy.Publisher('/execute_trajectory/goal', ExecuteTrajectoryActionGoal, queue_size = 10)
 
         msg = planner.build_execute_trajectory(t, q)
-
+    print("3")
     control_publisher.publish(msg)
 
     print("Homing\n")

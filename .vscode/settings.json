@@ -2,6 +2,7 @@
     "files.associations": {
         "*.txt": "makefile",
         "*.xacro": "html",
+        "*.urdf": "html",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
@@ -60,7 +61,8 @@
         "random": "cpp",
         "set": "cpp",
         "string": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "dense": "cpp"
     },
     "cmake.sourceDirectory": "/home/lozer/franka_emika_ws/src/neural_network"
 }
