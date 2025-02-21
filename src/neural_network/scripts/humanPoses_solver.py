@@ -107,7 +107,6 @@ def reader():
                         pass
 
                     cnt += 1
-            break ##### gjavilu
 
     return humanPoses
 
