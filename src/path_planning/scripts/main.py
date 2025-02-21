@@ -7,7 +7,7 @@
 import rospy
 from copy import deepcopy
 import numpy as np
-from math import pi
+from math import pi, nan
 import control_tools as controller
 import csv
 import time
@@ -76,23 +76,21 @@ def endTransmission():
 
 
 
-def optMove(q_array_list):
-    #q_curr = controller.readJointStates()
-    #print("actual configuration = ", q_curr)
-
+def optMove(q_array_list, q_ref):
+    err = nan
+    
     if not q_array_list == []:
-        q_array = list(q_array_list[0])
+        for array in q_array_list:
+            print("array = ", array)
+            print("q_ref = ", q_ref)
+            n_err = np.dot((array-q_ref), (array-q_ref))
+
+            if n_err-err < 0 or np.isnan(n_err-err):
+                q_array = list(array)
+                err = n_err
     else:
         q_array = []
-    #do_once = True
-    #for array in q_array_list:
-    #    if do_once:
-    #        do_once = False
-    #        continue
-    #    
-    #    if array[0] < q_array[0]:
-    #        q_array = list(array)
-    
+
     return q_array
 
     
@@ -129,6 +127,9 @@ if __name__ == '__main__':
 
     qTime = -1
 
+    q_ref = np.array(controller.readJointStates())
+    print("q_ref = ", q_ref)
+
     for rw in range(100, len(list(csv.reader(open('/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv')))), 100):
         with open('/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv') as file:
             reader = csv.reader(file)
@@ -145,13 +146,16 @@ if __name__ == '__main__':
             print("Elapsed time for IK client: ", t1-t0, "s")
             print("----------------")
 
-            q_array = optMove(response)
+            q_array = optMove(response, q_ref)
+            
             print("q_array = ", q_array)
 
             qTime += 1
 
             if q_array == []:
                 continue
+
+            q_ref = q_array
 
             t.append(qTime)
             q.append(q_array)
