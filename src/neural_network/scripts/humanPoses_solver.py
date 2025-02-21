@@ -65,7 +65,7 @@ def reader():
     humanPoses = []
 
     prefix = "Arm"
-    arm = ["thumb", "finger", "hand", "inside_elbow", "outside_elbow", "shoulder"]
+    arm = ["thumb", "finger", "hand", "elbow", "shoulder"]
     
     order = dict()
     for i in range(len(arm)):
@@ -75,7 +75,7 @@ def reader():
 
     for folder in os.walk(path):
         for file in folder[2]:
-            with open(path+"/"+file) as file:
+            with open(path + "/" + file) as file:
                 reader = csv.reader(file)
                 
                 cnt = 0
@@ -86,24 +86,29 @@ def reader():
                                 order[row[i]] = i
                             else:
                                 continue
-                    
+                
                     elif cnt >=7:
-                        pose = [None, None, None, None, None, None]
+                        pose = [None, None, None, None, None]
 
                         for i in range(2, len(row)-2, 3):
                             if row[i] == "" or row[i+1] == "" or row[i+2] == "":
                                 continue
-
+                            
                             item = [float(row[i]), float(row[i+1]), float(row[i+2])]
-                            pos = arm.index(list(order.keys())[list(order.values()).index(i)])
+                            try:
+                                pos = arm.index(list(order.keys())[list(order.values()).index(i)])
+                            except:
+                                continue
                             pose[pos] = item
 
-                        humanPoses.append(pose)
+                        if all(pose):
+                            humanPoses.append(pose)
                     else:
                         pass
 
                     cnt += 1
-    
+            break ##### gjavilu
+
     return humanPoses
 
 
@@ -142,21 +147,22 @@ def solver(cPose):
                     [0, 0, -1],
                     [0, 1, 0]])
 
-    ref = deepcopy([cPose[5][0], cPose[5][1], cPose[5][2]])
-    #ref = deepcopy(np.dot(rMat, np.array(ref)))
-
+    ref = deepcopy([-cPose[4][0], cPose[4][1], -cPose[4][2]])   # cambie i segnos
+    
     for i in range(len(cPose)):
-        cPose[i] = deepcopy([cPose[i][0]-ref[0], cPose[i][1]-ref[1], cPose[i][2]-ref[2]])
+        cPose[i] = deepcopy([-cPose[i][0]-ref[0], cPose[i][1]-ref[1], -cPose[i][2]-ref[2]])
         cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
         cPose[i][2] += base_height
 
     O_ee = (np.array(cPose[0])+np.array(cPose[1]))/2
-    elbow = (np.array(cPose[3])+np.array(cPose[4]))/2
+    hand = np.array(cPose[2])
+    elbow = np.array(cPose[3])
+    shoulder = np.array(cPose[4])
 
     segm_ee_finger = np.array(cPose[1])-O_ee
-    segm_hand_ee = O_ee-np.array(cPose[2])
-    segm_hand_elbow = elbow-np.array(cPose[2])
-    segm_elbow_shoulder = np.array(cPose[5])-elbow
+    segm_hand_ee = O_ee-hand
+    segm_hand_elbow = elbow-hand
+    segm_elbow_shoulder = shoulder-elbow
 
     zAxis = (segm_hand_ee)/np.linalg.norm(segm_hand_ee)
     yAxis_tmp = np.array(cPose[1])-(O_ee+np.dot(segm_ee_finger, zAxis)*zAxis)
@@ -168,14 +174,9 @@ def solver(cPose):
     ee_frame[0:3, 2] = deepcopy(zAxis)
     ee_frame[0:3, 3] = O_ee
 
-    O_q7 = cPose[2]+(np.dot(segm_hand_elbow, segm_hand_ee)/np.linalg.norm(segm_hand_ee))*zAxis
+    O_q7 = hand+(np.dot(segm_hand_elbow, segm_hand_ee)/np.linalg.norm(segm_hand_ee))*zAxis
     segm_q7_elbow = elbow-O_q7
     q7 = np.arccos(np.dot(segm_q7_elbow/np.linalg.norm(segm_q7_elbow), -xAxis))
-
-    #zAxis = np.array([0, 0, 1])
-    #xAxis_tmp = np.array(cPose[5])-(cPose[6]+np.dot(segm_shoulder_shoulder, zAxis)*zAxis)
-    #xAxis = (xAxis_tmp)/np.linalg.norm(xAxis_tmp)
-    #yAxis = -np.cross(xAxis, zAxis)
 
     #plotter(cPose, frames=[base_frame, ee_frame])
 
@@ -187,8 +188,7 @@ def solver(cPose):
 
 
 if __name__ == "__main__":
-    h = reader()  
-    solver(h[0])    
+    h = reader()
 
 
 

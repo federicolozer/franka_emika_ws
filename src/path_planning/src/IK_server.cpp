@@ -26,7 +26,7 @@ void printFrame(Eigen::Matrix4d O_T_EE_tmp) {
 
 
 
-boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater, std::array<double, 3> O_EE, double q7, int mode) {  
+boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater, std::array<double, 3> O_EE, double q7, int mode, bool dispFrame) {  
     Eigen::Matrix4d O_T_EE_mat = quaternionToFrame(quater, O_EE[0], O_EE[1], O_EE[2]);
     Eigen::Matrix4d O_T_EE_tmp;   
 
@@ -62,7 +62,9 @@ boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater
     }
     Eigen::Map< Eigen::Matrix4d > O_T_EE(O_T_EE_tmp.data());
 
-    printFrame(O_T_EE_mat); //display frame in gazebo
+    if (dispFrame) {
+        printFrame(O_T_EE_mat); //display frame in gazebo
+    }
     boost::array<boost::array<double, 7>, 4> q_array_list = franka_IK(O_T_EE, q7, q_actual_array);
 
     return q_array_list;
@@ -97,8 +99,9 @@ void server() {
             break;
         }
 
-        double* buffer = new double[9];
-        recv(new_socket, buffer, 72, 0);
+        int nArgs = 10;
+        double* buffer = new double[nArgs];
+        recv(new_socket, buffer, nArgs*8, 0);
 
         std::array<double, 4> quaternion;
         for (int i=0; i<4; i++) {
@@ -113,10 +116,11 @@ void server() {
   
         double q7 = buffer[7];
         int mode = buffer[8];
+        bool dispFrame = buffer[9];
 
         std::cout << "mode = " << std::endl << mode << std::endl;
 
-        boost::array<boost::array<double, 7>, 4> q_array_list = IK_fromQuater(quater, O_EE, q7, mode);
+        boost::array<boost::array<double, 7>, 4> q_array_list = IK_fromQuater(quater, O_EE, q7, mode, dispFrame);
 
         send(new_socket, &q_array_list[0], sizeof(q_array_list[0]), 0);
         send(new_socket, &q_array_list[1], sizeof(q_array_list[1]), 0);

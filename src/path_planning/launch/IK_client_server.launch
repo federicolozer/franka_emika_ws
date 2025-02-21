@@ -1,26 +1,6 @@
 <?xml version="1.0" ?>
 
-<launch>
-    <!-- <node name="change_gravity_x_param"
-        pkg="dynamic_reconfigure"
-        type="dynparam"
-        args="set /gazebo gravity_x 0"
-    />   
-
-    <node name="change_gravity_y_param"
-        pkg="dynamic_reconfigure"
-        type="dynparam"
-        args="set /gazebo gravity_y 0"
-    /> 
-
-    <node name="change_gravity_z_param"
-        pkg="dynamic_reconfigure"
-        type="dynparam"
-        args="set /gazebo gravity_z 9.8"
-    /> -->
-
-    <!-- rosrun dynamic_reconfigure dynparam set /gazebo "{'gravity_x':0, 'gravity_y':0, 'gravity_z':9.8}" -->
-    
+<launch>    
     <node name="server" pkg="path_planning" type="IK_server" output="screen"/>
     <node name="client" pkg="path_planning" type="main.py" output="screen" />
 </launch>
