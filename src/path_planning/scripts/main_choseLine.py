@@ -118,7 +118,7 @@ if __name__ == '__main__':
         else:
             gravity[2] = -9.8
 
-    #msg = "rosrun dynamic_reconfigure dynparam set /gazebo \"{" + f"'gravity_x':{gravity[0]}, 'gravity_y':{gravity[1]}, 'gravity_z':{gravity[2]}" + "}\""
+    msg = "rosrun dynamic_reconfigure dynparam set /gazebo \"{" + f"'gravity_x':{gravity[0]}, 'gravity_y':{gravity[1]}, 'gravity_z':{gravity[2]}" + "}\""
     #os.system(msg)
 
     ttype = "follow_joint"
@@ -172,8 +172,6 @@ if __name__ == '__main__':
             #q_array = [0, 0, 0, 0, 0, pi-0.2, pi/4] #optMove(response)
             q_array = optMove(response)
             print("q_array = ", q_array)
-
-            continue
             
             if not len(q_array) == 0:
                 t.append(2)

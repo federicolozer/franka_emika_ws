@@ -125,7 +125,8 @@ if __name__ == '__main__':
     t = []
     q = []
 
-    qTime = -1
+    qTime = -2
+    cnt = 0
 
     q_ref = np.array(controller.readJointStates())
     print("q_ref = ", q_ref)
@@ -150,16 +151,18 @@ if __name__ == '__main__':
             
             print("q_array = ", q_array)
 
-            qTime += 1
+            qTime += 2
 
             if q_array == []:
                 continue
 
             q_ref = q_array
+            cnt += 1
 
             t.append(qTime)
             q.append(q_array)
 
+    print("Found ", cnt, " points")
     print("Starting task")
     controller.launch_trajectory(t, q, ttype)
 

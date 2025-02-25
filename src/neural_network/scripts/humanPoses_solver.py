@@ -72,7 +72,7 @@ def reader():
         #order[f"{prefix}_{i}"] = None
         order[prefix + "_" + arm[i]] = None
         arm[i] = prefix + "_" + arm[i]
-
+    
     for folder in os.walk(path):
         for file in folder[2]:
             with open(path + "/" + file) as file:
@@ -146,10 +146,10 @@ def solver(cPose):
                     [0, 0, -1],
                     [0, 1, 0]])
 
-    ref = deepcopy([-cPose[4][0], cPose[4][1], -cPose[4][2]])   # cambie i segnos
+    ref = deepcopy([cPose[4][0], cPose[4][1], cPose[4][2]])   # cambie i segnos
     
     for i in range(len(cPose)):
-        cPose[i] = deepcopy([-cPose[i][0]-ref[0], cPose[i][1]-ref[1], -cPose[i][2]-ref[2]])
+        cPose[i] = deepcopy([cPose[i][0]-ref[0], cPose[i][1]-ref[1], cPose[i][2]-ref[2]])
         cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
         cPose[i][2] += base_height
 
