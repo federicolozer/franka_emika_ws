@@ -12,7 +12,7 @@ import rospy
 
 model = None
 dataset = None
-model_path = "/home/lozer/franka_emika_ws/src/neural_network/data/NN_model.pth"
+model_path = "/home/lozer/franka_emika_ws/src/neural_network/data/model/NN_model.pth"
 dataset_path = "/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv"
 
 
@@ -21,16 +21,14 @@ class NN(nn.Module):
     def __init__(self):
         super(NN, self).__init__()
         self.fc1 = nn.Linear(7, 5)
-        self.fc2 = nn.Linear(5, 5)
-        self.fc3 = nn.Linear(5, 1)
+        self.fc2 = nn.Linear(5, 1)
 
         self.criterion = nn.MSELoss(reduction = 'mean')
         self.optimizer = optim.Adam(self.parameters(), lr=0.001)
 
     def forward(self, x):
         x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        x = self.fc3(x)
+        x = self.fc2(x)
         return x
 
 
@@ -147,7 +145,7 @@ def neural_network(mod, inputData):
 
 if __name__ == "__main__":
     model = NN()
-    dataset = DS(1) 
+    dataset = DS(10) 
 
     mode = sys.argv[1]
     if mode == "--train":

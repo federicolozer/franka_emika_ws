@@ -61,13 +61,13 @@ int main(int argc, char** argv) {
                     PyObject* pq7 = PyList_GetItem(pList, 4);
                     double q7 = PyFloat_AsDouble(pq7);
 
-                    std::cout << "q7 = " << q7 << std::endl;
+                    //std::cout << "q7 = " << q7 << std::endl;
 
-                    std::cout << "frame = " << std::endl << frame << std::endl;
+                    //std::cout << "frame = " << std::endl << frame << std::endl;
 
                     Eigen::Quaterniond quater = frameToQuaternion(frame);
 
-                    std::cout << "quaternion = " << quater.x() << " " << quater.y() << " " << quater.z() << " " << quater.w()  << std::endl;
+                    //std::cout << "quaternion = " << quater.x() << " " << quater.y() << " " << quater.z() << " " << quater.w()  << std::endl;
 
                     file << quater.x() << "," << quater.y() << "," << quater.z() << "," << quater.w() << "," << frame(0,3) << "," << frame(1,3) << "," << frame(2,3) << "," << q7 << std::endl;
                 }

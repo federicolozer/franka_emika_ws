@@ -73,6 +73,27 @@ def optMove(q_array_list, q_ref):
 
     
 
+def random_quaternion():
+    # Generate four random numbers from a normal distribution
+    rand = np.random.normal(size=4)
+    # Normalize the quaternion
+    norm = np.linalg.norm(rand)
+    quaternion = rand / norm
+
+    return quaternion
+
+
+
+def random_position():
+    x = 0.2 + np.random.random()*0.5
+    y = -0.7 + np.random.random()*1.4
+    z = 0.2 + np.random.random()*0.8
+
+    position = [x, y, z]
+
+    return position
+
+
 
 
 if __name__ == '__main__':    
@@ -98,86 +119,83 @@ if __name__ == '__main__':
     os.system(msg)
 
     ttype = "follow_joint"
-    dispFrame = False
+    dispFrame = True
     q_ref = np.array(controller.readJointStates())
 
     model = nn.NN()
 
     while True:
-        with open('/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv') as file:
-            reader = csv.reader(file)
+        rw = input("Generate new random pose...\n")
+        if rw == "quit":
+            endTransmission()
+            break
 
-            rw = input("Select row...\n")
-            if rw == "quit":
-                endTransmission()
-                break
+        t = []
+        q = []
 
-            t = []
-            q = []
+        quater = random_quaternion()
+        O_EE = random_position()
 
-            row = list(reader)[int(rw)]
-            quater = np.array([float(row[0]), float(row[1]), float(row[2]), float(row[3])])
-            O_EE = np.array([float(row[4]), float(row[5]), float(row[6])])
+        # Neural network
+        # ------------------------------------------------------------------------------------
 
-            # Neural network
-            # ------------------------------------------------------------------------------------
+        t0 = time.time()
+        inputData = np.matrix(np.concatenate((quater, O_EE), axis=0))
+        q7 = float(nn.neural_network(model, inputData)[0]) 
+        print("\n----------------")
+        t1 = time.time()
+        print("Elapsed time for having a solution from NN: ", t1-t0, "s")
+        print("----------------")
 
-            t0 = time.time()
-            inputData = np.matrix(np.concatenate((quater, O_EE), axis=0))
-            q7 = float(nn.neural_network(model, inputData)[0]) 
-            print("\n----------------")
-            t1 = time.time()
-            print("Elapsed time for having a solution from NN: ", t1-t0, "s")
-            print("----------------")
+        # Inverse kinematics
+        # ------------------------------------------------------------------------------------
 
-            # Inverse kinematics
-            # ------------------------------------------------------------------------------------
+        t0 = time.time()
+        print(inputData[0])
+        print(inputData[0][0])
+        print(inputData[0, 0])
+        data = [float(inputData[0, 0]), float(inputData[0, 1]), float(inputData[0, 2]), float(inputData[0, 3]), float(inputData[0, 4]), float(inputData[0, 5]), float(inputData[0, 6]), pi/4-q7, float(mode), float(dispFrame)]
+        response = IK_fromQuater_client(data)
+        print("\n----------------")
+        t1 = time.time()
+        print("Elapsed time for IK client: ", t1-t0, "s")
+        print("----------------")
 
-            print("q7 value from NN = ", q7)
-            print("q7 value from dataset = ", float(row[7]))
-            t0 = time.time()
-            data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), pi/4-q7, float(mode), float(dispFrame)]
-            response = IK_fromQuater_client(data)
-            print("\n----------------")
-            t1 = time.time()
-            print("Elapsed time for IK client: ", t1-t0, "s")
-            print("----------------")
+        # Trajectory planning
+        # ------------------------------------------------------------------------------------
 
-            # Trajectory planning
-            # ------------------------------------------------------------------------------------
+        if response == []:
+            print("No response found")
+            continue
 
-            if response == []:
-                print("No response found")
-                continue
+        q_array = optMove(response, q_ref)
+        print("q_array = ", q_array)
+        
+        if not len(q_array) == 0:
+            t.append(2)
+            q.append(q_array)
+            q_ref = q_array
 
-            q_array = optMove(response, q_ref)
-            print("q_array = ", q_array)
-            
-            if not len(q_array) == 0:
-                t.append(2)
-                q.append(q_array)
-                q_ref = q_array
+            controller.launch_trajectory(t, q, ttype)
 
-                controller.launch_trajectory(t, q, ttype)
+            time.sleep(5)
 
-                time.sleep(5)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         
-    
-    
-
-    
-
-
-
-
-
-
-
-    
-    
-
-
-            
 
 

@@ -119,7 +119,7 @@ if __name__ == '__main__':
             gravity[2] = -9.8
 
     msg = "rosrun dynamic_reconfigure dynparam set /gazebo \"{" + f"'gravity_x':{gravity[0]}, 'gravity_y':{gravity[1]}, 'gravity_z':{gravity[2]}" + "}\""
-    #os.system(msg)
+    os.system(msg)
 
     ttype = "follow_joint"
     dispFrame = True
@@ -179,7 +179,7 @@ if __name__ == '__main__':
 
                 controller.launch_trajectory(t, q, ttype)
 
-                time.sleep(5)
+                time.sleep(3)
 
             q_curr = controller.readJointStates()
             print("q_curr = ", q_curr)

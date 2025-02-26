@@ -97,7 +97,9 @@ def homing(q_last, ttype):
         q_diff[i] -= q_last[i]
         q_diff[i] = q_diff[i]/(0.2*q_p_lim[i]) + 0.1
     
-    t = [0, max(q_diff)]
+    t = [0, min([3, max(q_diff)])]
+    print(t)
+    t = [0, 2]
     q = [q_reg, q_last]
     
     if ttype == "follow_joint":

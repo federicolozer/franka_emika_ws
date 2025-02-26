@@ -7,6 +7,7 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from math import sin, cos, asin, acos
+#from progress.bar import IncrementalBar as Bar
 import os
 
 path = "/home/lozer/franka_emika_ws/src/neural_network/data/tracking_data"
@@ -65,7 +66,7 @@ def reader():
     humanPoses = []
 
     prefix = "Arm"
-    arm = ["thumb", "finger", "hand", "elbow", "shoulder"]
+    arm = ["EE", "finger", "hand", "elbow", "shoulder"]
     
     order = dict()
     for i in range(len(arm)):
@@ -77,6 +78,8 @@ def reader():
         for file in folder[2]:
             with open(path + "/" + file) as file:
                 reader = csv.reader(file)
+                #print(len(file))
+                #bar = Bar("Elaborating " + file + "...", max=100)
                 
                 cnt = 0
                 for row in reader:
@@ -88,6 +91,7 @@ def reader():
                                 continue
                 
                     elif cnt >=7:
+                        #bar.next()
                         pose = [None, None, None, None, None]
 
                         for i in range(2, len(row)-2, 3):
@@ -107,7 +111,8 @@ def reader():
                         pass
 
                     cnt += 1
-
+            #bar.finish()
+            
     return humanPoses
 
 
@@ -153,7 +158,7 @@ def solver(cPose):
         cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
         cPose[i][2] += base_height
 
-    O_ee = (np.array(cPose[0])+np.array(cPose[1]))/2
+    O_ee = np.array(cPose[0]) #(np.array(cPose[0])+np.array(cPose[1]))/2
     hand = np.array(cPose[2])
     elbow = np.array(cPose[3])
     shoulder = np.array(cPose[4])

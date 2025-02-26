@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-import sys
-sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')
-
-import NN_engine as nn
+#import sys
+#sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')
+#import NN_engine as nn
 import rospy
 from copy import deepcopy
 import numpy as np
@@ -28,7 +27,7 @@ def IK_fromQuater_client(data):
     client_socket.send(b"1")
 
     data = np.array(data, dtype=np.double)
-    print("data = ", data)
+    #print("data = ", data)
     request = data.tobytes()
     
     client_socket.send(request)
@@ -36,10 +35,31 @@ def IK_fromQuater_client(data):
     response = []
     for i in range(4):
         res = np.frombuffer(client_socket.recv(56), dtype=np.double)
-        print(f"--- res{i} = ", res)
+        #print(f"--- res{i} = ", res)
         if np.isnan(res).any() == False:
             response.append(res)
 
+    """res1 = np.frombuffer(client_socket.recv(56), dtype=np.double)
+    res2 = np.frombuffer(client_socket.recv(56), dtype=np.double)
+    res3 = np.frombuffer(client_socket.recv(56), dtype=np.double)
+    res4 = np.frombuffer(client_socket.recv(56), dtype=np.double)
+
+    print("--- res1 = ", res1)
+    print("--- res2 = ", res2)
+    print("--- res3 = ", res3)
+    print("--- res4 = ", res4)
+
+    response = []
+
+    if np.isnan(res1).any() == False:
+        response.append(res1)
+    elif np.isnan(res2).any() == False:
+        response.append(res2)
+    elif np.isnan(res3).any() == False:
+        response.append(res3)
+    elif np.isnan(res4).any() == False:
+        response.append(res4)"""
+        
     client_socket.close()
 
     return response
@@ -61,6 +81,8 @@ def optMove(q_array_list, q_ref):
     
     if not q_array_list == []:
         for array in q_array_list:
+            print("array = ", array)
+            print("q_ref = ", q_ref)
             n_err = np.dot((array-q_ref), (array-q_ref))
 
             if n_err-err < 0 or np.isnan(n_err-err):
@@ -99,69 +121,52 @@ if __name__ == '__main__':
 
     ttype = "follow_joint"
     dispFrame = False
+
+    t = []
+    q = []
+
+    qTime = -2
+    cnt = 0
+
     q_ref = np.array(controller.readJointStates())
+    print("q_ref = ", q_ref)
 
-    model = nn.NN()
-
-    while True:
+    for rw in range(100, len(list(csv.reader(open('/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv')))), 100):
         with open('/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv') as file:
             reader = csv.reader(file)
 
-            rw = input("Select row...\n")
-            if rw == "quit":
-                endTransmission()
-                break
-
-            t = []
-            q = []
-
             row = list(reader)[int(rw)]
-            quater = np.array([float(row[0]), float(row[1]), float(row[2]), float(row[3])])
-            O_EE = np.array([float(row[4]), float(row[5]), float(row[6])])
-
-            # Neural network
-            # ------------------------------------------------------------------------------------
 
             t0 = time.time()
-            inputData = np.matrix(np.concatenate((quater, O_EE), axis=0))
-            q7 = float(nn.neural_network(model, inputData)[0]) 
-            print("\n----------------")
-            t1 = time.time()
-            print("Elapsed time for having a solution from NN: ", t1-t0, "s")
-            print("----------------")
 
-            # Inverse kinematics
-            # ------------------------------------------------------------------------------------
-
-            print("q7 value from NN = ", q7)
-            print("q7 value from dataset = ", float(row[7]))
-            t0 = time.time()
-            data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), pi/4-q7, float(mode), float(dispFrame)]
+            data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), pi/4-float(row[7]), float(mode), float(dispFrame)]
             response = IK_fromQuater_client(data)
+
             print("\n----------------")
             t1 = time.time()
             print("Elapsed time for IK client: ", t1-t0, "s")
             print("----------------")
 
-            # Trajectory planning
-            # ------------------------------------------------------------------------------------
+            q_array = optMove(response, q_ref)
+            
+            print("q_array = ", q_array)
 
-            if response == []:
-                print("No response found")
+            qTime += 2
+
+            if q_array == []:
                 continue
 
-            q_array = optMove(response, q_ref)
-            print("q_array = ", q_array)
-            
-            if not len(q_array) == 0:
-                t.append(2)
-                q.append(q_array)
-                q_ref = q_array
+            q_ref = q_array
+            cnt += 1
 
-                controller.launch_trajectory(t, q, ttype)
+            t.append(qTime)
+            q.append(q_array)
 
-                time.sleep(5)
+    print("Found ", cnt, " points")
+    print("Starting task")
+    controller.launch_trajectory(t, q, ttype)
 
+    endTransmission()
         
     
     
