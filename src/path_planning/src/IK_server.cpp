@@ -65,6 +65,7 @@ boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater
     if (dispFrame) {
         printFrame(O_T_EE_mat); //display frame in gazebo
     }
+
     boost::array<boost::array<double, 7>, 4> q_array_list = franka_IK(O_T_EE, q7, q_actual_array);
 
     return q_array_list;

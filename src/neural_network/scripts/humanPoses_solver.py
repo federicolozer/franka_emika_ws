@@ -7,7 +7,7 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from math import sin, cos, asin, acos
-#from progress.bar import IncrementalBar as Bar
+from progress.bar import IncrementalBar as Bar
 import os
 
 path = "/home/lozer/franka_emika_ws/src/neural_network/data/tracking_data"
@@ -70,8 +70,7 @@ def reader():
     
     order = dict()
     for i in range(len(arm)):
-        #order[f"{prefix}_{i}"] = None
-        order[prefix + "_" + arm[i]] = None
+        order[f"{prefix}_{arm[i]}"] = None
         arm[i] = prefix + "_" + arm[i]
     
     for folder in os.walk(path):
@@ -79,7 +78,7 @@ def reader():
             with open(path + "/" + file) as file:
                 reader = csv.reader(file)
                 #print(len(file))
-                #bar = Bar("Elaborating " + file + "...", max=100)
+                bar = Bar("Elaborating...", max=100)
                 
                 cnt = 0
                 for row in reader:
@@ -91,7 +90,7 @@ def reader():
                                 continue
                 
                     elif cnt >=7:
-                        #bar.next()
+                        bar.next()
                         pose = [None, None, None, None, None]
 
                         for i in range(2, len(row)-2, 3):
@@ -111,7 +110,7 @@ def reader():
                         pass
 
                     cnt += 1
-            #bar.finish()
+            bar.finish()
             
     return humanPoses
 
