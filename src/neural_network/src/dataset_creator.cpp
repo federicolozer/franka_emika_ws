@@ -42,14 +42,14 @@ int main(int argc, char** argv) {
 
                 PyObject* pPose = PyList_GetItem(pHumanPoses, i);
 
-                //for (int j=0; j<5; j++) {
-                //    PyObject* obj = PyList_GetItem(pPose, j);
-                //    double item = PyFloat_AsDouble(obj);
-                //    std::cout << "Item = " << item << std::endl;
-                //    //double item2 = PyFloat_AsDouble(PyList_GetItem(pPose, j));
-                //    
-                //    std::cout << "Item 2 = " << PyFloat_AsDouble(PyList_GetItem(pPose, j)) << std::endl;
-                //}
+                for (int j=0; j<5; j++) {
+                    PyObject* obj = PyList_GetItem(pPose, j);
+                    double item = PyFloat_AsDouble(obj);
+                    std::cout << "Item = " << item << std::endl;
+                    //double item2 = PyFloat_AsDouble(PyList_GetItem(pPose, j));
+                    
+                    std::cout << "Item 2 = " << PyFloat_AsDouble(PyList_GetItem(pPose, j)) << std::endl;
+                }
 
 
 

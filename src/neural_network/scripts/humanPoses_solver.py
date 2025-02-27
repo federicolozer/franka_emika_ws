@@ -75,11 +75,10 @@ def reader():
     
     for folder in os.walk(path):
         for file in folder[2]:
+            bar = Bar(f"Reading {file}", max=len(list(csv.reader(open(path + "/" + file))))-7)
+
             with open(path + "/" + file) as file:
                 reader = csv.reader(file)
-                #print(len(file))
-                bar = Bar("Elaborating...", max=100)
-                
                 cnt = 0
                 for row in reader:
                     if cnt == 3:
@@ -124,8 +123,8 @@ def check(cPose):
 
 
 def adjust(ee_frame, q7, ah, bh):
-    ah = 0.345
-    bh = 0.302
+    #ah = 0.345
+    #bh = 0.302
     ar = 0.594
     br = 0.316
     ratio = (ar+br)/(ah+bh)
