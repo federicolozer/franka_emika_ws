@@ -15,53 +15,6 @@ base_height = 0.7
 
 
 
-def plotter(markers, segments= None, frames=None):
-    x = []
-    y = []
-    z = []
-
-    for lst in markers:
-        x.append(lst[0])
-        y.append(lst[1])
-        z.append(lst[2])
-
-    # Create a figure and a 3D axis
-    fig = plt.figure(figsize=(10, 7))
-    ax = fig.add_subplot(111, projection='3d')
-
-    # Plot the data
-    ax.scatter3D(x, y, z, color='black')
-
-    # Set plot title and labels
-    plt.title("Simple 3D Scatter Plot")
-    ax.set_xlabel('X-axis')
-    ax.set_ylabel('Y-axis')
-    ax.set_zlabel('Z-axis')
-    ax.set_xlim(-0.2, 0.8)
-    ax.set_ylim(-0.5, 0.5)
-    ax.set_zlim(0, 1)
-
-    if not segments == None:
-        for segment in segments:
-            ax.plot3D([segment[0][0], segment[1][0]], [segment[0][1], segment[1][1]], [segment[0][2], segment[1][2]], color='green')
-
-    if not frames == None:
-        for frame in frames:
-            O = frame[0:3, 3]
-            x_dir = np.dot(frame, [0.1, 0, 0, 1])
-            y_dir = np.dot(frame, [0, 0.1, 0, 1])
-            z_dir = np.dot(frame, [0, 0, 0.1, 1])
-
-            ax.plot3D([x_dir[0], O[0]], [x_dir[1], O[1]], [x_dir[2], O[2]], color='red')
-            ax.plot3D([y_dir[0], O[0]], [y_dir[1], O[1]], [y_dir[2], O[2]], color='green')
-            ax.plot3D([z_dir[0], O[0]], [z_dir[1], O[1]], [z_dir[2], O[2]], color='blue')
-
-    # Show the plot
-    #plt.pause(5)
-    plt.show()
-
-
-
 def reader():
     humanPoses = []
 
@@ -110,15 +63,8 @@ def reader():
 
                     cnt += 1
             bar.finish()
-            
+    
     return humanPoses
-
-
-
-def check(cPose):
-    result = all(cPose)
-
-    return result
 
 
 
@@ -149,7 +95,7 @@ def solver(cPose):
                     [0, 0, -1],
                     [0, 1, 0]])
 
-    ref = deepcopy([cPose[4][0], cPose[4][1], cPose[4][2]])   # cambie i segnos
+    ref = deepcopy([cPose[4][0], cPose[4][1], cPose[4][2]])
     
     for i in range(len(cPose)):
         cPose[i] = deepcopy([cPose[i][0]-ref[0], cPose[i][1]-ref[1], cPose[i][2]-ref[2]])
@@ -180,17 +126,12 @@ def solver(cPose):
     segm_q7_elbow = elbow-O_q7
     q7 = np.arccos(np.dot(segm_q7_elbow/np.linalg.norm(segm_q7_elbow), -xAxis))
 
-    #plotter(cPose, frames=[base_frame, ee_frame])
-
     ee_frame, q7 = adjust(ee_frame, q7, np.linalg.norm(segm_hand_elbow)+np.linalg.norm(segm_hand_ee), np.linalg.norm(segm_elbow_shoulder))
 
     res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7]
 
     return res
 
-
-if __name__ == "__main__":
-    h = reader()
 
 
 

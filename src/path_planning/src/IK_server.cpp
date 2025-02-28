@@ -1,4 +1,4 @@
-#include "IK_solver.hpp"
+#include "kinematics.hpp"
 #include "cast_tools.hpp"
 #include <eigen3/Eigen/Dense>
 #include <stdexcept>
@@ -66,7 +66,7 @@ boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater
         printFrame(O_T_EE_mat); //display frame in gazebo
     }
 
-    boost::array<boost::array<double, 7>, 4> q_array_list = franka_IK(O_T_EE, q7, q_actual_array);
+    boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE, q7, q_actual_array, false);
 
     return q_array_list;
 }

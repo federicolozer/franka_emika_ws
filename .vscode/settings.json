@@ -3,6 +3,7 @@
         "*.txt": "makefile",
         "*.xacro": "html",
         "*.urdf": "html",
+        "*.world": "html",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
@@ -62,7 +63,8 @@
         "set": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "dense": "cpp"
+        "dense": "cpp",
+        "*.ipp": "cpp"
     },
     "cmake.sourceDirectory": "/home/lozer/franka_emika_ws/src/neural_network"
 }

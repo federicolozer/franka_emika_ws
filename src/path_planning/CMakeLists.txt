@@ -6,10 +6,10 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
-  franka_gazebo
 )
 
 find_package(Eigen3 REQUIRED)
+find_package(Franka 0.8.0 REQUIRED)
 
 ## Generate services in the 'srv' folder
 add_service_files(
@@ -31,7 +31,6 @@ catkin_package(
     roscpp 
     rospy 
     std_msgs
-    franka_gazebo
     xacro
 )
 
@@ -43,6 +42,8 @@ catkin_package(
 
 include_directories(include
   ${catkin_INCLUDE_DIRS}
+  ${Franka_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
 )
 
 # IK server
@@ -52,6 +53,7 @@ add_executable(IK_server
 
 target_link_libraries(IK_server
   ${catkin_LIBRARIES}
+  ${Franka_LIBRARIES}
 )
 
 

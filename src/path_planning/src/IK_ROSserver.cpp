@@ -1,10 +1,9 @@
-#include "IK_solver.hpp"
+#include "kinematics.hpp"
 #include "cast_tools.hpp"
 #include "ros/ros.h"
 #include "path_planning/IK_fromFrame.h"
 #include "path_planning/IK_fromQuater.h"
 #include <eigen3/Eigen/Dense>
-#include <franka_gazebo/model_kdl.h>
 #include <stdexcept>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -49,7 +48,7 @@ bool CallbackIK_fromFrame(path_planning::IK_fromFrame::Request &req, path_planni
     }
 
 
-    boost::array<boost::array<double, 7>, 4> q_array_list = franka_IK(O_T_EE, q7, q_actual_array);
+    boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE, q7, q_actual_array, false);
 
     res.q_array_1 = q_array_list[0];
     res.q_array_2 = q_array_list[1];
@@ -109,7 +108,7 @@ bool CallbackIK_fromQuater(path_planning::IK_fromQuater::Request &req, path_plan
         q_actual_array[i] = static_cast<double>(req.q_actual_array[i]);
     }
 
-    boost::array<boost::array<double, 7>, 4> q_array_list = franka_IK(O_T_EE, q7, q_actual_array);
+    boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE, q7, q_actual_array, false);
 
     res.q_array_1 = q_array_list[0];
     res.q_array_2 = q_array_list[1];
