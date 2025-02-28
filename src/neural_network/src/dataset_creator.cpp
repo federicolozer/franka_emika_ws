@@ -1,5 +1,5 @@
 #include "cast_tools.hpp"
-//#include "kinematics.hpp"
+#include "kinematics.hpp"
 #include <eigen3/Eigen/Dense>
 #include <array>
 #include <cmath>
@@ -8,11 +8,11 @@
 #include <Python.h>
 
 
-//boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};
+boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};
 
 
 
-/*bool IK_check(Eigen::Map< Eigen::Matrix4d > O_T_EE, double q7) {
+bool IK_check(Eigen::Map< Eigen::Matrix4d > O_T_EE, double q7) {
     boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE, q7, q_actual_array, false);
 
     bool result = false;
@@ -29,8 +29,8 @@
         }
     }
 
-    return result
-}*/
+    return result;
+}
 
 
 

@@ -8,8 +8,9 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-#find_package(Eigen3 REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(PythonLibs REQUIRED)
+find_package(Franka 0.8.0 REQUIRED)
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
@@ -35,6 +36,8 @@ catkin_package(
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${PYTHON_INCLUDE_DIRS}
+  ${Franka_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
   ../path_planning/include
 )
 
@@ -46,7 +49,6 @@ add_executable(dataset_creator
 target_link_libraries(dataset_creator
   ${catkin_LIBRARIES}
   ${PYTHON_LIBRARIES}
-  ${path_planning_LIBRARIES}
 )
 
 

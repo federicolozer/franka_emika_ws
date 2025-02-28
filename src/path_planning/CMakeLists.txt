@@ -53,7 +53,6 @@ add_executable(IK_server
 
 target_link_libraries(IK_server
   ${catkin_LIBRARIES}
-  ${Franka_LIBRARIES}
 )
 
 
