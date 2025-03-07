@@ -1,0 +1,10 @@
+div {
+    display: flex;
+}
+p {
+    padding-right: 50;
+}
+button {
+    height: 30;
+    width: 60;
+}

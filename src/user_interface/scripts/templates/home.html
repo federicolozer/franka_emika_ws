@@ -1,0 +1,32 @@
+<!DOCTYPE html5>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script src="static/script.js"></script>
+</head>
+
+<body>
+    <h1>CREATE DATASET</h1>
+    <p>Select data to include in the dataset</p>
+    <div id="output"></div>
+    <script>
+        const json = {{data | tojson}};
+        let count = 1;
+        for (var key in json) {
+            createSection(key, json[key], count++);
+        }
+
+        var data_set = new Set();
+
+
+        //$.getJSON("data.json", function(data) {
+        //    document.getElementById("p2").innerHTML = data.Data_1;
+        //    for (item in data) {
+        //        document.getElementById("p3").innerHTML = item;
+        //    };
+        //});
+    </script>
+    <button onclick="returnData()">Proceed</button>
+</body>

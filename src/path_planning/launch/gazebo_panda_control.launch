@@ -75,7 +75,7 @@
     </group>
     
     <rosparam file="$(find franka_gazebo)/config/franka_hw_sim.yaml" subst_value="true" />
-    <rosparam file="$(find franka_gazebo)/config/sim_controllers.yaml" subst_value="true" />
+    <rosparam file="$(find path_planning)/config/controllers.yaml" subst_value="true" /> 
 
 
 

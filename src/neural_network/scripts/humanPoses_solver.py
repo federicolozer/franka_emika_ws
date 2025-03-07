@@ -28,6 +28,9 @@ def reader():
     
     for folder in os.walk(path):
         for file in folder[2]:
+            print(file)
+            continue
+
             bar = Bar(f"Reading {file}", max=len(list(csv.reader(open(path + "/" + file))))-7)
 
             with open(path + "/" + file) as file:
@@ -64,6 +67,7 @@ def reader():
                     cnt += 1
             bar.finish()
     
+        os.system()
     return humanPoses
 
 
@@ -134,7 +138,7 @@ def solver(cPose):
 
 
 
-
+reader()
 
 
         
