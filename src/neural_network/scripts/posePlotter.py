@@ -9,7 +9,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from math import sin, cos, asin, acos
 from progress.bar import IncrementalBar as Bar
 import os
-from humanPoses_solver import reader, solver
+from neural_network.scripts.humanPoses import reader, solver
 
 path = "/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv"
 

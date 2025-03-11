@@ -15,7 +15,8 @@ base_height = 0.7
 
 
 
-def reader():
+
+def reader(target=None):
     humanPoses = []
 
     prefix = "Arm"
@@ -26,48 +27,41 @@ def reader():
         order[f"{prefix}_{arm[i]}"] = None
         arm[i] = prefix + "_" + arm[i]
     
-    for folder in os.walk(path):
-        for file in folder[2]:
-            print(file)
-            continue
-
-            bar = Bar(f"Reading {file}", max=len(list(csv.reader(open(path + "/" + file))))-7)
-
-            with open(path + "/" + file) as file:
-                reader = csv.reader(file)
-                cnt = 0
-                for row in reader:
-                    if cnt == 3:
-                        for i in range(2, len(row)-2, 3):
-                            if row[i] in order:
-                                order[row[i]] = i
-                            else:
-                                continue
-                
-                    elif cnt >=7:
-                        bar.next()
-                        pose = [None, None, None, None, None]
-
-                        for i in range(2, len(row)-2, 3):
-                            if row[i] == "" or row[i+1] == "" or row[i+2] == "":
-                                continue
-                            
-                            item = [float(row[i]), float(row[i+1]), float(row[i+2])]
-                            try:
-                                pos = arm.index(list(order.keys())[list(order.values()).index(i)])
-                            except:
-                                continue
-                            pose[pos] = item
-
-                        if all(pose):
-                            humanPoses.append(pose)
-                    else:
-                        pass
-
-                    cnt += 1
-            bar.finish()
+    if target == None:
+        tracking_data = list(os.walk(path))[0][2]
+    else:
+        tracking_data = list(target)
     
-        os.system()
+    for data in tracking_data:
+        with open(path + "/" + data) as file:
+            reader = csv.reader(file)
+            cnt = 0
+            for row in reader:
+                if cnt == 3:
+                    for i in range(2, len(row)-2, 3):
+                        if row[i] in order:
+                            order[row[i]] = i
+                        else:
+                            continue
+            
+                elif cnt >=7:
+                    pose = [None, None, None, None, None]
+                    for i in range(2, len(row)-2, 3):
+                        if row[i] == "" or row[i+1] == "" or row[i+2] == "":
+                            continue
+                        
+                        item = [float(row[i]), float(row[i+1]), float(row[i+2])]
+                        try:
+                            pos = arm.index(list(order.keys())[list(order.values()).index(i)])
+                        except:
+                            continue
+                        pose[pos] = item
+                    if all(pose):
+                        humanPoses.append(pose)
+                else:
+                    pass
+                cnt += 1
+    
     return humanPoses
 
 
@@ -136,9 +130,4 @@ def solver(cPose):
 
     return res
 
-
-
 reader()
-
-
-        

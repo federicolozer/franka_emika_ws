@@ -59,6 +59,6 @@ target_link_libraries(dataset_creator
 
 catkin_install_python(PROGRAMS
   scripts/NN_engine.py
-  scripts/humanPoses_solver.py
+  scripts/humanPoses.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

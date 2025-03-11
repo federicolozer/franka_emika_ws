@@ -4,6 +4,7 @@
         "*.xacro": "html",
         "*.urdf": "html",
         "*.world": "html",
+        "*.hta": "html",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
@@ -64,7 +65,11 @@
         "string": "cpp",
         "string_view": "cpp",
         "dense": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "condition_variable": "cpp",
+        "unordered_set": "cpp",
+        "mutex": "cpp",
+        "core": "cpp"
     },
     "cmake.sourceDirectory": "/home/lozer/franka_emika_ws/src/neural_network"
 }
