@@ -10,11 +10,11 @@ app = Flask(__name__)
 
 
 def callDatasetCreator(data):
-    msg = ""
+    msg = "rosrun neural_network dataset_creator"
     for elem in data:
         msg += (" " + elem)
-    print(msg)
-    os.system(f"rosrun neural_network dataset_creator{msg}")
+    
+    os.system(msg)
 
 
 
@@ -24,17 +24,25 @@ def home():
 
 
 
-@app.route('/get', methods=['GET'])
+@app.route('/getJson', methods=['GET'])
 def sendData():
     return gen_json()
 
 
 
-@app.route('/send', methods=['SEND'])
+@app.route('/sendDatasetCreatorRequest', methods=['SEND'])
 def getData():
     data = request.get_json()
     callDatasetCreator(data)
-    return jsonify(result=1)
+    return jsonify(result="Dataset created correctly")
+
+
+
+@app.route('/sendTrainingNNRequest', methods=['SEND'])
+def startTraining():
+    data = request.get_json()
+    callDatasetCreator(data)
+    return jsonify(result="Neural network training has ended correctly")
 
 
 

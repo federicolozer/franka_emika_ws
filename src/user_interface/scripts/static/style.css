@@ -1,12 +1,20 @@
 div {
     display: flex;
 }
+div.msg{
+    display: block;
+}
+div#btn{
+    height: 100;
+}
 p {
     padding-right: 50;
 }
 button {
     height: 30;
     width: 60;
+    margin-top: 10;
+    margin-right: 30;
 }
 #output {
     padding-left: 50;

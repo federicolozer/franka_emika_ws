@@ -1,6 +1,6 @@
 function interface() {
     $.ajax({
-        url: '/get',
+        url: '/getJson',
         type: 'GET',
         contentType: 'application/json',
         success: function(data, status) {
@@ -12,7 +12,7 @@ function interface() {
             }
         },
         error: function(error) {
-            document.getElementById("output").innerHTML = "Error: failed to load data";
+            document.getElementById("msg").innerHTML = "Error: failed to load data";
         }
     });
     //$.getJSON("/get", function(data, status){
@@ -45,7 +45,7 @@ function createSection(key, val, count) {
     button.id = "bt_" + count;
     defineButtonBehavior(button, val, count);
 
-    document.body.appendChild(div);
+    document.getElementById("inst").appendChild(div);
     document.getElementById("d_" + count).appendChild(p1);
     document.getElementById("d_" + count).appendChild(p2);
     document.getElementById("d_" + count).appendChild(button);
@@ -74,15 +74,32 @@ function defineButtonBehavior(button, val, count) {
 
 function returnData() {
     $.ajax({
-        url: '/send',
+        url: '/sendDatasetCreatorRequest',
         type: 'SEND',
         contentType: 'application/json',
         data: JSON.stringify(Array.from(data_set)),
         success: function(response) {
-            document.getElementById('output').innerHTML = response.result;
+            document.getElementById('msg').innerHTML = response.result;
         },
         error: function(error) {
-            document.getElementById('output').innerHTML = "Error: failed to create database";
+            document.getElementById('msg').innerHTML = "Error: failed to send request";
+        }
+    });
+}
+
+
+
+function createDataset() {
+    $.ajax({
+        url: '/sendTrainingNNRequest',
+        type: 'SEND',
+        contentType: 'application/json',
+        data: JSON.stringify({"value": 1}),
+        success: function(response) {
+            document.getElementById('msg').innerHTML = response.result;
+        },
+        error: function(error) {
+            document.getElementById('msg').innerHTML = "Error: failed to send request";
         }
     });
 }

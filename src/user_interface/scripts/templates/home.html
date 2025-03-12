@@ -9,13 +9,18 @@
 
 <body>
     <h1>CREATE DATASET</h1>
-    <p>Select data to include in the dataset</p>
+    <div id="inst" class="msg">
+        <p>Select data to include in the dataset</p>
+    </div>
     <script>
         var data_set = new Set();
         interface();
     </script>
-    <div>
-        <button onclick="returnData()">Proceed</button>
-        <p id="output"></p>
+    <div id="btn" class="msg">
+        <p id="msg"></p>
+        <div>
+            <button onclick="returnData()">Proceed</button>
+            <button onclick="createDataset()">Proceed</button>
+        </div>
     </div>
 </body>

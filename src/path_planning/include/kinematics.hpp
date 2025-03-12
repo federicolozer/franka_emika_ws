@@ -58,7 +58,7 @@ void error(int n, double val) {
 
 
 boost::array<boost::array<double, 7>, 4> IK_solver(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE, double q7, boost::array<double, 7> q_actual_array, bool print) {
-    //std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
+    std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
     
     const boost::array< boost::array<double, 7>, 4 > q_all_NAN = {{ {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}},
                                                                 {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}},
@@ -269,42 +269,33 @@ boost::array<boost::array<double, 7>, 4> IK_solver(Eigen::Map< Eigen::Matrix<dou
         }
     }
 
-    //std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
-    //std::chrono::duration<double> t_elaps = t_end - t_start;
-    //std::cout << std::endl << "Elapsed time for IK solver: " << t_elaps.count() << "s" << std::endl;
+    if (print) {
+        std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
+        std::chrono::duration<double> t_elaps = t_end - t_start;
+        std::cout << std::endl << "Elapsed time for IK solver: " << t_elaps.count() << "s" << std::endl;
+    }
     
     return q_all;
 }
 
 
 
-int FK_solver() {
-    //ros::init(argc, argv, "fk_test");
-    //ros::NodeHandle nh;
-    //
-    //std::array<double, 7> q = {0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397};
-    //std::array<double, 16> identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-    //urdf::Model robot;
-    //robot.initParam("robot_description");
-    ////model = std::make_unique<franka_gazebo::ModelKDL>(robot, "panda_link0", "panda_link8");
-    //franka_gazebo::ModelKDL model = franka_gazebo::ModelKDL(robot, "panda_link0", "panda_link8");
-  //
-  //
-  //
-    //std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
+Eigen::Matrix4d FK_solver(boost::array<double, 7> q_array) {
+    std::array<double, 16> identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    urdf::Model robot;
+    robot.initParam("robot_description");
+    franka_gazebo::ModelKDL model = franka_gazebo::ModelKDL(robot, "panda_link0", "panda_link8");
+
+    std::array<double, 7> q;
+    std::copy(q_array.begin(), q_array.end(), q.begin());
+
     //std::array<double, 16> pose_J4 = model.pose(franka::Frame::kJoint4, q, identity, identity);
     //std::array<double, 16> pose_J6 = model.pose(franka::Frame::kJoint6, q, identity, identity);
-    //std::array<double, 16> pose_EE = model.pose(franka::Frame::kFlange, q, identity, identity);
-  //
-    //std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
-    //std::chrono::duration<double> t_elaps = t_end - t_start;
-    //std::cout << "Elapsed time for computation: " << t_elaps.count() << "s" << std::endl;
-  //
-    //
-    //Eigen::Matrix4d aframe(Eigen::Matrix4d(pose_EE.data()));
-  //
-    //std::cout << "Actual frame:" << std::endl;
-    std::cout << "FK" << std::endl << std::endl;
+    std::array<double, 16> pose_EE = model.pose(franka::Frame::kFlange, q, identity, identity);
+
+    Eigen::Matrix4d O_T_EE(Eigen::Matrix4d(pose_EE.data()));
+
+    return O_T_EE;
 }
 
 #endif

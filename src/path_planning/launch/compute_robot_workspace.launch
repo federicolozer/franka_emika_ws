@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+
+<launch>
+    <arg name="robot_ip" default="172.16.0.2" />
+    <arg name="arm_id" default="panda" />
+    <arg name="load_gripper" default="true" />
+    <arg name="mode" default="vert" />
+    <arg name="base_height" default="0.7" />
+    <arg name="first_joint_length" default="0.333" />
+
+
+    <param name="m_ee" value="0.76" if="$(arg load_gripper)" />
+    <param name="mode" value="$(arg mode)" />
+
+    <group if="$(eval mode == 'vert')">
+        <param name="robot_description"
+                command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+                        gazebo:=false
+                        hand:=$(arg load_gripper)
+                        arm_id:=$(arg arm_id)
+                        xyz:='0 0 0'
+                        rpy:='0 0 0'">
+        </param>
+    </group>
+
+    <group if="$(eval mode == 'horz')">
+        <param name="robot_description"
+                command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+                        gazebo:=false
+                        hand:=$(arg load_gripper)
+                        arm_id:=$(arg arm_id)
+                        xyz:='-$(arg first_joint_length) 0 $(arg base_height)'
+                        rpy:='0 -1.57079632679 3.14159265359'">
+        </param>
+    </group>
+
+    <group if="$(eval mode == 'horz_rev')">
+        <param name="robot_description"
+                command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+                        gazebo:=false
+                        hand:=$(arg load_gripper)
+                        arm_id:=$(arg arm_id)
+                        xyz:='-$(arg first_joint_length) 0 $(arg base_height)'
+                        rpy:='0 1.57079632679 0'">
+        </param>
+    </group>
+
+    <group if="$(eval mode == 'ceil')">
+        <arg name="height" value="$(eval arg('first_joint_length')+arg('base_height'))" />
+        <param name="robot_description"
+                command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+                        gazebo:=false
+                        hand:=$(arg load_gripper)
+                        arm_id:=$(arg arm_id)
+                        xyz:='0 0 $(arg height)'
+                        rpy:='0 3.14159265359 3.14159265359'">
+        </param>
+    </group>
+
+    <node  pkg="path_planning" type="computeWorkspace" name="computeWorkspace" output="screen" />
+</launch>

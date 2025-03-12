@@ -6,6 +6,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  franka_gazebo
+  xacro
 )
 
 find_package(Eigen3 REQUIRED)
@@ -31,7 +33,6 @@ catkin_package(
     roscpp 
     rospy 
     std_msgs
-    xacro
 )
 
 
@@ -52,6 +53,15 @@ add_executable(IK_server
 )
 
 target_link_libraries(IK_server
+  ${catkin_LIBRARIES}
+)
+
+# computeWorkspace
+add_executable(computeWorkspace
+  src/computeWorkspace.cpp
+)
+
+target_link_libraries(computeWorkspace
   ${catkin_LIBRARIES}
 )
 

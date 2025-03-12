@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Eigen3 REQUIRED)
-find_package(PythonLibs REQUIRED)
+find_package(PythonLibs 3.8 REQUIRED)
 find_package(Franka 0.8.0 REQUIRED)
 
 ## Generate added messages and services with any dependencies listed here
