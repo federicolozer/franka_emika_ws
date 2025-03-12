@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef UTILS
-#define UTILS
+#ifndef CAST_TOOLS
+#define CAST_TOOLS
 
 #include <eigen3/Eigen/Dense>
 #include <array>

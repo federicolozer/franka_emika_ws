@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef IK_SOLVER
-#define IK_SOLVER
+#ifndef KINEMATICS
+#define KINEMATICS
 
 #define _USE_MATH_DEFINES
 
@@ -58,7 +58,7 @@ void error(int n, double val) {
 
 
 boost::array<boost::array<double, 7>, 4> IK_solver(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE, double q7, boost::array<double, 7> q_actual_array, bool print) {
-    std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
+    //std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
     
     const boost::array< boost::array<double, 7>, 4 > q_all_NAN = {{ {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}},
                                                                 {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}},
@@ -269,9 +269,9 @@ boost::array<boost::array<double, 7>, 4> IK_solver(Eigen::Map< Eigen::Matrix<dou
         }
     }
 
-    std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
-    std::chrono::duration<double> t_elaps = t_end - t_start;
-    std::cout << std::endl << "Elapsed time for IK solver: " << t_elaps.count() << "s" << std::endl;
+    //std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
+    //std::chrono::duration<double> t_elaps = t_end - t_start;
+    //std::cout << std::endl << "Elapsed time for IK solver: " << t_elaps.count() << "s" << std::endl;
     
     return q_all;
 }

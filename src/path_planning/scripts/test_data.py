@@ -139,7 +139,7 @@ if __name__ == '__main__':
 
             t0 = time.time()
 
-            data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), pi/4-float(row[7]), float(mode), float(dispFrame)]
+            data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), float(row[7]), float(mode), float(dispFrame)]
             response = IK_fromQuater_client(data)
 
             print("\n----------------")

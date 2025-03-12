@@ -154,7 +154,7 @@ if __name__ == '__main__':
         print(inputData[0])
         print(inputData[0][0])
         print(inputData[0, 0])
-        data = [float(inputData[0, 0]), float(inputData[0, 1]), float(inputData[0, 2]), float(inputData[0, 3]), float(inputData[0, 4]), float(inputData[0, 5]), float(inputData[0, 6]), pi/4-q7, float(mode), float(dispFrame)]
+        data = [float(inputData[0, 0]), float(inputData[0, 1]), float(inputData[0, 2]), float(inputData[0, 3]), float(inputData[0, 4]), float(inputData[0, 5]), float(inputData[0, 6]), q7, float(mode), float(dispFrame)]
         response = IK_fromQuater_client(data)
         print("\n----------------")
         t1 = time.time()

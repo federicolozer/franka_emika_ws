@@ -4,10 +4,7 @@
 import csv
 import numpy as np
 from copy import deepcopy
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from math import sin, cos, asin, acos
-from progress.bar import IncrementalBar as Bar
+from math import pi
 import os
 
 path = "/home/lozer/franka_emika_ws/src/neural_network/data/tracking_data"
@@ -67,20 +64,17 @@ def reader(target=None):
 
 
 def adjust(ee_frame, q7, ah, bh):
-    #ah = 0.345
-    #bh = 0.302
     ar = 0.594
     br = 0.316
     ratio = (ar+br)/(ah+bh)
-    #ratio = 1.4
 
     #print(cos(q7)*ah) 
     #print(acos(ee_frame[0, 3] - cos(q7)*ah)/bh)
     #print(cos(asin((-sin(acos((ee_frame[0, 3] - cos(q7)*ah)/bh))*bh + sin(q7)*(ah + ar))/br)))
     #q7 = acos((ee_frame[0, 3] - cos(asin((-sin(acos((ee_frame[0, 3] - cos(q7)*ah)/bh))*bh + sin(q7)*(ah + ar))/br))*br)/ar) 
     
-    ee_frame[0:2, 3] *= ratio
-    ee_frame[2, 3] = ((ee_frame[2, 3]-base_height)*ratio)+base_height
+    #ee_frame[0:2, 3] *= ratio
+    #ee_frame[2, 3] = ((ee_frame[2, 3]-base_height)*ratio)+base_height
 
     return ee_frame, q7
 
@@ -122,9 +116,9 @@ def solver(cPose):
 
     O_q7 = hand+(np.dot(segm_hand_elbow, segm_hand_ee)/np.linalg.norm(segm_hand_ee))*zAxis
     segm_q7_elbow = elbow-O_q7
-    q7 = np.arccos(np.dot(segm_q7_elbow/np.linalg.norm(segm_q7_elbow), -xAxis))
+    q7 = pi/4 - np.arccos(np.dot(segm_q7_elbow/np.linalg.norm(segm_q7_elbow), -xAxis))
 
-    ee_frame, q7 = adjust(ee_frame, q7, np.linalg.norm(segm_hand_elbow)+np.linalg.norm(segm_hand_ee), np.linalg.norm(segm_elbow_shoulder))
+    #ee_frame, q7 = adjust(ee_frame, q7, np.linalg.norm(segm_hand_elbow)+np.linalg.norm(segm_hand_ee), np.linalg.norm(segm_elbow_shoulder))
 
     res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7]
 
