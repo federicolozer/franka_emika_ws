@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  franka_gazebo
 )
 
 find_package(Eigen3 REQUIRED)

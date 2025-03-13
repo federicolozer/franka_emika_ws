@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
     Eigen::Matrix4d O_T_EE_mat = quaternionToFrame(quater, 0.439546, 0.108194, 0.418348);
     Eigen::Map< Eigen::Matrix4d > O_T_EE(O_T_EE_mat.data());
 
+    std::cout << "INPUT -----------" << std::endl;
     std::cout << O_T_EE << std::endl;
 
     boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE, q7, q_actual_array, false);
@@ -30,9 +31,9 @@ int main(int argc, char** argv) {
         for (int j=0; j<7; j++) {
             std::cout << q_array_list[i][j] << " ";
         }
-        Eigen::Matrix4d res = FK_solver(q_array_list[i]);
+        Eigen::Matrix4d res = FK_solver(q_array_list[i], true);
 
-        std::cout << std::endl << "Response = ";
+        std::cout << "OUTPUT -----------" << std::endl;
         std::cout << res << std::endl;
     }
 }

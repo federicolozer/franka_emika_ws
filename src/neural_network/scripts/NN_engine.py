@@ -20,7 +20,7 @@ dataset_path = "/home/lozer/franka_emika_ws/src/neural_network/data/dataset/huma
 class NN(nn.Module):
     def __init__(self):
         super(NN, self).__init__()
-        self.fc1 = nn.Linear(7, 5)
+        self.fc1 = nn.Linear(7, 5)  #relu 
         self.fc2 = nn.Linear(5, 1)
 
         self.criterion = nn.MSELoss(reduction = 'mean')
@@ -51,10 +51,8 @@ class DS(Dataset):
         return self.n_samples 
 
     def create_dataset(self):
-        n_cpu = os.cpu_count()
-        print(n_cpu)
-        train_data, eval_data = random_split(self, [len(self)-10, 10])
-        self.train_dataloader = DataLoader(dataset=train_data, batch_size=int(len(self)/n_cpu), shuffle=True, num_workers=n_cpu) 
+        test_data, eval_data, train_data = random_split(self, [len(self)-10, 10])
+        self.train_dataloader = DataLoader(dataset=train_data, batch_size=int(len(self)/n_cpu), shuffle=True, num_workers=os.cpu_count()) 
         self.eval_dataloader = DataLoader(dataset=eval_data, batch_size=10, shuffle=True) 
 
 
@@ -130,6 +128,9 @@ def neural_network(mod, inputData):
 if __name__ == "__main__":
     model = NN()
     dataset = DS() 
+
+
+    quit()
 
     try:
         mode = sys.argv[1]

@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
 # coding=utf-8
  
-import csv
 import numpy as np
-from copy import deepcopy
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from math import sin, cos, asin, acos
-from progress.bar import IncrementalBar as Bar
-import os
+#from mpl_toolkits.mplot3d import Axes3D
 from neural_network.scripts.humanPoses import reader, solver
 
 path = "/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv"
