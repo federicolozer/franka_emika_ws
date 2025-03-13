@@ -3,7 +3,7 @@ function interface() {
         url: '/getJson',
         type: 'GET',
         contentType: 'application/json',
-        success: function(data, status) {
+        success: function(data) {
             const json = data;
 
             let count = 1;
@@ -11,23 +11,10 @@ function interface() {
                 createSection(key, json[key], count++);
             }
         },
-        error: function(error) {
+        error: function() {
             document.getElementById("msg").innerHTML = "Error: failed to load data";
         }
     });
-    //$.getJSON("/get", function(data, status){
-    //    if (status == "success") {
-    //        const json = data;
-//
-    //        let count = 1;
-    //        for (var key in json) {
-    //            createSection(key, json[key], count++);
-    //        }
-    //    }
-    //    else {
-    //        document.getElementById("output").innerHTML = "Error: failed to load data";
-    //    }
-    //});
 }
 
 
@@ -72,7 +59,15 @@ function defineButtonBehavior(button, val, count) {
 
 
 
-function returnData() {
+function restoreMsg() {
+    window.setTimeout(function() {document.getElementById('msg').innerHTML = '...';}, 3000);
+}
+
+
+
+function createDataset() {
+    document.getElementById('msg').innerHTML = "Creating dataset...";
+    
     $.ajax({
         url: '/sendDatasetCreatorRequest',
         type: 'SEND',
@@ -80,16 +75,20 @@ function returnData() {
         data: JSON.stringify(Array.from(data_set)),
         success: function(response) {
             document.getElementById('msg').innerHTML = response.result;
+            restoreMsg();
         },
-        error: function(error) {
+        error: function() {
             document.getElementById('msg').innerHTML = "Error: failed to send request";
+            restoreMsg();
         }
     });
 }
 
 
 
-function createDataset() {
+function trainNN() {
+    document.getElementById('msg').innerHTML = "Training neural network...";
+
     $.ajax({
         url: '/sendTrainingNNRequest',
         type: 'SEND',
@@ -97,9 +96,11 @@ function createDataset() {
         data: JSON.stringify({"value": 1}),
         success: function(response) {
             document.getElementById('msg').innerHTML = response.result;
+            restoreMsg();
         },
-        error: function(error) {
+        error: function() {
             document.getElementById('msg').innerHTML = "Error: failed to send request";
+            restoreMsg();
         }
     });
 }

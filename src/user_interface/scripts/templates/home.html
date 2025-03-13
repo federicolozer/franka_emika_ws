@@ -15,12 +15,16 @@
     <script>
         var data_set = new Set();
         interface();
+
+        function prova() {
+            document.getElementById('msg').innerHTML = '..§§.';
+        }
     </script>
     <div id="btn" class="msg">
-        <p id="msg"></p>
+        <p id="msg">...</p>
         <div>
-            <button onclick="returnData()">Proceed</button>
-            <button onclick="createDataset()">Proceed</button>
+            <button class="out" onclick="createDataset()">Create dataset</button>
+            <button class="out" onclick="trainNN()">Train NN</button>
         </div>
     </div>
 </body>

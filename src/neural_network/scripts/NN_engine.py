@@ -7,7 +7,7 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader, random_split
 import sys
 import numpy as np
-import rospy
+import os
 
 
 model = None
@@ -24,7 +24,7 @@ class NN(nn.Module):
         self.fc2 = nn.Linear(5, 1)
 
         self.criterion = nn.MSELoss(reduction = 'mean')
-        self.optimizer = optim.Adam(self.parameters(), lr=0.001)
+        self.optimizer = optim.SGD(self.parameters(), lr=0.001)
 
     def forward(self, x):
         x = torch.relu(self.fc1(x))
@@ -34,7 +34,7 @@ class NN(nn.Module):
 
 
 class DS(Dataset): 
-    def __init__(self, n_eval): 
+    def __init__(self): 
         global dataset_path
 
         data = np.loadtxt(dataset_path, delimiter=',', dtype=np.float32, skiprows=1) 
@@ -42,7 +42,7 @@ class DS(Dataset):
         self.inputs = torch.from_numpy(data[:, 0:7]) 
         self.outputs = torch.from_numpy(data[:, [7]]) 
         self.n_samples = data.shape[0]  
-        self.create_dataset(n_eval)
+        self.create_dataset()
       
     def __getitem__(self, index): 
         return self.inputs[index], self.outputs[index] 
@@ -50,13 +50,12 @@ class DS(Dataset):
     def __len__(self): 
         return self.n_samples 
 
-    def create_dataset(self, n_eval):
-        if len(self) <= n_eval:
-            raise ValueError('number of evaluation data bigger or equal than training data')
-        else:
-            train_data, eval_data = random_split(self, [len(self)-n_eval, n_eval])
-            self.train_dataloader = DataLoader(dataset=train_data, batch_size=len(self)-n_eval, shuffle=True) 
-            self.eval_dataloader = DataLoader(dataset=eval_data, batch_size=n_eval, shuffle=True) 
+    def create_dataset(self):
+        n_cpu = os.cpu_count()
+        print(n_cpu)
+        train_data, eval_data = random_split(self, [len(self)-10, 10])
+        self.train_dataloader = DataLoader(dataset=train_data, batch_size=int(len(self)/n_cpu), shuffle=True, num_workers=n_cpu) 
+        self.eval_dataloader = DataLoader(dataset=eval_data, batch_size=10, shuffle=True) 
 
 
 
@@ -66,9 +65,9 @@ def training(n_epoch, dataloader):
     prev_loss = 1
     for epoch in range(n_epoch):
         model.train()
-        for IN_train, OUT_train in dataloader: 
-            outputs = model(IN_train)
-            loss = model.criterion(outputs, OUT_train)
+        for IN_data, OUT_data in dataloader: 
+            outputs = model(IN_data)
+            loss = model.criterion(outputs, OUT_data)
             
             model.optimizer.zero_grad()
             grad = loss.backward()
@@ -92,52 +91,37 @@ def evaluation(dataloader, print_out=False):
 
     model.eval()
     with torch.no_grad():
-        for IN_eval, OUT_eval in dataloader: 
-            outputs = model(IN_eval)
-            loss = model.criterion(outputs, OUT_eval)
+        for IN_data, OUT_data in dataloader: 
+            outputs = model(IN_data)
+            loss = model.criterion(outputs, OUT_data)
 
             if print_out == True:
                 print("\nINPUTS")
-                print(IN_eval)
+                print(IN_data)
 
             print("\nOUTPUTS")
             print("------------------")
             print(f'Predictions:\n{torch.transpose(outputs, 0, 1)}')
             print("------------------")
-            print(f'Real data:\n{torch.transpose(OUT_eval, 0, 1)}')
-
-
-
-def solution(dataloader, print_out=False):
-    global model
-
-    model.eval()
-    with torch.no_grad():
-        outputs = model(dataloader)
-
-        print("\nOUTPUTS")
-        print("------------------")
-        print(f'Solutions:\n{torch.transpose(outputs, 0, 1)}')
-
-        return outputs
-            
+            print(f'Real data:\n{torch.transpose(OUT_data, 0, 1)}')
 
 
 
 def neural_network(mod, inputData):
-    global model, dataset, model_path
-
     model = mod    
+
     torch.set_default_dtype(torch.float32)
-    dataloader = torch.tensor(inputData, dtype=torch.float32)
+    IN_data = torch.tensor(inputData, dtype=torch.float32)
     sol = None
 
-    if not model_path:
-        raise ValueError('incorrect neural network model path')
-    else:
+    if model_path:
         model.load_state_dict(torch.load(model_path, weights_only=False))
-        sol = solution(dataloader, print_out=True)
-
+        model.eval()
+        with torch.no_grad():
+            sol = model(IN_data)
+    else:
+        raise ValueError('wrong neural network model path')
+        
     return sol
 
 
@@ -145,19 +129,22 @@ def neural_network(mod, inputData):
 
 if __name__ == "__main__":
     model = NN()
-    dataset = DS(10) 
+    dataset = DS() 
 
-    mode = sys.argv[1]
-    if mode == "--train":
-        n_epoch = 10000
-        training(n_epoch, dataset.train_dataloader)
-        torch.save(model.state_dict(), model_path)
-    elif mode == "--eval":
-        if not model_path:
-            raise ValueError('incorrect NN model path')
+    try:
+        mode = sys.argv[1]
+        if mode == "--train":
+            n_epoch = 10000
+            training(n_epoch, dataset.train_dataloader)
+            torch.save(model.state_dict(), model_path)
+        elif mode == "--eval":
+            if not model_path:
+                raise ValueError('wrong neural network model path')
+            else:
+                model.load_state_dict(torch.load(model_path, weights_only=False))
+                evaluation(dataset.eval_dataloader, print_out=True)
         else:
-            model.load_state_dict(torch.load(model_path, weights_only=False))
-            evaluation(dataset.eval_dataloader, print_out=True)
-    else:
-        raise ValueError('argument required or wrong argument')
+            raise ValueError('wrong argument')
+    except:
+        raise ValueError('argument required')
 

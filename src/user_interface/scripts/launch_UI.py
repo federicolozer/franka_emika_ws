@@ -18,6 +18,12 @@ def callDatasetCreator(data):
 
 
 
+def callTrainNN():
+    msg = "rosrun neural_network NN_engine.py --train"
+    os.system(msg)
+
+
+
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -41,7 +47,7 @@ def getData():
 @app.route('/sendTrainingNNRequest', methods=['SEND'])
 def startTraining():
     data = request.get_json()
-    callDatasetCreator(data)
+    callTrainNN()
     return jsonify(result="Neural network training has ended correctly")
 
 

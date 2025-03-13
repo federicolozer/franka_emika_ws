@@ -16,6 +16,9 @@ button {
     margin-top: 10;
     margin-right: 30;
 }
+button.out {
+    width: 120;
+}
 #output {
     padding-left: 50;
 }
