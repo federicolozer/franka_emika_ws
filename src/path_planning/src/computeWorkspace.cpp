@@ -5,13 +5,13 @@
 
 
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "computeWorkspace");
-    ros::NodeHandle n;
+    //ros::init(argc, argv, "computeWorkspace");
+    //ros::NodeHandle n;
+//
+    //std::string mode;
+    //n.getParam("/mode", mode);
 
-    std::string mode;
-    n.getParam("/mode", mode);
-
-    std::cout << "Mode = " << mode << std::endl;
+    //std::cout << "Mode = " << mode << std::endl;
 
     boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};
     std::array<double, 4> quaternion = {{0.573172, 0.709486, 0.35312, 0.208349}};

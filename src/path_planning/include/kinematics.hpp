@@ -6,16 +6,12 @@
 #define _USE_MATH_DEFINES
 
 #include "ros/ros.h"
-#include <franka_gazebo/model_kdl.h>
 #include <eigen3/Eigen/Dense>
 #include <array>
 #include <cmath>
 #include <iostream>
 #include <chrono>
 
-
-
-// constants
 const double d1 = 0.3330;
 const double d3 = 0.3160;
 const double d5 = 0.3840;
@@ -23,16 +19,6 @@ const double d7 = 0.107;
 const double d7e = 0.2104;
 const double a4 = 0.0825;
 const double a7 = 0.0880;
-
-const double LL24 = 0.10666225;
-const double LL46 = 0.15426225;
-const double L24 = 0.326591870689;
-const double L46 = 0.392762332715;
-
-const double thetaH46 = 1.35916951803; 
-const double theta342 = 1.31542071191; 
-const double theta46H = 0.211626808766;
-
 const std::array<double, 7> q_min = {{-2.8973, -1.7628, -2.8973, -3.0718, -2.8973, -0.0175, -2.8973}};
 const std::array<double, 7> q_max = {{2.8973, 1.7628, 2.8973, -0.0698, 2.8973, 3.7525, 2.8973}};
 
@@ -59,6 +45,23 @@ void error(int n, double val) {
 
 boost::array<boost::array<double, 7>, 4> IK_solver(Eigen::Map< Eigen::Matrix<double, 4, 4> > O_T_EE, double q7, boost::array<double, 7> q_actual_array, bool print) {
     std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
+
+    const double d1 = 0.3330;
+    const double d3 = 0.3160;
+    const double d5 = 0.3840;
+    const double d7 = 0.107;
+    const double d7e = 0.2104;
+    const double a4 = 0.0825;
+    const double a7 = 0.0880;
+
+    const double LL24 = 0.10666225;
+    const double LL46 = 0.15426225;
+    const double L24 = 0.326591870689;
+    const double L46 = 0.392762332715;
+
+    const double thetaH46 = 1.35916951803; 
+    const double theta342 = 1.31542071191; 
+    const double theta46H = 0.211626808766;
     
     const boost::array< boost::array<double, 7>, 4 > q_all_NAN = {{ {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}},
                                                                 {{NAN, NAN, NAN, NAN, NAN, NAN, NAN}},
@@ -83,13 +86,14 @@ boost::array<boost::array<double, 7>, 4> IK_solver(Eigen::Map< Eigen::Matrix<dou
     Eigen::Matrix3d R_EE = O_T_EE.topLeftCorner<3, 3>();
     Eigen::Vector3d z_EE = O_T_EE.block<3, 1>(0, 2);
     Eigen::Vector3d p_EE = O_T_EE.block<3, 1>(0, 3);
-    Eigen::Vector3d p_7;
+    double dee;
     if (ros::param::has("/m_ee")) {
-        p_7 = p_EE - d7e * z_EE;
+        dee = d7e;
     }
     else {
-        p_7 = p_EE - d7 * z_EE;
+        dee = d7;
     } 
+    Eigen::Vector3d p_7 = p_EE - d7e * z_EE;
     
     Eigen::Vector3d x_EE_6;
     x_EE_6 << std::cos(q7 - M_PI_4), -std::sin(q7 - M_PI_4), 0.0;
@@ -280,10 +284,83 @@ boost::array<boost::array<double, 7>, 4> IK_solver(Eigen::Map< Eigen::Matrix<dou
 
 
 
-Eigen::Matrix4d FK_solver(boost::array<double, 7> q_array, bool print) {
+Eigen::Matrix4d FK_solver(boost::array<double, 7> q, bool print) {
     std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();
 
-    std::array<double, 16> identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    q[6] -= M_PI_2;
+
+    const double s0 = std::sin(q[0]), c0 = std::cos(q[0]);
+    const double s1 = std::sin(q[1]), c1 = std::cos(q[1]);
+    const double s2 = std::sin(q[2]), c2 = std::cos(q[2]);
+    const double s3 = std::sin(q[3]), c3 = std::cos(q[3]);
+    const double s4 = std::sin(q[4]), c4 = std::cos(q[4]);
+    const double s5 = std::sin(q[5]), c5 = std::cos(q[5]);
+    const double s6 = std::sin(q[6]), c6 = std::cos(q[6]);
+
+    double c_p_s6 = c6 + s6;
+    double c_m_s6 = c6 - s6;
+
+    const double t1 = c3*(c5*c4*c_m_s6 + s4*c_p_s6) - s3*s5*c_m_s6;
+    const double t3 = c3*(c5*c4*c_p_s6 - s4*c_m_s6) - s3*s5*c_p_s6;
+    const double t2  = c4*c_p_s6 - c5*s4*c_m_s6;
+    const double t18 = c4*c_m_s6 + c5*s4*c_p_s6;
+    const double t20 = c3*s5*c_p_s6 - s3*s4*c_m_s6;
+    const double t21 = c3*s5*c_m_s6 + s3*s4*c_p_s6;
+    const double t4 = s1*(t20 + c5*c4*s3*c_p_s6) + c1*(c2*t3 - s2*t18);
+    const double t5 = s1*(t21 + c5*c4*s3*c_m_s6) + c1*(c2*t1 + s2*t2);
+    double dee;
+    if (ros::param::has("/m_ee")) {
+        dee = d7e;
+    }
+    else {
+        dee = d7;
+    }
+    const double t8 = -a7*c5 - d7e*s5;
+    const double t22 = d5 + a7*s5 - d7e*c5;
+    const double t6 = -a4 - c4*t8;
+    const double t7 = d3 + c3*t22 + s3*t6;
+    const double t9 = -a4 + s3*t22 - c3*t6;
+    const double t13 = c1*t21 + c5*s4*s1*s2*c_m_s6;
+    const double t14 = c1*t20 + c5*s4*s1*s2*c_p_s6;
+    const double t15 = c2*t18 + s2*t3;
+    const double t16 = c2*t2 - s2*t1;
+    const double t17 = s1*s3 + c1*c2*c3;
+    const double t24 = s1*c3 - c1*c2*s3;
+    const double t19 = c1*(-c2*t9 + s2*s4*t8) + s1*t7;
+    const double t23 = s2*t9 + c2*s4*t8;
+
+    const double sq2 = 1./std::sqrt(2);
+
+    std::array<double, 16> pose_EE = {{
+        (s0*t16 + c0*t5)*sq2,
+        (-c0*t16 + s0*t5)*sq2,
+        (t13 - c4*(s1*s2*c_p_s6 - c1*c5*s3*c_m_s6) - c2*s1*t1)*sq2,
+        0,
+        -(-s0*t15 + c0*t4)*sq2,
+        -(c0*t15 + s0*t4)*sq2,
+        -(t14 + c4*(s1*s2*c_m_s6 + c1*c5*s3*c_p_s6) - c2*s1*t3)*sq2,
+        0,
+        -(c5*(c0*t24 + s3*s0*s2) + c4*s5*(c3*s0*s2 - c0*t17) + (c2*s0 + c0*c1*s2)*s4*s5),
+        -(c5*(s0*t24 - s3*c0*s2) - c4*s5*(c3*c0*s2 + s0*t17) - (c2*c0 - s0*c1*s2)*s4*s5),
+        -(c1*(c3*c5 - s3*c4*s5) + s1*(c2*(c5*s3 + c3*c4*s5) - s2*s4*s5)),
+        0,
+        s0*t23 + c0*t19,
+        s0*t19 - c0*t23,
+        d1 - s1*s2*s4*t8 + c2*s1*t9 + c1*t7,
+        1,
+    }};
+
+    Eigen::Matrix4d O_T_EE(Eigen::Matrix4d(pose_EE.data()));
+
+    if (print) {
+        std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
+        std::chrono::duration<double> t_elaps = t_end - t_start;
+        std::cout << std::endl << "Elapsed time for FK solver: " << t_elaps.count() << "s" << std::endl;
+    }
+
+    return O_T_EE;
+
+    /*std::array<double, 16> identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
     urdf::Model robot;
     robot.initParam("robot_description");
     franka_gazebo::ModelKDL model = franka_gazebo::ModelKDL(robot, "panda_link0", "panda_link8");
@@ -310,7 +387,7 @@ Eigen::Matrix4d FK_solver(boost::array<double, 7> q_array, bool print) {
         std::cout << std::endl << "Elapsed time for FK solver: " << t_elaps.count() << "s" << std::endl;
     }
 
-    return O_T_EE;
+    return O_T_EE;*/
 }
 
 #endif

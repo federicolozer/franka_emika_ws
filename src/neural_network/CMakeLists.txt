@@ -6,12 +6,10 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
-  franka_gazebo
 )
 
 find_package(Eigen3 REQUIRED)
 find_package(PythonLibs 3.8 REQUIRED)
-find_package(Franka 0.8.0 REQUIRED)
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
@@ -37,7 +35,6 @@ catkin_package(
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${PYTHON_INCLUDE_DIRS}
-  ${Franka_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ../path_planning/include
 )

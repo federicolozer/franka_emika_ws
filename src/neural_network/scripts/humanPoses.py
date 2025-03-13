@@ -12,7 +12,6 @@ base_height = 0.7
 
 
 
-
 def reader(target=None):
     humanPoses = []
 
@@ -68,13 +67,8 @@ def adjust(ee_frame, q7, ah, bh):
     br = 0.316
     ratio = (ar+br)/(ah+bh)
 
-    #print(cos(q7)*ah) 
-    #print(acos(ee_frame[0, 3] - cos(q7)*ah)/bh)
-    #print(cos(asin((-sin(acos((ee_frame[0, 3] - cos(q7)*ah)/bh))*bh + sin(q7)*(ah + ar))/br)))
-    #q7 = acos((ee_frame[0, 3] - cos(asin((-sin(acos((ee_frame[0, 3] - cos(q7)*ah)/bh))*bh + sin(q7)*(ah + ar))/br))*br)/ar) 
-    
-    #ee_frame[0:2, 3] *= ratio
-    #ee_frame[2, 3] = ((ee_frame[2, 3]-base_height)*ratio)+base_height
+    ee_frame[0:2, 3] *= ratio
+    ee_frame[2, 3] = ((ee_frame[2, 3]-base_height)*ratio)+base_height
 
     return ee_frame, q7
 
@@ -94,7 +88,7 @@ def solver(cPose):
         cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
         cPose[i][2] += base_height
 
-    O_ee = np.array(cPose[0]) #(np.array(cPose[0])+np.array(cPose[1]))/2
+    O_ee = np.array(cPose[0])
     hand = np.array(cPose[2])
     elbow = np.array(cPose[3])
     shoulder = np.array(cPose[4])
