@@ -1,5 +1,6 @@
 #include "cast_tools.hpp"
 #include "kinematics.hpp"
+#include "utils.hpp"
 #include "progressbar.hpp"
 #include <eigen3/Eigen/Dense>
 #include <array>
@@ -13,7 +14,10 @@ boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899,
 
 
 bool IK_check(Eigen::Map< Eigen::Matrix4d > O_T_EE, double q7) {
-    boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE, q7, q_actual_array, false);
+    Eigen::Matrix4d O_T_EE_tmp = baseCoordTransf(O_T_EE, 3);
+    Eigen::Map<Eigen::Matrix4d> O_T_EE_new(O_T_EE_tmp.data());
+
+    boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE_new, q7, q_actual_array, false);
 
     bool result = false;
     bool valid;

@@ -14,11 +14,17 @@ int main(int argc, char** argv) {
     //std::cout << "Mode = " << mode << std::endl;
 
     boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};
-    std::array<double, 4> quaternion = {{0.573172, 0.709486, 0.35312, 0.208349}};
-    Eigen::Quaterniond quater(quaternion.data());
     double q7 = -0.238573;
 
-    Eigen::Matrix4d O_T_EE_mat = quaternionToFrame(quater, 0.439546, 0.108194, 0.418348);
+    Eigen::Matrix4d O_T_EE_mat;
+    O_T_EE_mat << -1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, -1.0, 0.1034,
+                0.0, 0.0, 0.0, 1.0;
+
+    Eigen::Quaterniond quater = frameToQuaternion(O_T_EE_mat);
+    std::cout << "Quaternion = " << quater.x() << " " << quater.y() << " " << quater.z() << " " << quater.w() << std::endl;
+
     Eigen::Map< Eigen::Matrix4d > O_T_EE(O_T_EE_mat.data());
 
     std::cout << "INPUT -----------" << std::endl;

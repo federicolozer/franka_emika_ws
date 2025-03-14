@@ -19,7 +19,7 @@ def callDatasetCreator(data):
 
 
 def callTrainNN():
-    msg = "rosrun neural_network NN_engine.py --train"
+    msg = "rosrun neural_network NN_trainer.py"
     os.system(msg)
 
 

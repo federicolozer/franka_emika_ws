@@ -6,25 +6,49 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader, random_split
 import numpy as np
+import rospkg
 
-model_path = "/home/lozer/franka_emika_ws/src/neural_network/data/model/NN_model.pth"
+model_path = rospkg.RosPack().get_path("neural_network") + "/data/model/NN_model.pth"
+dataset_path = rospkg.RosPack().get_path("neural_network") + "/data/dataset/humanPoses.csv"
 
 
+
+class NN_new(nn.Module):
+    def __init__(self, n1, n2, criterion, optimizer):
+        super(NN, self).__init__()
+        if n2 == None:
+            self.layer1 = nn.Linear(7, n1)
+            self.layer2 = nn.Linear(n1, 1)
+        else:
+            self.layer1 = nn.Linear(7, n1)
+            self.layer2 = nn.Linear(n1, n2)
+            self.layer3 = nn.Linear(n2, 1)
+
+        self.criterion = criterion
+        self.optimizer = optimizer
+
+    def forward(self, x):
+        x = torch.relu(self.layer1(x))
+        x = self.layer2(x)
+        return x
 
 class NN(nn.Module):
-    def __init__(self):
+    def __init__(self, n1):
         super(NN, self).__init__()
-        self.fc1 = nn.ReLU(7, 5)
-        self.fc2 = nn.Linear(5, 1)
+        self.layer1 = nn.Linear(7, n1)
+        self.layer2 = nn.Linear(n1, 1)
 
         self.criterion = nn.MSELoss(reduction = 'mean')
         self.optimizer = optim.SGD(self.parameters(), lr=0.001)
 
     def forward(self, x):
-        x = torch.relu(self.fc1(x))
-        x = self.fc2(x)
+        x = torch.relu(self.layer1(x))
+        x = self.layer2(x)
         return x
+    
 
+
+    
 
 
 class DS(Dataset): 
@@ -38,7 +62,7 @@ class DS(Dataset):
         self.n_samples = data.shape[0] 
         self.create_dataset(batch)
       
-    def getitem(self, index): 
+    def __getitem__(self, index): 
         return self.inputs[index], self.outputs[index] 
 
     def __len__(self): 
@@ -53,8 +77,8 @@ class DS(Dataset):
 
 
 
-def neural_network(mod, inputData):
-    model = mod    
+def neural_network(model, inputData):
+    global model_path
 
     torch.set_default_dtype(torch.float32)
     IN_data = torch.tensor(inputData, dtype=torch.float32)

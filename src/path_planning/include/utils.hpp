@@ -25,7 +25,7 @@ void printFrame(Eigen::Matrix4d O_T_EE_tmp) {
 
 
 
-Eigen::Map< Eigen::Matrix4d > baseCoordTransf(Eigen::Matrix4d O_T_EE_mat, int mode) {
+Eigen::Matrix4d baseCoordTransf(Eigen::Matrix4d O_T_EE_mat, int mode) {
     Eigen::Matrix4d O_T_EE_tmp;   
 
     if (mode == 1) { // horz
@@ -58,9 +58,8 @@ Eigen::Map< Eigen::Matrix4d > baseCoordTransf(Eigen::Matrix4d O_T_EE_mat, int mo
     else {
         O_T_EE_tmp = Eigen::Matrix4d(O_T_EE_mat.data());
     }
-    Eigen::Map< Eigen::Matrix4d > O_T_EE(O_T_EE_tmp.data());
-
-    return O_T_EE;
+    
+    return O_T_EE_tmp;
 }
 
 #endif

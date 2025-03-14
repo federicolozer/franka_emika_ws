@@ -359,35 +359,6 @@ Eigen::Matrix4d FK_solver(boost::array<double, 7> q, bool print) {
     }
 
     return O_T_EE;
-
-    /*std::array<double, 16> identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-    urdf::Model robot;
-    robot.initParam("robot_description");
-    franka_gazebo::ModelKDL model = franka_gazebo::ModelKDL(robot, "panda_link0", "panda_link8");
-
-    std::array<double, 7> q;
-    std::copy(q_array.begin(), q_array.end(), q.begin());
-    q[6] -= M_PI_4;
-
-    std::array<double, 16> pose_EE = model.pose(franka::Frame::kFlange, q, identity, identity);
-    //std::array<double, 16> pose_EE = model.pose(franka::Frame::kEndEffector, q, identity, identity);
-
-    Eigen::Matrix4d O_T_EE(Eigen::Matrix4d(pose_EE.data()));
-
-    Eigen::Matrix4d EE_mat;
-    EE_mat << 1.0, 0.0, 0.0, 0.0,
-                0.0, 1.0, 0.0, 0.0,
-                0.0, 0.0, 1.0, 0.1034,
-                0.0, 0.0, 0.0, 1.0;
-    O_T_EE = O_T_EE*EE_mat;
-
-    if (print) {
-        std::chrono::time_point<std::chrono::system_clock> t_end = std::chrono::system_clock::now();
-        std::chrono::duration<double> t_elaps = t_end - t_start;
-        std::cout << std::endl << "Elapsed time for FK solver: " << t_elaps.count() << "s" << std::endl;
-    }
-
-    return O_T_EE;*/
 }
 
 #endif

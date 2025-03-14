@@ -17,9 +17,9 @@ json_path = rospkg.RosPack().get_path("user_interface") + "/data/model/config.js
 
 
 def elaps_time(func):
-    def inner(dataloader, n_epoch):
+    def inner(dataloader, n_epoch, prnt):
         t_start = time.time()
-        func(dataloader, n_epoch)
+        func(dataloader, n_epoch, prnt)
         print("Elapsed time for training = ", time.time()-t_start, "s")
     
     return inner
@@ -41,15 +41,15 @@ def training(dataloader, n_epoch, prnt=False):
             loss.backward()
             model.optimizer.step()
 
-        #if loss.item() <= 0.000001:
-        #    break
+        if loss.item() <= 0.000001:
+            break
 
         if abs(loss.item() - prev_loss) <= 0.000001:
             break
         prev_loss = loss.item()
 
         if prnt:
-            if (epoch + 1) % 100 == 0:
+            if (epoch + 1) % 10 == 0:
                 print(f'Epoch [{epoch + 1}/{n_epoch}], Loss: {loss.item():.4f}')
 
 
@@ -84,56 +84,40 @@ def test(dataloader):
 
 
 
-def set_config(loss, batch):
-    config["loss"] = loss
-    config["batch"] = batch
+class NN(nn.Module):
+    def __init__(self, n1):
+        super(NN, self).__init__()
+        self.layer1 = nn.Linear(7, n1)
+        self.layer2 = nn.Linear(n1, 1)
+
+        self.criterion = nn.MSELoss(reduction = 'mean')
+        self.optimizer = optim.SGD(self.parameters(), lr=0.001)
+
+    def forward(self, x):
+        x = torch.relu(self.layer1(x))
+        x = self.layer2(x)
+        return x
 
 
 
 
 if __name__ == "__main__":
     n_epoch = 1000
-    batch = 10
-    config = {}
-    n1_array = [4, 6, 8, 10, 15, 20]
-    n2_array = [4, 6, 8, 10, 15, 20]
-    criterion_array = [nn.MSELoss(reduction = 'mean')]
-    optimizer_array = [optim.SGD(self.parameters(), lr=0.001)]
-    
-    dataset = engine.DS(batch)  
+    batch = 10 
 
-    doOnce = True
-    for n1 in n1_array:
-        for n2 in n2_array:
-            for criterion in criterion_array:
-                for optimizer in optimizer_array:  
-                    print("------------------")
+    print("------------------")
 
-                    model = engine.NN(n1, n2, criterion, optimizer)
-
-                    training(dataset.train_dataloader, n_epoch)
-                    loss = evaluation(dataset.eval_dataloader)
-
-                    if doOnce:
-                        set_config(loss, batch)
-                        torch.save(model.state_dict(), model_path)
-                        doOnce = False
-                    else:
-                        if config["loss"] > loss:
-                            set_config(loss, batch)
-                            torch.save(model.state_dict(), model_path)
-
-    batch = config["batch"]
-    model = engine.NN()
+    model = NN(8)
     dataset = engine.DS(batch) 
 
-    print("final config = ", config)
+    training(dataset.train_dataloader, n_epoch, True)
+    loss = evaluation(dataset.eval_dataloader)
+    print("Loss = ", loss)
 
-    with open(json_path, "w") as file:
-        json.dump(config, file, indent=4)
+    accuracy = evaluation(dataset.test_dataloader)
+    print("Accuracy = ", accuracy)
 
+    torch.save(model.state_dict(), model_path)
 
-#torch.save(model.state_dict(), model_path)
-#model.load_state_dict(torch.load(model_path, weights_only=False))
 
 

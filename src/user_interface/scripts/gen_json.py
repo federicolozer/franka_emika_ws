@@ -22,7 +22,7 @@ def gen_json():
         for i in range(len(data_list)):
             data[f"Data_{i+1}"] = data_list[i]
         
-        json_data = json.dump(data, file, indent=4)
+        json.dump(data, file, indent=4)
     
     return data
 

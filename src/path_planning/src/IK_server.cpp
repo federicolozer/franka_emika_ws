@@ -15,13 +15,14 @@ boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899,
 boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater, std::array<double, 3> O_EE, double q7, int mode, bool dispFrame) {  
     Eigen::Matrix4d O_T_EE_mat = quaternionToFrame(quater, O_EE[0], O_EE[1], O_EE[2]);
 
-    Eigen::Map< Eigen::Matrix4d > O_T_EE = baseCoordTransf(O_T_EE_mat, mode);
+    Eigen::Matrix4d O_T_EE_tmp = baseCoordTransf(O_T_EE_mat, mode);
+    Eigen::Map<Eigen::Matrix4d> O_T_EE(O_T_EE_tmp.data());
 
     if (dispFrame) {
         printFrame(O_T_EE_mat); //display frame in gazebo
     }
 
-    boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE, q7, q_actual_array, false);
+    boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE, q7, q_actual_array, true);
 
     return q_array_list;
 }
@@ -73,8 +74,6 @@ void server() {
         double q7 = buffer[7];
         int mode = buffer[8];
         bool dispFrame = buffer[9];
-
-        std::cout << "mode = " << std::endl << mode << std::endl;
 
         boost::array<boost::array<double, 7>, 4> q_array_list = IK_fromQuater(quater, O_EE, q7, mode, dispFrame);
 

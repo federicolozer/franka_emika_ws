@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-import sys
-sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')
-
-import NN_engine as nn
+#import sys
+#sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')
+#import NN_engine as nn
 import rospy
 from copy import deepcopy
 import numpy as np
-from math import pi, nan
+from math import pi
 import control_tools as controller
 import csv
 import time
@@ -39,7 +38,7 @@ def IK_fromQuater_client(data):
         print(f"--- res{i} = ", res)
         if np.isnan(res).any() == False:
             response.append(res)
-
+        
     client_socket.close()
 
     return response
@@ -56,43 +55,19 @@ def endTransmission():
 
 
 
-def optMove(q_array_list, q_ref):
-    err = nan
-    
-    if not q_array_list == []:
-        for array in q_array_list:
-            n_err = np.dot((array-q_ref), (array-q_ref))
+def optMove(q_array_list):
+    q_curr = controller.readJointStates()
+    print("actual configuration = ", q_curr)
 
-            if n_err-err < 0 or np.isnan(n_err-err):
-                q_array = list(array)
-                err = n_err
+    if not q_array_list == []:
+        q_array = list(q_array_list[0])
     else:
         q_array = []
 
+    
     return q_array
 
     
-
-def random_quaternion():
-    # Generate four random numbers from a normal distribution
-    rand = np.random.normal(size=4)
-    # Normalize the quaternion
-    norm = np.linalg.norm(rand)
-    quaternion = rand / norm
-
-    return quaternion
-
-
-
-def random_position():
-    x = 0.2 + np.random.random()*0.5
-    y = -0.7 + np.random.random()*1.4
-    z = 0.2 + np.random.random()*0.8
-
-    position = [x, y, z]
-
-    return position
-
 
 
 
@@ -115,70 +90,53 @@ if __name__ == '__main__':
         else:
             gravity[2] = -9.8
 
-    msg = "rosrun dynamic_reconfigure dynparam set /gazebo \"{" + f"'gravity_x':{gravity[0]}, 'gravity_y':{gravity[1]}, 'gravity_z':{gravity[2]}" + "}\""
-    os.system(msg)
+    #msg = "rosrun dynamic_reconfigure dynparam set /gazebo \"{" + f"'gravity_x':{gravity[0]}, 'gravity_y':{gravity[1]}, 'gravity_z':{gravity[2]}" + "}\""
+    #os.system(msg)
 
     ttype = "follow_joint"
     dispFrame = True
-    q_ref = np.array(controller.readJointStates())
-
-    model = nn.NN(8)
 
     while True:
-        rw = input("Generate new random pose...\n")
-        if rw == "quit":
+
+        q7 = input("Select q7...\n")
+        if q7 == "quit":
             endTransmission()
             break
+
 
         t = []
         q = []
 
-        quater = random_quaternion()
-        O_EE = random_position()
 
-        # Neural network
-        # ------------------------------------------------------------------------------------
+        q7 = pi/4 - float(q7)
+        print("q7 = ", q7)
 
         t0 = time.time()
-        inputData = np.matrix(np.concatenate((quater, O_EE), axis=0))
-        q7 = float(nn.neural_network(model, inputData)[0]) 
-        print("\n----------------")
-        t1 = time.time()
-        print("Elapsed time for having a solution from NN: ", t1-t0, "s")
-        print("----------------")
-
-        # Inverse kinematics
-        # ------------------------------------------------------------------------------------
-
-        t0 = time.time()
-        print(inputData[0])
-        print(inputData[0][0])
-        print(inputData[0, 0])
-        data = [float(inputData[0, 0]), float(inputData[0, 1]), float(inputData[0, 2]), float(inputData[0, 3]), float(inputData[0, 4]), float(inputData[0, 5]), float(inputData[0, 6]), q7, float(mode), float(dispFrame)]
+        data = [1, 0, 0, 0, 0.4, 0, 0.2, q7, float(mode), True]
         response = IK_fromQuater_client(data)
+
         print("\n----------------")
         t1 = time.time()
         print("Elapsed time for IK client: ", t1-t0, "s")
         print("----------------")
-
-        # Trajectory planning
-        # ------------------------------------------------------------------------------------
-
+#
         if response == []:
             print("No response found")
             continue
 
-        q_array = optMove(response, q_ref)
+        q_array = optMove(response)
         print("q_array = ", q_array)
         
         if not len(q_array) == 0:
             t.append(2)
             q.append(q_array)
-            q_ref = q_array
 
             controller.launch_trajectory(t, q, ttype)
 
-            time.sleep(5)
+            time.sleep(3)
+
+        q_curr = controller.readJointStates()
+        print("q_curr = ", q_curr)
 
     
 
