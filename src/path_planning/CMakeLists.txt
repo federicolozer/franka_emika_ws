@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   xacro
+  roslib
 )
 
 find_package(Eigen3 REQUIRED)
@@ -31,6 +32,7 @@ catkin_package(
     roscpp 
     rospy 
     std_msgs
+    roslib
 )
 
 
@@ -42,6 +44,7 @@ catkin_package(
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
+  ../neural_network/include
 )
 
 # IK server

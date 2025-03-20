@@ -10,9 +10,9 @@ import time
 import rospkg
 
 model = None
-model_path = rospkg.RosPack().get_path("neural_network") + "/data/model/NN_model.pth"
+model_path = rospkg.RosPack().get_path("neural_network") + "/data/models/NN_model.pth"
 dataset_path = rospkg.RosPack().get_path("neural_network") + "data/dataset/humanPoses.csv"
-json_path = rospkg.RosPack().get_path("user_interface") + "/data/model/config.json"
+#json_path = rospkg.RosPack().get_path("user_interface") + "/data/model/config.json"
 
 
 

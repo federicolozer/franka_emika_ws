@@ -91,8 +91,8 @@ if __name__ == '__main__':
         else:
             gravity[2] = -9.8
 
-    #msg = "rosrun dynamic_reconfigure dynparam set /gazebo \"{" + f"'gravity_x':{gravity[0]}, 'gravity_y':{gravity[1]}, 'gravity_z':{gravity[2]}" + "}\""
-    #os.system(msg)
+    msg = "rosrun dynamic_reconfigure dynparam set /gazebo \"{" + f"'gravity_x':{gravity[0]}, 'gravity_y':{gravity[1]}, 'gravity_z':{gravity[2]}" + "}\""
+    os.system(msg)
 
     ttype = "follow_joint"
     dispFrame = False
@@ -154,11 +154,13 @@ if __name__ == '__main__':
                 q.append(q_array)
                 q_ref = q_array
 
-
+        t = [0, 2, 4, 6, 8, 10]
         print("t = ", t)
         print("q = ", q)
 
         controller.launch_trajectory(t, q, ttype)
+
+        time.sleep(5)
 
     
 

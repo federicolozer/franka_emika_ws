@@ -1,0 +1,11 @@
+{
+    "loss": 0.011903472451700104,
+    "epochs": 100,
+    "batch_size": 1000,
+    "n1": 15,
+    "n2": 15,
+    "activation_fn": "<class 'torch.nn.modules.activation.Tanh'>",
+    "loss_fn": "<class 'torch.nn.modules.loss.MSELoss'>",
+    "optimizer_fn": "<class 'torch.optim.adam.Adam'>",
+    "lr": 0.1
+}
