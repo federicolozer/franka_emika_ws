@@ -10,4 +10,21 @@ This workspace contains all the packages used for tests and simulations regardin
     <img src="media/Panda.jpg"  width="400">
 </p>
 
-All the applications were developed by the University of Udine robotics laboratory, at the SMACT3 module of the LabVillage.
+## Installation
+
+### ROS environment
+
+Firts of all, you need to install the ROS environment.
+For this project, ROS Melodic Morenia distro is needed.
+You can find the whole procedure [**here**](https://wiki.ros.org/melodic/Installation)
+
+Then you are ready to install this project repository.
+```shell script
+git clone https://github.com/federicolozer/franka_emika_ws.git
+```
+
+Once installed, you need to build the project
+```shell script
+cd franka_emika_ws/src
+catkin_make -D
+```
