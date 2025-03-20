@@ -7,7 +7,7 @@
 This workspace contains all the packages used for tests and simulations regarding Franka Emika Panda Robot.
 
 <p align="center">
-    <img src="media/Panda.png"  width="400">
+    <img src="media/Panda.png"  width="500">
 </p>
 
 ## Installation
