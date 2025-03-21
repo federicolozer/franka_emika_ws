@@ -5,18 +5,19 @@
             "name": "Python: Flask",
             "type": "python",
             "request": "launch",
-            "module": "flask",
+            "module": "launch_UI",
             "env": {
-                "FLASK_APP": "searchData.py",
+                "FLASK_APP": "launch_UI.py",
                 "FLASK_ENV": "development"
-                },
+            },
             "args": [
                 "run",
                 "--no-debugger",
                 "--no-reload"
-                ],
+            ],
             "jinja": true,
-            "justMyCode": true
+            "justMyCode": true,
+            "autoStartBrowser": true
         }
     ]
 }

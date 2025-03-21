@@ -28,7 +28,10 @@ void printFrame(Eigen::Matrix4d O_T_EE_tmp) {
 Eigen::Matrix4d baseCoordTransf(Eigen::Matrix4d O_T_EE_mat, int mode) {
     Eigen::Matrix4d O_T_EE_tmp;   
 
-    if (mode == 1) { // horz
+    if (mode == 0) { // vert
+        O_T_EE_tmp = Eigen::Matrix4d(O_T_EE_mat.data());
+    }
+    else if (mode == 1) { // horz
         Eigen::Matrix4d O_T_EE_rot(O_T_EE_mat.data());
         Eigen::Matrix4d baseToWall_rot;
         baseToWall_rot << 0.0, 0.0, 1.0, -0.333,
@@ -37,16 +40,7 @@ Eigen::Matrix4d baseCoordTransf(Eigen::Matrix4d O_T_EE_mat, int mode) {
                             0.0, 0.0, 0.0, 1.0;
         O_T_EE_tmp = baseToWall_rot.inverse()*O_T_EE_rot;
     }
-    else if (mode == 2) { // horz_rev
-        Eigen::Matrix4d O_T_EE_rot(O_T_EE_mat.data());
-        Eigen::Matrix4d baseToWall_rot;
-        baseToWall_rot << 0.0, 0.0, 1.0, -0.333,
-                            0.0, 1.0, 0.0, 0.0,
-                            -1.0, 0.0, 0.0, 0.7,
-                            0.0, 0.0, 0.0, 1.0;
-        O_T_EE_tmp = baseToWall_rot.inverse()*O_T_EE_rot;
-    }
-    else if (mode == 3) { // ceil
+    else if (mode == 2) { // ceil
         Eigen::Matrix4d O_T_EE_rot(O_T_EE_mat.data());
         Eigen::Matrix4d baseToWall_rot;
         baseToWall_rot << 1.0, 0.0, 0.0, 0.0,
@@ -54,9 +48,6 @@ Eigen::Matrix4d baseCoordTransf(Eigen::Matrix4d O_T_EE_mat, int mode) {
                             0.0, 0.0, -1.0, 1.033,
                             0.0, 0.0, 0.0, 1.0;
         O_T_EE_tmp = baseToWall_rot.inverse()*O_T_EE_rot;
-    }
-    else {
-        O_T_EE_tmp = Eigen::Matrix4d(O_T_EE_mat.data());
     }
     
     return O_T_EE_tmp;

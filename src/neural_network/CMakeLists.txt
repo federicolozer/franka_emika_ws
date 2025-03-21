@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  roslib
 )
 
 find_package(Eigen3 REQUIRED)
@@ -24,6 +25,7 @@ catkin_package(
     roscpp 
     rospy 
     std_msgs
+    roslib
 )
 
 
@@ -33,8 +35,8 @@ catkin_package(
 ###########
 
 include_directories(include
-  ${catkin_INCLUDE_DIRS}
   ${PYTHON_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ../path_planning/include
 )
@@ -45,8 +47,8 @@ add_executable(dataset_creator
 )
 
 target_link_libraries(dataset_creator
-  ${catkin_LIBRARIES}
   ${PYTHON_LIBRARIES}
+  ${catkin_LIBRARIES}
 )
 
 

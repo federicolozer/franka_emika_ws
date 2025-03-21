@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+
+<launch>    
+    <node name="server" pkg="path_planning" type="IK_server" output="screen"/>
+    <node name="client" pkg="path_planning" type="main.py" output="screen" />
+</launch>

@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <sys/socket.h>
 #include <netinet/in.h>
-
+//dut di comeda
 
 Eigen::IOFormat MatFmt(1, 0, ", ", ";\n", "[", "]", "[", "]");
 boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};

@@ -5,33 +5,70 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader, random_split
-from math import pi
+import json
 import numpy as np
 import rospkg
 
 model_path = rospkg.RosPack().get_path("neural_network") + "/data/models/NN_model.pth"
 dataset_path = rospkg.RosPack().get_path("neural_network") + "/data/dataset/humanPoses.csv"
 #dataset_path = rospkg.RosPack().get_path("neural_network") + "/data/dataset/test.csv"
+json_path = rospkg.RosPack().get_path("neural_network") + "/data/models/hyperparams.json"
 
 
 
 class NN(nn.Module):
-    def __init__(self, n1, n2, activation_fn, loss_fn, optimizer_fn, lr):
+    def __init__(self, layers, activation_fn, loss_fn, optimizer_fn, lr):
         super(NN, self).__init__()
         #self.flatten = nn.Flatten()
-        if n2 == 0:
+        if layers[1] == 0:
             self.layer_logic = nn.Sequential(
-                nn.Linear(7, n1),
+                nn.Linear(7, layers[0]),
                 activation_fn(),
-                nn.Linear(n1, 1)
+                nn.Linear(layers[0], 1)
+            )
+        elif layers[2] == 0:
+            self.layer_logic = nn.Sequential(
+                nn.Linear(7, layers[0]),
+                activation_fn(),
+                nn.Linear(layers[0], layers[1]),
+                activation_fn(),
+                nn.Linear(layers[1], 1)
+            )
+        elif layers[3] == 0:
+            self.layer_logic = nn.Sequential(
+                nn.Linear(7, layers[0]),
+                activation_fn(),
+                nn.Linear(layers[0], layers[1]),
+                activation_fn(),
+                nn.Linear(layers[1], layers[2]),
+                activation_fn(),
+                nn.Linear(layers[2], 1)
+            )
+        elif layers[4] == 0:
+            self.layer_logic = nn.Sequential(
+                nn.Linear(7, layers[0]),
+                activation_fn(),
+                nn.Linear(layers[0], layers[1]),
+                activation_fn(),
+                nn.Linear(layers[1], layers[2]),
+                activation_fn(),
+                nn.Linear(layers[2], layers[3]),
+                activation_fn(),
+                nn.Linear(layers[3], 1)
             )
         else:
             self.layer_logic = nn.Sequential(
-                nn.Linear(7, n1),
+                nn.Linear(7, layers[0]),
                 activation_fn(),
-                nn.Linear(n1, n2),
+                nn.Linear(layers[0], layers[1]),
                 activation_fn(),
-                nn.Linear(n2, 1)
+                nn.Linear(layers[1], layers[2]),
+                activation_fn(),
+                nn.Linear(layers[2], layers[3]),
+                activation_fn(),
+                nn.Linear(layers[3], layers[4]),
+                activation_fn(),
+                nn.Linear(layers[4], 1)
             )
 
         self.loss = loss_fn()
@@ -53,6 +90,10 @@ class DS(Dataset):
 
         self.inputs = torch.from_numpy(data[:, 0:7]) 
         self.outputs = torch.from_numpy(data[:, [7]]) 
+        # self.outputs +=
+        # print(max(self.outputs))
+        # print(min(self.outputs))
+        # quit()
         self.n_samples = data.shape[0] 
         self.create_dataset(batch_size)
       
@@ -71,7 +112,29 @@ class DS(Dataset):
 
 
 
-def neural_network(model, inputData):
+def createModel():
+    with open(json_path, "r") as file:
+        config = json.load(file)
+
+    layers =[]
+
+    layers.append(config["n1"])
+    layers.append(config["n2"])
+    layers.append(config["n3"])
+    layers.append(config["n4"])
+    layers.append(config["n5"])
+    activation_fn = eval(config["activation_fn"])
+    loss_fn = eval(config["loss_fn"])
+    optimizer_fn = eval(config["optimizer_fn"])
+    lr = config["lr"]
+
+    model = NN(layers, activation_fn, loss_fn, optimizer_fn, lr)
+
+    return model
+
+
+
+def neuralNetwork(model, inputData):
     global model_path
 
     torch.set_default_dtype(torch.float32)

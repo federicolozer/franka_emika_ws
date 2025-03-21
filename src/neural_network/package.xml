@@ -13,8 +13,10 @@
 
   <build_depend>eigen</build_depend>
   <build_depend>message_generation</build_depend>
+  <build_depend>roslib</build_depend>
 
-  <exec_depend>message_runtime</exec_depend> 
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>roslib</exec_depend>
 
   <depend>roscpp</depend>
   <depend>rospy</depend>

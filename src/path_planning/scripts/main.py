@@ -10,14 +10,11 @@ from copy import deepcopy
 import numpy as np
 from math import pi, nan
 import control_tools as controller
-import csv
+import rospkg
 import time
 import socket
-import struct
-#from gazebo_msgs.srv import SetPhysicsProperties, GetPhysicsProperties
-#from geometry_msgs.msg import Vector3
-#from std_srvs.srv import Empty
 import os
+import json
 
 
 
@@ -76,23 +73,29 @@ def optMove(q_array_list, q_ref):
 
 
 if __name__ == '__main__':    
-    rospy.init_node('controller')
+    
+    
+    model = nn.createModel()
+
+    print(model)
+
+
+
+    """rospy.init_node('controller')
 
     mode = 0
     gravity = [0, 0, 0]
     if not rospy.search_param('/mode') == None:
         param = rospy.get_param('/mode')
-        if param == "horz":
+        if param == "vert":
+            mode = 0
+            gravity[2] = -9.8
+        elif param == "horz":
             mode = 1
             gravity[0] = -9.8
-        elif param == "horz_rev":
-            mode = 2
-            gravity[0] = -9.8
         elif param == "ceil":
-            mode = 3
-            gravity[2] = 9.8
-        else:
-            gravity[2] = -9.8
+            mode = 2
+            gravity[2] = 9.8            
 
     msg = "rosrun dynamic_reconfigure dynparam set /gazebo \"{" + f"'gravity_x':{gravity[0]}, 'gravity_y':{gravity[1]}, 'gravity_z':{gravity[2]}" + "}\""
     os.system(msg)
@@ -101,30 +104,35 @@ if __name__ == '__main__':
     dispFrame = False
     q_ref = np.array(controller.readJointStates())
 
-    model = nn.NN()
+    model = nn.NN(8) #comeda i argomenz
 
-    while True:
-        with open('/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv') as file:
-            reader = csv.reader(file)
+    t = []
+    q = []
 
-            rw = input("Select row...\n")
-            if rw == "quit":
-                endTransmission()
-                break
+    with open('/home/lozer/franka_emika_ws/src/path_planning/data/times.json', "r") as file:
+        times = json.load(file)
 
-            t = []
-            q = []
+        for time in times["waypoints"]:
+            t.append(time)
 
-            row = list(reader)[int(rw)]
-            quater = np.array([float(row[0]), float(row[1]), float(row[2]), float(row[3])])
-            O_EE = np.array([float(row[4]), float(row[5]), float(row[6])])
+    with open('/home/lozer/franka_emika_ws/src/path_planning/data/poses.json', "r") as file:
+        poses = json.load(file)
+
+        for pose in poses["waypoints"]:
+            print("------")
+
+            quater = np.array([float(pose["Qx"]), float(pose["Qy"]), float(pose["Qz"]), float(pose["Qw"])])
+            O_EE = np.array([float(pose["x"]), float(pose["y"]), float(pose["z"])])
+
+            print(quater)
+            print(O_EE)
 
             # Neural network
             # ------------------------------------------------------------------------------------
 
             t0 = time.time()
             inputData = np.matrix(np.concatenate((quater, O_EE), axis=0))
-            q7 = float(nn.neural_network(model, inputData)[0]) 
+            q7 = float(nn.neuralNetwork(model, inputData)[0]) 
             print("\n----------------")
             t1 = time.time()
             print("Elapsed time for having a solution from NN: ", t1-t0, "s")
@@ -133,10 +141,8 @@ if __name__ == '__main__':
             # Inverse kinematics
             # ------------------------------------------------------------------------------------
 
-            print("q7 value from NN = ", q7)
-            print("q7 value from dataset = ", float(row[7]))
             t0 = time.time()
-            data = [float(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5]), float(row[6]), q7, float(mode), float(dispFrame)]
+            data = [float(inputData[0, 0]), float(inputData[0, 1]), float(inputData[0, 2]), float(inputData[0, 3]), float(inputData[0, 4]), float(inputData[0, 5]), float(inputData[0, 6]), q7, float(mode), float(dispFrame)]
             response = IK_fromQuater_client(data)
             print("\n----------------")
             t1 = time.time()
@@ -152,21 +158,25 @@ if __name__ == '__main__':
 
             q_array = optMove(response, q_ref)
             print("q_array = ", q_array)
-            
+
             if not len(q_array) == 0:
-                t.append(2)
                 q.append(q_array)
                 q_ref = q_array
+            else:
+                q.append(None)
 
-                controller.launch_trajectory(t, q, ttype)
+    print("t = ", t)
+    print("q = ", q)
 
-                time.sleep(5)
+    controller.launch_trajectory(t, q, ttype)
 
-        
+    time.sleep(5)"""
+
     
-    
 
-    
+
+
+
 
 
 

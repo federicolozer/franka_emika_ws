@@ -8,13 +8,14 @@
 #include <iostream>
 #include <fstream>
 #include <Python.h>
+#include <ros/package.h>
 
 boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};
+std::string yaml_path = ros::package::getPath("path_planning") + "/config/mode.yaml";
 
 
-
-bool IK_check(Eigen::Map< Eigen::Matrix4d > O_T_EE, double q7) {
-    Eigen::Matrix4d O_T_EE_tmp = baseCoordTransf(O_T_EE, 3);
+bool IK_check(Eigen::Map< Eigen::Matrix4d > O_T_EE, double q7, int mode) {
+    Eigen::Matrix4d O_T_EE_tmp = baseCoordTransf(O_T_EE, mode);
     Eigen::Map<Eigen::Matrix4d> O_T_EE_new(O_T_EE_tmp.data());
 
     boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE_new, q7, q_actual_array, false);
@@ -45,8 +46,26 @@ int createDataset(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d fram
     bar.reset();
     bar.set_done_char("█");
 
-    int cnt = 0;
+    // Read mode from yaml
+    std::ifstream yaml;
 
+    yaml.open(yaml_path);
+    std::string param;
+    yaml >> param >> param;
+    std::cout << param << std::endl;
+
+    int mode;
+    if (param == "vert") {
+        mode = 0;
+    }
+    else if (param == "horz") {
+        mode = 1;
+    }
+    else if (param == "ceil") {
+        mode = 2;
+    }            
+
+    int cnt = 0;
     for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i++) {
         frame = Eigen::Matrix4d::Identity();
 
@@ -76,7 +95,7 @@ int createDataset(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d fram
             // Check if inverse kinematics is feasible
             Eigen::Map< Eigen::Matrix4d > O_T_EE(frame.data());
             double q7 = PyFloat_AsDouble(PyList_GetItem(pList, 4));
-            if (!IK_check(O_T_EE, q7)) {
+            if (!IK_check(O_T_EE, q7, mode)) {
                 cnt++;
                 continue;
             }

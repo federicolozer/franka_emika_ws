@@ -18,12 +18,13 @@ boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater
     Eigen::Matrix4d O_T_EE_tmp = baseCoordTransf(O_T_EE_mat, mode);
     Eigen::Map<Eigen::Matrix4d> O_T_EE(O_T_EE_tmp.data());
 
-    if (dispFrame) {
-        printFrame(O_T_EE_mat); //display frame in gazebo
-    }
-
     boost::array<boost::array<double, 7>, 4> q_array_list = IK_solver(O_T_EE, q7, q_actual_array, true);
 
+    //Display pose frame in gazebo
+    if (dispFrame) {
+        printFrame(O_T_EE_mat);
+    }
+    
     return q_array_list;
 }
 

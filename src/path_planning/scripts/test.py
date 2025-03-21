@@ -5,16 +5,19 @@ import sys
 sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')
 
 import NN_engine as nn
+
 import rospy
 from copy import deepcopy
 import numpy as np
 from math import pi, nan
 import control_tools as controller
-import csv
+import rospkg
 import time
 import socket
 import os
 import json
+
+json_path = rospkg.RosPack().get_path("neural_network") + "/data/models/hyperparams.json"
 
 
 
@@ -73,23 +76,28 @@ def optMove(q_array_list, q_ref):
 
 
 if __name__ == '__main__':    
-    rospy.init_node('controller')
+    
+    with open(json_path, "w") as file:
+        json.dump(config, file, indent=4)
+    model = nn.NN(8)
+
+
+
+    """rospy.init_node('controller')
 
     mode = 0
     gravity = [0, 0, 0]
     if not rospy.search_param('/mode') == None:
         param = rospy.get_param('/mode')
-        if param == "horz":
+        if param == "vert":
+            mode = 0
+            gravity[2] = -9.8
+        elif param == "horz":
             mode = 1
             gravity[0] = -9.8
-        elif param == "horz_rev":
-            mode = 2
-            gravity[0] = -9.8
         elif param == "ceil":
-            mode = 3
-            gravity[2] = 9.8
-        else:
-            gravity[2] = -9.8
+            mode = 2
+            gravity[2] = 9.8            
 
     msg = "rosrun dynamic_reconfigure dynparam set /gazebo \"{" + f"'gravity_x':{gravity[0]}, 'gravity_y':{gravity[1]}, 'gravity_z':{gravity[2]}" + "}\""
     os.system(msg)
@@ -98,7 +106,7 @@ if __name__ == '__main__':
     dispFrame = False
     q_ref = np.array(controller.readJointStates())
 
-    model = nn.NN(8)
+    model = nn.NN(8) #comeda i argomenz
 
     with open('/home/lozer/franka_emika_ws/src/path_planning/data/poses.json', "r") as file:
         poses = json.load(file)
@@ -160,7 +168,7 @@ if __name__ == '__main__':
 
         controller.launch_trajectory(t, q, ttype)
 
-        time.sleep(5)
+        time.sleep(5)"""
 
     
 

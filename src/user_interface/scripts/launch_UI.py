@@ -3,6 +3,7 @@
  
 from flask import Flask, render_template, request, jsonify
 from gen_json import gen_json
+import webbrowser
 import os
 
 app = Flask(__name__)
@@ -53,5 +54,7 @@ def startTraining():
 
 
 
-if __name__ == '__main__':    
+if __name__ == '__main__':   
+    if not os.environ.get("WERKZEUG_RUN_MAIN"):
+        webbrowser.open_new('http://127.0.0.1:5000/')
     app.run(debug=True)
