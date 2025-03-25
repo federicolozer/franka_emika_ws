@@ -134,17 +134,32 @@ def save_config():
 
 
 if __name__ == "__main__":
-    epochs = 100
-    batch_list = [500]
-    n1_list = [10, 15, 20, 30]
-    n2_list = [0, 10, 15, 20, 30]
-    n3_list = [0, 10, 15, 20, 30]
-    n4_list = [0, 10, 15, 20, 30]
-    n5_list = [0, 10, 15, 20, 30]
-    activation_list = ["nn.ReLU", "nn.Sigmoid", "nn.Tanh"]
+    epochs = 50
+    batch_list = [1000]
+    n1_list = [10, 20, 30]
+    n2_list = [0, 10, 20, 30]
+    n3_list = [0, 10, 20, 30]
+    n4_list = [0, 10, 20, 30]
+    n5_list = [0, 10, 20, 30]
+    activation_list = ["nn.ReLU", "nn.Sigmoid", "nn.Tanh", "nn.Tanhshrink"]
     loss_list = ["nn.MSELoss"]
     optimizer_list = ["optim.Adagrad", "optim.Adam", "optim.RMSprop", "optim.SGD"]
     lr_list = [0.1, 0.01, 0.001]
+
+
+
+
+    epochs = 200
+    batch_list = [1000]
+    n1_list = [30]
+    n2_list = [70]
+    n3_list = [60]
+    n4_list = [60]
+    n5_list = [40]
+    activation_list = ["nn.Tanh"]
+    loss_list = ["nn.MSELoss"]
+    optimizer_list = ["optim.Adam"]
+    lr_list = [0.008]
 
     layers_list = []
     for n1 in n1_list:
@@ -184,7 +199,7 @@ if __name__ == "__main__":
                     for optimizer_fn in optimizer_list: 
                         for lr in lr_list:
                             cnt += 1
-                            print("\n=============================================================")
+                            print("\n===============================================================")
                             print(f"\tProgress: {cnt}/{n_iter}")
                             print("===============================================================")
                             if stamp:
@@ -198,10 +213,10 @@ if __name__ == "__main__":
                             
                             model = engine.NN(layers, eval(activation_fn), eval(loss_fn), eval(optimizer_fn), lr)
 
-                            print("\n--------- Training NN ----------\n")
+                            print("\n--------- Training NN -----------------------------------------\n")
                             training(dataset.train_dataloader, epochs)
 
-                            print("\n-------- Evaluating NN ---------\n")
+                            print("\n-------- Evaluating NN ----------------------------------------\n")
                             loss = evaluation(dataset.eval_dataloader)
 
                             if doOnce:

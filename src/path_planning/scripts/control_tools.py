@@ -2,15 +2,17 @@
 # coding=utf-8
 
 import rospy
-from copy import deepcopy
 import numpy as np
-from tqdm import tqdm
+from copy import deepcopy
 from sensor_msgs.msg import JointState
 from control_msgs.msg import FollowJointTrajectoryActionGoal, FollowJointTrajectoryActionResult
 from moveit_msgs.msg import ExecuteTrajectoryActionGoal, ExecuteTrajectoryActionResult
+from franka_gripper.msg import MoveActionGoal, GraspActionGoal, MoveGoal, GraspGoal
 from path_planning.srv import IK_fromFrame, IK_fromQuater
 import Panda_trajectory_planner as planner
 from progress.bar import IncrementalBar as Bar
+import time
+import threading
 
 
 status = None
@@ -77,7 +79,7 @@ def wait_execution(t_tot):
     bar = Bar('Execution', max=100)
     for i in range(100):
         t = rospy.get_time()
-        while (t - t0)/t_tot*100 < i:
+        while (t-t0)/t_tot*100 < i:
             t = rospy.get_time()
             pass
         bar.next()
@@ -98,8 +100,6 @@ def homing(q_last, ttype):
         q_diff[i] = q_diff[i]/(0.2*q_p_lim[i]) + 0.1
     
     t = [0, min([3, max(q_diff)])]
-    print(t)
-    t = [0, 2]
     q = [q_reg, q_last]
     
     if ttype == "follow_joint":
@@ -115,6 +115,8 @@ def homing(q_last, ttype):
         msg = planner.build_execute_trajectory(t, q)
     
     control_publisher.publish(msg)
+
+    open_gripper()
 
     print("Homing\n")
     while status == None:
@@ -146,7 +148,7 @@ def exec_trajectory(t, q, ttype):
     control_publisher.publish(msg)
 
     print("Starting trajectory\n")
-    wait_execution(t[-1])
+    wait_execution((t[-1]-t[0]))
 
     if status == 3:
         print("\nTrajectory executed correctly")
@@ -157,12 +159,122 @@ def exec_trajectory(t, q, ttype):
 
 
 
+def open_gripper():
+    control_publisher = rospy.Publisher('/franka_gripper/move/goal', MoveActionGoal, queue_size = 10)
+
+    msg = MoveActionGoal()
+    msg.header.stamp = rospy.Duration(0)
+    msg.header.frame_id = ''
+
+    goal = MoveGoal()
+    goal.width = 0.08
+    goal.speed = 1
+        
+    msg.goal = deepcopy(goal)
+
+    time.sleep(0.4)
+
+    control_publisher.publish(msg)
+
+
+def close_gripper():
+    control_publisher = rospy.Publisher('/franka_gripper/grasp/goal', GraspActionGoal, queue_size = 10)
+
+    msg = GraspActionGoal()
+    msg.header.stamp = rospy.Duration(0)
+    msg.header.frame_id = ''
+
+    goal = GraspGoal()
+    goal.width = 0.02
+    goal.speed = 1
+    goal.force = 10
+        
+    msg.goal = deepcopy(goal)
+
+    time.sleep(0.4)
+
+    control_publisher.publish(msg)
+
+
+
 def launch_trajectory(t, q, ttype):
     if len(q) > 0:
-            homing(q[0], ttype)
-            if not len(q) == 1:
-                exec_trajectory(t, q, ttype)
+        homing(q[0], ttype)
+        if not len(q) == 1:
+            t_temp = [t[0]]
+            q_temp = [q[0]]
+            for i in range(1, len(t)):
+                if q[i] == "open_gripper":
+                    print("-------------")
+                    print(t_temp)
+                    print(q_temp)
+                    exec_trajectory(t_temp, q_temp, ttype)
+                    open_gripper()
+                    t_temp = [t[i]]
+                    q_temp = [q_temp[-1]]
+                elif q[i] == "close_gripper":
+                    print("-------------")
+                    print(t_temp)
+                    print(q_temp)
+                    exec_trajectory(t_temp, q_temp, ttype)
+                    close_gripper()
+                    t_temp = [t[i]]
+                    q_temp = [q_temp[-1]]
+                else:
+                    t_temp.append(t[i])
+                    q_temp.append(q[i])
+            
+            print("-------------")
+            print(t_temp)
+            print(q_temp)
+            exec_trajectory(t_temp, q_temp, ttype)
 
+
+"""def exec_grasping(t, q):
+    for i in range(len(t)):
+        if q[i] == "open_gripper":
+            time.sleep(t[i])
+            print("open_gripper")
+            open_gripper()
+        elif q[i] == "close_gripper":
+            time.sleep(t[i])
+            print("close_gripper")
+            close_gripper()
+
+
+def launch_trajectory(t, q, ttype):
+    if len(q) > 0:
+        homing(q[0], ttype)
+        if not len(q) == 1:
+            t_arm = []
+            q_arm = []
+            t_gripper = []
+            q_gripper = []
+            for i in range(len(t)):
+                if q[i].__class__.__name__ == "list":
+                    t_arm.append(t[i])
+                    q_arm.append(q[i])
+                else:
+                    t_gripper.append(t[i])
+                    q_gripper.append(q[i])
+            
+            print("-------------")
+            print(t_arm)
+            print(q_arm)
+            print("-------------")
+            print(t_gripper)
+            print(q_gripper)
+
+            t1 = threading.Thread(target=exec_trajectory, args=(t_arm, q_arm, ttype))
+            t2 = threading.Thread(target=exec_grasping, args=(t_gripper, q_gripper))
+
+            t1.start()
+            t2.start()
+
+            time.sleep(5)
+
+            t1.join()
+            t2.join()"""
 
 
     

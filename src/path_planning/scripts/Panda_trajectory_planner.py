@@ -46,7 +46,7 @@ def build_execute_trajectory(times, positions, velocities=None, accelerations=No
                 point.accelerations = accelerations[i]
             if not efforts == None:
                 point.effort = efforts[i]
-            point.time_from_start = rospy.Duration(times[i])
+            point.time_from_start = rospy.Duration(times[i]-times[0])
             
             msg.goal.trajectory.joint_trajectory.points.append(deepcopy(point))
 
@@ -92,7 +92,7 @@ def build_follow_joint_trajectory(times, positions, velocities=None, acceleratio
                 point.accelerations = accelerations[i]
             if not efforts == None:
                 point.effort = efforts[i]
-            point.time_from_start = rospy.Duration(times[i])
+            point.time_from_start = rospy.Duration(times[i]-times[0])
             
             msg.goal.trajectory.points.append(deepcopy(point))
 

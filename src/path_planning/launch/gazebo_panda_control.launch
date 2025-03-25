@@ -111,5 +111,7 @@
         <rosparam param="source_list">[franka_state_controller/joint_states, franka_gripper/joint_states] </rosparam>
     </node>
 
-    <node  pkg="rviz" type="rviz" output="screen" name="rviz" args="-d $(find franka_example_controllers)/launch/rviz/franka_description_with_marker.rviz" if="$(arg rviz)"/>
+    <node pkg="path_planning" type="gravity_comp.py" name="gravity_compensation" output="screen" />
+
+    <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(find franka_example_controllers)/launch/rviz/franka_description_with_marker.rviz" output="screen"/>
 </launch>

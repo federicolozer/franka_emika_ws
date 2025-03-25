@@ -10,11 +10,9 @@ from copy import deepcopy
 import numpy as np
 from math import pi, nan
 import control_tools as controller
-import rospkg
+import json
 import time
 import socket
-import os
-import json
 
 
 
@@ -36,7 +34,7 @@ def IK_fromQuater_client(data):
         print(f"--- res{i} = ", res)
         if np.isnan(res).any() == False:
             response.append(res)
-
+    print("Response = ", response)
     client_socket.close()
 
     return response
@@ -55,6 +53,8 @@ def endTransmission():
 
 def optMove(q_array_list, q_ref):
     err = nan
+
+    print(q_array_list)
     
     if not q_array_list == []:
         for array in q_array_list:
@@ -68,126 +68,109 @@ def optMove(q_array_list, q_ref):
 
     return q_array
 
-    
 
 
-
-if __name__ == '__main__':    
-    
-    
-    model = nn.createModel()
-
-    print(model)
-
-
-
-    """rospy.init_node('controller')
-
-    mode = 0
-    gravity = [0, 0, 0]
+def sel_mode():
     if not rospy.search_param('/mode') == None:
         param = rospy.get_param('/mode')
         if param == "vert":
             mode = 0
-            gravity[2] = -9.8
         elif param == "horz":
             mode = 1
-            gravity[0] = -9.8
         elif param == "ceil":
-            mode = 2
-            gravity[2] = 9.8            
+            mode = 2    
 
-    msg = "rosrun dynamic_reconfigure dynparam set /gazebo \"{" + f"'gravity_x':{gravity[0]}, 'gravity_y':{gravity[1]}, 'gravity_z':{gravity[2]}" + "}\""
-    os.system(msg)
+    return mode
 
+    
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--cls":
+            endTransmission()
+        else:
+            raise ValueError("wrong argument")
+        quit()
+
+    rospy.init_node('controller')
+
+    mode = sel_mode()
     ttype = "follow_joint"
     dispFrame = False
     q_ref = np.array(controller.readJointStates())
 
-    model = nn.NN(8) #comeda i argomenz
+    model = nn.createModel()
 
     t = []
     q = []
 
-    with open('/home/lozer/franka_emika_ws/src/path_planning/data/times.json', "r") as file:
-        times = json.load(file)
+    with open('/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/waypoints.json', "r") as file:
+        trajectory = json.load(file)
 
-        for time in times["waypoints"]:
-            t.append(time)
+        for waypoint in trajectory["waypoints"]:
+            if waypoint["type"] == "EE_pose":
+                quater = np.array([float(waypoint["Qx"]), float(waypoint["Qy"]), float(waypoint["Qz"]), float(waypoint["Qw"])])
+                O_EE = np.array([float(waypoint["x"]), float(waypoint["y"]), float(waypoint["z"])])
 
-    with open('/home/lozer/franka_emika_ws/src/path_planning/data/poses.json', "r") as file:
-        poses = json.load(file)
+                print(quater)
+                print(O_EE)
 
-        for pose in poses["waypoints"]:
-            print("------")
+                # Neural network ---------------------------------------------------------------------
 
-            quater = np.array([float(pose["Qx"]), float(pose["Qy"]), float(pose["Qz"]), float(pose["Qw"])])
-            O_EE = np.array([float(pose["x"]), float(pose["y"]), float(pose["z"])])
+                t0 = time.time()
+                inputData = np.matrix(np.concatenate((quater, O_EE), axis=0))
+                q7 = float(nn.neuralNetwork(model, inputData)[0]) 
+                print("\n----------------")
+                t1 = time.time()
+                print("Elapsed time for having a solution from NN: ", t1-t0, "s")
+                print("----------------")
 
-            print(quater)
-            print(O_EE)
+                # Inverse kinematics -----------------------------------------------------------------
 
-            # Neural network
-            # ------------------------------------------------------------------------------------
 
-            t0 = time.time()
-            inputData = np.matrix(np.concatenate((quater, O_EE), axis=0))
-            q7 = float(nn.neuralNetwork(model, inputData)[0]) 
-            print("\n----------------")
-            t1 = time.time()
-            print("Elapsed time for having a solution from NN: ", t1-t0, "s")
-            print("----------------")
+                print("q7 = ", q7)
+                print("expected q7 = ", -0.238573)
 
-            # Inverse kinematics
-            # ------------------------------------------------------------------------------------
+                #q7 = -0.238573
 
-            t0 = time.time()
-            data = [float(inputData[0, 0]), float(inputData[0, 1]), float(inputData[0, 2]), float(inputData[0, 3]), float(inputData[0, 4]), float(inputData[0, 5]), float(inputData[0, 6]), q7, float(mode), float(dispFrame)]
-            response = IK_fromQuater_client(data)
-            print("\n----------------")
-            t1 = time.time()
-            print("Elapsed time for IK client: ", t1-t0, "s")
-            print("----------------")
 
-            # Trajectory planning
-            # ------------------------------------------------------------------------------------
 
-            if response == []:
-                print("No response found")
-                continue
 
-            q_array = optMove(response, q_ref)
-            print("q_array = ", q_array)
+                t0 = time.time()
+                data = [float(inputData[0, 0]), float(inputData[0, 1]), float(inputData[0, 2]), float(inputData[0, 3]), float(inputData[0, 4]), float(inputData[0, 5]), float(inputData[0, 6]), q7, float(mode), float(dispFrame)]
+                response = IK_fromQuater_client(data)
+                print("\n----------------")
+                t1 = time.time()
+                print("Elapsed time for IK client: ", t1-t0, "s")
+                print("----------------")
 
-            if not len(q_array) == 0:
-                q.append(q_array)
-                q_ref = q_array
+                # Trajectory planning ----------------------------------------------------------------
+
+                q_array = optMove(response, q_ref)
+                print("q_array = ", q_array)
+
+                if not len(q_array) == 0:
+                    t.append(waypoint["t"])
+                    q.append(q_array)
+                    q_ref = q_array
+                else:
+                    t.append(None)
+                    q.append(None)
+                    print("No response found")
+
             else:
-                q.append(None)
+                if waypoint["type"] == "close_gripper":
+                    q_array = [0]
+                    q_array.append(waypoint["width"])
+                elif waypoint["type"] == "open_gripper":
+                    q_array = [1]
+                    q_array.append(waypoint["width"])
+                q.append(q_array)
 
     print("t = ", t)
     print("q = ", q)
 
     controller.launch_trajectory(t, q, ttype)
 
-    time.sleep(5)"""
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-
-
-            
-
-
+    time.sleep(5)
