@@ -5,7 +5,6 @@
 #include <eigen3/Eigen/Dense>
 #include <array>
 #include <cmath>
-#include <iostream>
 #include <fstream>
 #include <Python.h>
 #include <ros/package.h>
@@ -143,15 +142,28 @@ int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file, st
 int main(int argc, char** argv) {
     std::ofstream file;
 
-    file.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv");
-    file << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
-    
-	Py_Initialize();
+    Py_Initialize();
 
+    PyObject* pModule
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')");
-    PyObject* pModule = PyImport_ImportModule("humanPoses");
-    
+
+    if (argc > 1) {
+        std::cout << argv[1] << std::endl;
+        if (std::string(argv[1]) == "--test") {
+            file.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/test.csv");
+            file << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
+            
+            pModule = PyImport_ImportModule("humanPoses_test");
+        }
+        else {
+            file.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/main.csv");
+            file << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
+            
+            pModule = PyImport_ImportModule("humanPoses");
+        }
+    }
+
     Eigen::Matrix4d frame;
 
     if (pModule) {

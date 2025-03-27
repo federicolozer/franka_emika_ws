@@ -16,7 +16,7 @@ def reader(target=None):
     humanPoses = []
 
     prefix = "arm"
-    arm = ["EE", "finger", "hand", "elbow", "shoulder"]
+    arm = ["thumb", "finger", "hand", "elbow", "shoulder"]
     
     order = dict()
     for i in range(len(arm)):
@@ -88,7 +88,11 @@ def solver(cPose):
         cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
         cPose[i][2] += base_height
 
-    O_ee = np.array(cPose[0])
+    print(cPose[0])
+    print(cPose[1])
+    print((cPose[0]+cPose[1])/2)
+    
+    O_ee = np.array((cPose[0]+cPose[1])/2)
     hand = np.array(cPose[2])
     elbow = np.array(cPose[3])
     shoulder = np.array(cPose[4])

@@ -10,7 +10,10 @@
 <body>
     <h1>CREATE DATASET</h1>
     <div id="inst" class="msg">
-        <p>Select data to include in the dataset</p>
+        <div id="dall">
+            <p id="instmsg">Select data to include in the dataset</p>
+            <button id="chall" value="Add" onclick="changeAll(self)">Add</button>
+        </div>
     </div>
     <script>
         var data_set = new Set();

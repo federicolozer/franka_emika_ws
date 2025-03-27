@@ -9,10 +9,10 @@ import json
 import numpy as np
 import rospkg
 
-model_path = rospkg.RosPack().get_path("neural_network") + "/data/models/NN_model.pth"
-dataset_path = rospkg.RosPack().get_path("neural_network") + "/data/dataset/humanPoses.csv"
+model_path = rospkg.RosPack().get_path("neural_network") + "/data/new_models_92/NN_model.pth"
+dataset_path = rospkg.RosPack().get_path("neural_network") + "/data/dataset/main.csv"
 #dataset_path = rospkg.RosPack().get_path("neural_network") + "/data/dataset/test.csv"
-json_path = rospkg.RosPack().get_path("neural_network") + "/data/models/hyperparams.json"
+json_path = rospkg.RosPack().get_path("neural_network") + "/data/new_models_92/hyperparams.json"
 
 
 

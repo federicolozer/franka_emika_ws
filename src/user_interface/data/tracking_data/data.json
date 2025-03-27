@@ -1,7 +1,18 @@
 {
-    "Data_1": "Test_4_sx.csv",
-    "Data_2": "Test_3_dx.csv",
-    "Data_3": "Test_4_dx.csv",
-    "Data_4": "Test_1_dx.csv",
-    "Data_5": "Test_2_dx.csv"
+    "Data_1": "dir_bottom_or_front_dx_lin.csv",
+    "Data_2": "dir_right_or_bottom_sx_lin.csv",
+    "Data_3": "dir_top_or_front_dx_lin.csv",
+    "Data_4": "dir_right_or_front_sx_lin.csv",
+    "Data_5": "dir_front_or_bottom_dx_lin.csv",
+    "Data_6": "dir_bottom_or_left_dx_lin.csv",
+    "Data_7": "dir_top_or_right_sx_lin.csv",
+    "Data_8": "dir_left_or_top_dx_lin.csv",
+    "Data_9": "dir_right_or_top_sx_lin.csv",
+    "Data_10": "dir_front_or_right_dx_lin.csv",
+    "Data_11": "dir_front_or_left_sx_lin.csv",
+    "Data_12": "dir_left_or_bottom_dx_lin.csv",
+    "Data_13": "dir_front_or_top_dx_lin.csv",
+    "Data_14": "dir_left_or_front_dx_lin.csv",
+    "Data_15": "dir_top_or_left_dx_lin.csv",
+    "Data_16": "dir_bottom_or_right_sx_lin.csv"
 }

@@ -5,11 +5,12 @@
 #include <stdexcept>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <fstream>
 #include <cmath>
-
+#include <ros/package.h>
 
 boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};
-
+std::string yaml_path = ros::package::getPath("path_planning") + "/config/mode.yaml";
 
 
 boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater, std::array<double, 3> O_EE, double q7, int mode, bool dispFrame) {  
@@ -30,7 +31,7 @@ boost::array<boost::array<double, 7>, 4> IK_fromQuater(Eigen::Quaterniond quater
 
 
 
-void server() {
+void server(int mode) {
     // Socket initialization
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -101,14 +102,30 @@ void server() {
 
 
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "IK_server");
-    ros::NodeHandle n;
+    // Read mode from yaml
+    std::ifstream yaml;
+    
+    yaml.open(yaml_path);
+    std::string param;
+    yaml >> param >> param;
+    std::cout << param << std::endl;
+
+    int mode;
+    if (param == "vert") {
+        mode = 0;
+    }
+    else if (param == "horz") {
+        mode = 1;
+    }
+    else if (param == "ceil") {
+        mode = 2;
+    } 
 
     std::fixed;
     std::setprecision(2);
 
     std::cout << "Ready" << std::endl;
-    server();
+    server(mode);
 
     return 0;
 }

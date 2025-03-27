@@ -149,17 +149,17 @@ if __name__ == "__main__":
 
 
 
-    epochs = 200
+    epochs = 50
     batch_list = [1000]
     n1_list = [30]
-    n2_list = [70]
-    n3_list = [60]
-    n4_list = [60]
+    n2_list = [72]
+    n3_list = [63]
+    n4_list = [65]
     n5_list = [40]
     activation_list = ["nn.Tanh"]
     loss_list = ["nn.MSELoss"]
     optimizer_list = ["optim.Adam"]
-    lr_list = [0.008]
+    lr_list = [0.01]
 
     layers_list = []
     for n1 in n1_list:

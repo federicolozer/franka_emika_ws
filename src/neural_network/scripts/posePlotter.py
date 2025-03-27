@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 #from mpl_toolkits.mplot3d import Axes3D
 from neural_network.scripts.humanPoses import reader, solver
 
-path = "/home/lozer/franka_emika_ws/src/neural_network/data/dataset/humanPoses.csv"
+path = "/home/lozer/franka_emika_ws/src/neural_network/data/dataset/main.csv"
 
 
 

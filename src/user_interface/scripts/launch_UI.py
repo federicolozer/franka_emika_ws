@@ -14,7 +14,7 @@ def callDatasetCreator(data):
     msg = "rosrun neural_network dataset_creator"
     for elem in data:
         msg += (" " + elem)
-    
+
     os.system(msg)
 
 

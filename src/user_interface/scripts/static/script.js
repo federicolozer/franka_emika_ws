@@ -36,6 +36,10 @@ function createSection(key, val, count) {
     document.getElementById("d_" + count).appendChild(p1);
     document.getElementById("d_" + count).appendChild(p2);
     document.getElementById("d_" + count).appendChild(button);
+
+    div.className = "data"
+    p1.className = "ndata"
+    p2.className = "dataname"
 }
 
 
@@ -55,6 +59,34 @@ function defineButtonBehavior(button, val, count) {
             document.getElementById("d_" + count).setAttribute('style', '');
         }
     });
+}
+
+
+
+function changeAll() {
+    button = document.getElementById("chall");
+    if (button.value == "Add") {
+        button.value = "Remove";
+        button.innerHTML = button.value;
+        divs = document.getElementsByClassName("data");
+        for (let i=0; i<divs.length; i++) {
+            data_set.add(divs[i].children[1].innerHTML);
+            divs[i].children[2].value = "Remove";
+            divs[i].children[2].innerHTML = button.value;
+            divs[i].setAttribute('style', 'background-color: rgb(86, 180, 86);');
+        }
+    }
+    else if (button.value == "Remove") {
+        button.value = "Add";
+        button.innerHTML = button.value;
+        divs = document.getElementsByClassName("data");
+        for (let i=0; i<divs.length; i++) {
+            data_set.delete(divs[i].children[1].innerHTML);
+            divs[i].children[2].value = "Add";
+            divs[i].children[2].innerHTML = button.value;
+            divs[i].setAttribute('style', '');
+        }
+    }
 }
 
 

@@ -205,17 +205,11 @@ def launch_trajectory(t, q, ttype):
             q_temp = [q[0]]
             for i in range(1, len(t)):
                 if q[i] == "open_gripper":
-                    print("-------------")
-                    print(t_temp)
-                    print(q_temp)
                     exec_trajectory(t_temp, q_temp, ttype)
                     open_gripper()
                     t_temp = [t[i]]
                     q_temp = [q_temp[-1]]
                 elif q[i] == "close_gripper":
-                    print("-------------")
-                    print(t_temp)
-                    print(q_temp)
                     exec_trajectory(t_temp, q_temp, ttype)
                     close_gripper()
                     t_temp = [t[i]]
@@ -224,9 +218,6 @@ def launch_trajectory(t, q, ttype):
                     t_temp.append(t[i])
                     q_temp.append(q[i])
             
-            print("-------------")
-            print(t_temp)
-            print(q_temp)
             exec_trajectory(t_temp, q_temp, ttype)
 
 
