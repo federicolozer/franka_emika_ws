@@ -24,7 +24,7 @@ q_p_lim = np.array([2.1750, 2.1750, 2.1750, 2.1750, 2.6100, 2.6100, 2.6100])
 
 def CallbackJointStates(data):
     global q_reg
-
+    
     q_reg = list(data.position[0:7])
 
 
@@ -39,7 +39,7 @@ def CallbackResult(data):
 
 def readJointStates():
     joint_states_subscriber = rospy.Subscriber('/joint_states', JointState, CallbackJointStates) 
-
+    
     while q_reg == []:
         pass
 

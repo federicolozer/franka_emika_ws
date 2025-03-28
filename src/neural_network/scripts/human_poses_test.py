@@ -12,10 +12,10 @@ base_height = 0.7
 
 
 
-def reader(target=None):
+def reader(target):
     humanPoses = []
 
-    prefix = "arm"
+    prefix = "arm_test"
     arm = ["thumb", "finger", "hand", "elbow", "shoulder"]
     
     order = dict()
@@ -23,10 +23,7 @@ def reader(target=None):
         order[f"{prefix}_{arm[i]}"] = None
         arm[i] = prefix + "_" + arm[i]
     
-    if target == None:
-        tracking_data = list(os.walk(path))[0][2]
-    else:
-        tracking_data = list(target)
+    tracking_data = list(target)
     
     for data in tracking_data:
         with open(path + "/" + data) as file:
@@ -41,7 +38,7 @@ def reader(target=None):
                             continue
             
                 elif cnt >=7:
-                    pose = [None, None, None, None, None]
+                    pose = [None, None, None, None, None, None]
                     for i in range(2, len(row)-2, 3):
                         if row[i] == "" or row[i+1] == "" or row[i+2] == "":
                             continue
@@ -52,6 +49,8 @@ def reader(target=None):
                         except:
                             continue
                         pose[pos] = item
+
+                    pose[-1] = row[1]
                     if all(pose):
                         humanPoses.append(pose)
                 else:
@@ -83,19 +82,16 @@ def solver(cPose):
 
     ref = deepcopy([cPose[4][0], cPose[4][1], cPose[4][2]])
     
-    for i in range(len(cPose)):
+    for i in range(len(cPose)-1):
         cPose[i] = deepcopy([cPose[i][0]-ref[0], cPose[i][1]-ref[1], cPose[i][2]-ref[2]])
         cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
         cPose[i][2] += base_height
-
-    print(cPose[0])
-    print(cPose[1])
-    print((cPose[0]+cPose[1])/2)
     
     O_ee = np.array((cPose[0]+cPose[1])/2)
     hand = np.array(cPose[2])
     elbow = np.array(cPose[3])
     shoulder = np.array(cPose[4])
+    t = np.array(cPose[5])
 
     segm_ee_finger = np.array(cPose[1])-O_ee
     segm_hand_ee = O_ee-hand
@@ -118,8 +114,6 @@ def solver(cPose):
 
     ee_frame = adjust(ee_frame, np.linalg.norm(segm_hand_elbow)+np.linalg.norm(segm_hand_ee), np.linalg.norm(segm_elbow_shoulder))
 
-    res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7]
+    res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7, t]
 
     return res
-
-reader()

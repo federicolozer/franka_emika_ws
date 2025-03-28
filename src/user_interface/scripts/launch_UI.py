@@ -14,14 +14,29 @@ def callDatasetCreator(data):
     msg = "rosrun neural_network dataset_creator"
     for elem in data:
         msg += (" " + elem)
+    
+    res = os.system(msg)
 
-    os.system(msg)
+    return(res)
+
+
+
+def callTestCreator(data):
+    msg = "rosrun neural_network test_creator"
+    for elem in data:
+        msg += (" " + elem)
+    
+    res = os.system(msg)
+    
+    return(res)
 
 
 
 def callTrainNN():
     msg = "rosrun neural_network NN_trainer.py"
-    os.system(msg)
+    res = os.system(msg)
+
+    return(res)
 
 
 
@@ -40,16 +55,24 @@ def sendData():
 @app.route('/sendDatasetCreatorRequest', methods=['SEND'])
 def getData():
     data = request.get_json()
-    callDatasetCreator(data)
-    return jsonify(result="Dataset created correctly")
+    res = callDatasetCreator(data)
+    return jsonify(result=res)
+
+
+
+@app.route('/sendTestCreatorRequest', methods=['SEND'])
+def getTest():
+    data = request.get_json()
+    res = callTestCreator(data)
+    return jsonify(result=res)
 
 
 
 @app.route('/sendTrainingNNRequest', methods=['SEND'])
 def startTraining():
-    data = request.get_json()
-    callTrainNN()
-    return jsonify(result="Neural network training has ended correctly")
+    request.get_json()
+    res = callTrainNN()
+    return jsonify(result=res)
 
 
 

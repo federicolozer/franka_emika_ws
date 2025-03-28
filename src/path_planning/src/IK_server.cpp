@@ -108,7 +108,6 @@ int main(int argc, char** argv) {
     yaml.open(yaml_path);
     std::string param;
     yaml >> param >> param;
-    std::cout << param << std::endl;
 
     int mode;
     if (param == "vert") {

@@ -51,6 +51,16 @@ target_link_libraries(dataset_creator
   ${catkin_LIBRARIES}
 )
 
+# test_creator
+add_executable(test_creator
+  src/test_creator.cpp
+)
+
+target_link_libraries(test_creator
+  ${PYTHON_LIBRARIES}
+  ${catkin_LIBRARIES}
+)
+
 
 
 #############
@@ -58,7 +68,10 @@ target_link_libraries(dataset_creator
 #############
 
 catkin_install_python(PROGRAMS
+  scripts/human_poses.py
+  scripts/human_poses_test.py
   scripts/NN_engine.py
-  scripts/humanPoses.py
+  scripts/NN_trainer.py
+  scripts/pose_plotter.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

@@ -9,6 +9,7 @@
 #include <Python.h>
 #include <ros/package.h>
 
+int skip = 10;
 boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};
 std::string yaml_path = ros::package::getPath("path_planning") + "/config/mode.yaml";
 
@@ -39,7 +40,7 @@ bool IK_check(Eigen::Map< Eigen::Matrix4d > O_T_EE, double q7, int mode) {
 
 
 
-int createDataset(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, std::ofstream* file) {
+int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, std::ofstream* file1, std::ofstream* file2) {
     progressbar bar(PyList_Size(pHumanPoses));
     bar.set_niter(PyList_Size(pHumanPoses));
     bar.reset();
@@ -64,7 +65,7 @@ int createDataset(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d fram
     }           
 
     int cnt = 0;
-    for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i++) {
+    for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i+=skip) {
         frame = Eigen::Matrix4d::Identity();
 
         PyObject* pPose = PyList_GetItem(pHumanPoses, i);
@@ -72,7 +73,9 @@ int createDataset(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d fram
         PyObject* pTuple = PyTuple_New(1);
         PyTuple_SetItem(pTuple, 0, pPose);
 
-        bar.update();
+        for (int j=0; j<skip; j++) {
+            bar.update();
+        }
 
         // Call solver function
         PyObject* pFuncSolver = PyObject_GetAttrString(pModule, "solver");
@@ -93,6 +96,7 @@ int createDataset(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d fram
             // Check if inverse kinematics is feasible
             Eigen::Map< Eigen::Matrix4d > O_T_EE(frame.data());
             double q7 = PyFloat_AsDouble(PyList_GetItem(pList, 4));
+            double t = PyFloat_AsDouble(PyList_GetItem(pList, 5));
             if (!IK_check(O_T_EE, q7, mode)) {
                 cnt++;
                 continue;
@@ -100,7 +104,8 @@ int createDataset(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d fram
 
             // Write line in dataset file
             Eigen::Quaterniond quater = frameToQuaternion(frame);
-            *file << quater.x() << "," << quater.y() << "," << quater.z() << "," << quater.w() << "," << frame(0,3) << "," << frame(1,3) << "," << frame(2,3) << "," << q7 << std::endl;
+            *file1 << quater.x() << "," << quater.y() << "," << quater.z() << "," << quater.w() << "," << frame(0,3) << "," << frame(1,3) << "," << frame(2,3) << "," << q7 << std::endl;
+            *file2 << "\n\t\t{\n\t\t\t\"t\": " << t << ",\n\t\t\t\"type\": \"EE_pose\",\n\t\t\t\"Qx\": " << quater.x() << ",\n\t\t\t\"Qy\": " << quater.y() << ",\n\t\t\t\"Qz\": " << quater.z() << ",\n\t\t\t\"Qw\": " << quater.w() << ",\n\t\t\t\"x\": " << frame(0,3) << ",\n\t\t\t\"y\": " << frame(1,3) << ",\n\t\t\t\"z\": " << frame(2,3) << "\n\t\t},";
         }
     }
 
@@ -109,17 +114,7 @@ int createDataset(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d fram
 
 
 
-int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file) {
-    PyObject* pFuncReader = PyObject_GetAttrString(pModule, "reader");
-    if(pFuncReader && PyCallable_Check(pFuncReader)) {
-        PyObject* pHumanPoses = PyObject_CallObject(pFuncReader, NULL);
-        createDataset(pModule, pHumanPoses, frame, file);
-    }
-}
-
-
-
-int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file, std::vector<std::string> tracking_data) {
+int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file1, std::ofstream* file2, std::vector<std::string> tracking_data) {
     PyObject* pFuncReader = PyObject_GetAttrString(pModule, "reader");
     if(pFuncReader && PyCallable_Check(pFuncReader)) {
         PyObject* pTuple = PyTuple_New(1);
@@ -131,7 +126,7 @@ int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file, st
         PyTuple_SetItem(pTuple, 0, pList);
 
         PyObject* pHumanPoses = PyObject_CallObject(pFuncReader, pTuple);
-        createDataset(pModule, pHumanPoses, frame, file);
+        createTest(pModule, pHumanPoses, frame, file1, file2);
     }
 }
 
@@ -139,16 +134,19 @@ int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file, st
 
 
 int main(int argc, char** argv) {
-    std::ofstream file;
+    std::ofstream file1;
+    std::ofstream file2;
 
-    file.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/main.csv");
-    file << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
+    file1.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/test.csv");
+    file1 << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
+    file2.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/waypoints_3.json");
+    file2 << "{\n\t\"waypoints\":[" << std::endl;
 
     Py_Initialize();
     
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')");
-    PyObject* pModule = PyImport_ImportModule("human_poses");
+    PyObject* pModule = PyImport_ImportModule("human_poses_test");
 
     Eigen::Matrix4d frame;
 
@@ -158,19 +156,24 @@ int main(int argc, char** argv) {
             for (int i=1; i<argc; i++) {
                 tracking_data[i-1] = argv[i];
             }
-            execPython(pModule, frame, &file, tracking_data);
+            execPython(pModule, frame, &file1, &file2, tracking_data);
         }
         else {
-            execPython(pModule, frame, &file);
+            std::cout << "Error: missing argument" << std::endl;
         }
     }
     else {
-        std::cout << "Error: failed loading python module 'human_poses'" << std::endl;
+        std::cout << "Error: failed loading python module 'human_poses_test'" << std::endl;
     }
 	
 	Py_Finalize();
 
-    file.close();
+    int pos = file2.tellp();
+    file2.seekp(pos - 1);
+    file2 << "\n\t]\n}" << std::endl;
+
+    file1.close();
+    file2.close();
 
     return 0;
 }

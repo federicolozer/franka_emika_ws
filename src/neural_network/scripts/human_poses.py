@@ -57,7 +57,7 @@ def reader(target=None):
                 else:
                     pass
                 cnt += 1
-    
+
     return humanPoses
 
 
@@ -75,7 +75,6 @@ def adjust(ee_frame, ah, bh):
 
 
 def solver(cPose):
-    base_frame = np.identity(4)
     ee_frame = np.identity(4)
     rMat = np.array([[1, 0, 0],
                     [0, 0, -1],
@@ -117,5 +116,3 @@ def solver(cPose):
     res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7]
 
     return res
-
-reader()

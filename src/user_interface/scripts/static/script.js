@@ -106,7 +106,38 @@ function createDataset() {
         contentType: 'application/json',
         data: JSON.stringify(Array.from(data_set)),
         success: function(response) {
-            document.getElementById('msg').innerHTML = response.result;
+            if (response.result == 0) {
+                document.getElementById('msg').innerHTML = "Dataset created correctly";
+            }
+            else {
+                document.getElementById('msg').innerHTML = "Error: failed to create dataset";
+            }
+            restoreMsg();
+        },
+        error: function() {
+            document.getElementById('msg').innerHTML = "Error: failed to send request";
+            restoreMsg();
+        }
+    });
+}
+
+
+
+function createTest() {
+    document.getElementById('msg').innerHTML = "Creating test...";
+    
+    $.ajax({
+        url: '/sendTestCreatorRequest',
+        type: 'SEND',
+        contentType: 'application/json',
+        data: JSON.stringify(Array.from(data_set)),
+        success: function(response) {
+            if (response.result == 0) {
+                document.getElementById('msg').innerHTML = "Test created correctly";
+            }
+            else {
+                document.getElementById('msg').innerHTML = "Error: failed to create test";
+            }
             restoreMsg();
         },
         error: function() {
@@ -127,7 +158,12 @@ function trainNN() {
         contentType: 'application/json',
         data: JSON.stringify({"value": 1}),
         success: function(response) {
-            document.getElementById('msg').innerHTML = response.result;
+            if (response.result == 0) {
+                document.getElementById('msg').innerHTML = "Neural network training has ended correctly";
+            }
+            else {
+                document.getElementById('msg').innerHTML = "Error: failed to train neural network";
+            }
             restoreMsg();
         },
         error: function() {

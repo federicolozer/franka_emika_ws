@@ -44,10 +44,10 @@ def training(dataloader, epochs):
             loss = model.loss(outputs, OUT_data)
             
             # Backpropagation
+            model.optimizer.zero_grad()
             loss.backward()
             model.optimizer.step()
-            model.optimizer.zero_grad()
-
+            
             tot_loss += loss
 
         size = len(dataloader)
@@ -95,6 +95,11 @@ def set_config(loss, epochs, batch_size, layers, activation_fn, loss_fn, optimiz
     config["n3"] = layers[2]
     config["n4"] = layers[3]
     config["n5"] = layers[4]
+    config["n6"] = layers[5]
+    config["n7"] = layers[6]
+    config["n8"] = layers[7]
+    config["n9"] = layers[8]
+    config["n10"] = layers[9]
     config["activation_fn"] = activation_fn
     config["loss_fn"] = loss_fn
     config["optimizer_fn"] = optimizer_fn
@@ -114,6 +119,11 @@ def get_config():
     layers.append(config["n3"])
     layers.append(config["n4"])
     layers.append(config["n5"])
+    layers.append(config["n6"])
+    layers.append(config["n7"])
+    layers.append(config["n8"])
+    layers.append(config["n9"])
+    layers.append(config["n10"])
     activation_fn = config["activation_fn"]
     loss_fn = config["loss_fn"]
     optimizer_fn = config["optimizer_fn"]
@@ -134,28 +144,35 @@ def save_config():
 
 
 if __name__ == "__main__":
-    epochs = 50
+    epochs = 10
     batch_list = [1000]
-    n1_list = [10, 20, 30]
-    n2_list = [0, 10, 20, 30]
-    n3_list = [0, 10, 20, 30]
-    n4_list = [0, 10, 20, 30]
-    n5_list = [0, 10, 20, 30]
-    activation_list = ["nn.ReLU", "nn.Sigmoid", "nn.Tanh", "nn.Tanhshrink"]
+    n1_list = [30, 35]
+    n2_list = [65, 70, 75]
+    n3_list = [60, 65, 70]
+    n4_list = [60, 65, 70]
+    n5_list = [35, 40, 45]
+    n6_list = [0, 10, 20, 30]
+    n7_list = [0, 10, 20, 30]
+    n8_list = [0, 10, 20, 30]
+    n9_list = [0, 10, 20, 30]
+    n10_list = [0, 10, 20, 30]
+    activation_list = ["nn.Tanh"]
     loss_list = ["nn.MSELoss"]
-    optimizer_list = ["optim.Adagrad", "optim.Adam", "optim.RMSprop", "optim.SGD"]
-    lr_list = [0.1, 0.01, 0.001]
+    optimizer_list = ["optim.Adam"]
+    lr_list = [0.01]
 
-
-
-
-    epochs = 50
+    epochs = 200
     batch_list = [1000]
     n1_list = [30]
-    n2_list = [72]
-    n3_list = [63]
+    n2_list = [70]
+    n3_list = [65]
     n4_list = [65]
     n5_list = [40]
+    n6_list = [0]
+    n7_list = [0]
+    n8_list = [0]
+    n9_list = [0]
+    n10_list = [0]
     activation_list = ["nn.Tanh"]
     loss_list = ["nn.MSELoss"]
     optimizer_list = ["optim.Adam"]
@@ -163,7 +180,7 @@ if __name__ == "__main__":
 
     layers_list = []
     for n1 in n1_list:
-        layer = [0, 0, 0, 0, 0]
+        layer = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         layer[0] = n1
         for n2 in n2_list:
             if n2 == 0:
@@ -184,8 +201,38 @@ if __name__ == "__main__":
                     else:
                         layer[3] = n4
                     for n5 in n5_list:
-                        layer[4] = n5
-                        layers_list.append(deepcopy(layer))      
+                        if n5 == 0:
+                            layers_list.append(deepcopy(layer))
+                            continue
+                        else:
+                            layer[4] = n5
+                        for n6 in n6_list:
+                            if n6 == 0:
+                                layers_list.append(deepcopy(layer))
+                                continue
+                            else:
+                                layer[5] = n6
+                            for n7 in n7_list:
+                                if n7 == 0:
+                                    layers_list.append(deepcopy(layer))
+                                    continue
+                                else:
+                                    layer[6] = n7
+                                for n8 in n8_list:
+                                    if n8 == 0:
+                                        layers_list.append(deepcopy(layer))
+                                        continue
+                                    else:
+                                        layer[7] = n8
+                                    for n9 in n9_list:
+                                        if n9 == 0:
+                                            layers_list.append(deepcopy(layer))
+                                            continue
+                                        else:
+                                            layer[8] = n9
+                                        for n10 in n10_list:
+                                            layer[9] = n10
+                                            layers_list.append(deepcopy(layer))      
     
     cnt = 0
     n_iter = len(batch_list)*len(layers_list)*len(activation_list)*len(loss_list)*len(optimizer_list)*len(lr_list)
@@ -203,12 +250,12 @@ if __name__ == "__main__":
                             print(f"\tProgress: {cnt}/{n_iter}")
                             print("===============================================================")
                             if stamp:
-                                print(f"\tBatch size: \t{batch_size}")
+                                print(f"\tBatch size: \t\t{batch_size}")
                                 print(f"\tNeurons in layers: \t{layers}")
                                 print(f"\tActivation function: \t{activation_fn}")
-                                print(f"\tLoss function: \t{loss_fn}")
+                                print(f"\tLoss function: \t\t{loss_fn}")
                                 print(f"\tOptimization function: \t{optimizer_fn}")
-                                print(f"\tLearning rate: \t{lr}")
+                                print(f"\tLearning rate: \t\t{lr}")
                                 print("---------------------------------------------------------------")
                             
                             model = engine.NN(layers, eval(activation_fn), eval(loss_fn), eval(optimizer_fn), lr)

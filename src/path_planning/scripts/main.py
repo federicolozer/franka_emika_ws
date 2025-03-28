@@ -4,6 +4,7 @@
 import sys
 sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')
 
+import rospy
 import NN_engine as nn
 from copy import deepcopy
 import numpy as np
@@ -93,6 +94,8 @@ if __name__ == '__main__':
             raise ValueError("wrong argument")
         quit()
 
+    rospy.init_node("main")
+
     mode = sel_mode()
     ttype = "follow_joint"
     dispFrame = False
@@ -144,13 +147,13 @@ if __name__ == '__main__':
                     q_array = optMove(response, q_actual_array)
 
                     if not len(q_array) == 0:
-                        t.append(waypoint["t"])
+                        t.append(waypoint["t"]*5)
                         q.append(q_array)
                         q_actual_array = q_array
                         print("\nq_array = ", q_array)
                     else:
-                        t.append(None)
-                        q.append(None)
+                        #t.append(None)     iot ce fa di chescj
+                        #q.append(None)
                         print("\nNo response found")
 
                 else:

@@ -9,10 +9,9 @@ import json
 import numpy as np
 import rospkg
 
-model_path = rospkg.RosPack().get_path("neural_network") + "/data/new_models_92/NN_model.pth"
+model_path = rospkg.RosPack().get_path("neural_network") + "/data/models/NN_model.pth"
 dataset_path = rospkg.RosPack().get_path("neural_network") + "/data/dataset/main.csv"
-#dataset_path = rospkg.RosPack().get_path("neural_network") + "/data/dataset/test.csv"
-json_path = rospkg.RosPack().get_path("neural_network") + "/data/new_models_92/hyperparams.json"
+json_path = rospkg.RosPack().get_path("neural_network") + "/data/models/hyperparams.json"
 
 
 
@@ -56,7 +55,7 @@ class NN(nn.Module):
                 activation_fn(),
                 nn.Linear(layers[3], 1)
             )
-        else:
+        elif layers[5] == 0:
             self.layer_logic = nn.Sequential(
                 nn.Linear(7, layers[0]),
                 activation_fn(),
@@ -69,6 +68,106 @@ class NN(nn.Module):
                 nn.Linear(layers[3], layers[4]),
                 activation_fn(),
                 nn.Linear(layers[4], 1)
+            )
+        elif layers[6] == 0:
+            self.layer_logic = nn.Sequential(
+                nn.Linear(7, layers[0]),
+                activation_fn(),
+                nn.Linear(layers[0], layers[1]),
+                activation_fn(),
+                nn.Linear(layers[1], layers[2]),
+                activation_fn(),
+                nn.Linear(layers[2], layers[3]),
+                activation_fn(),
+                nn.Linear(layers[3], layers[4]),
+                activation_fn(),
+                nn.Linear(layers[4], layers[5]),
+                activation_fn(),
+                nn.Linear(layers[5], 1)
+            )
+        elif layers[7] == 0:
+            self.layer_logic = nn.Sequential(
+                nn.Linear(7, layers[0]),
+                activation_fn(),
+                nn.Linear(layers[0], layers[1]),
+                activation_fn(),
+                nn.Linear(layers[1], layers[2]),
+                activation_fn(),
+                nn.Linear(layers[2], layers[3]),
+                activation_fn(),
+                nn.Linear(layers[3], layers[4]),
+                activation_fn(),
+                nn.Linear(layers[4], layers[5]),
+                activation_fn(),
+                nn.Linear(layers[5], layers[6]),
+                activation_fn(),
+                nn.Linear(layers[6], 1)
+            )
+        elif layers[8] == 0:
+            self.layer_logic = nn.Sequential(
+                nn.Linear(7, layers[0]),
+                activation_fn(),
+                nn.Linear(layers[0], layers[1]),
+                activation_fn(),
+                nn.Linear(layers[1], layers[2]),
+                activation_fn(),
+                nn.Linear(layers[2], layers[3]),
+                activation_fn(),
+                nn.Linear(layers[3], layers[4]),
+                activation_fn(),
+                nn.Linear(layers[4], layers[5]),
+                activation_fn(),
+                nn.Linear(layers[5], layers[6]),
+                activation_fn(),
+                nn.Linear(layers[6], layers[7]),
+                activation_fn(),
+                nn.Linear(layers[7], 1)
+            )
+        elif layers[9] == 0:
+            self.layer_logic = nn.Sequential(
+                nn.Linear(7, layers[0]),
+                activation_fn(),
+                nn.Linear(layers[0], layers[1]),
+                activation_fn(),
+                nn.Linear(layers[1], layers[2]),
+                activation_fn(),
+                nn.Linear(layers[2], layers[3]),
+                activation_fn(),
+                nn.Linear(layers[3], layers[4]),
+                activation_fn(),
+                nn.Linear(layers[4], layers[5]),
+                activation_fn(),
+                nn.Linear(layers[5], layers[6]),
+                activation_fn(),
+                nn.Linear(layers[6], layers[7]),
+                activation_fn(),
+                nn.Linear(layers[7], layers[8]),
+                activation_fn(),
+                nn.Linear(layers[8], 1)
+            )
+        else:
+            self.layer_logic = nn.Sequential(
+                nn.Linear(7, layers[0]),
+                activation_fn(),
+                nn.Linear(layers[0], layers[1]),
+                activation_fn(),
+                nn.Linear(layers[1], layers[2]),
+                activation_fn(),
+                nn.Linear(layers[2], layers[3]),
+                activation_fn(),
+                nn.Linear(layers[3], layers[4]),
+                activation_fn(),
+                nn.Linear(layers[4], layers[5]),
+                activation_fn(),
+                nn.Linear(layers[5], layers[6]),
+                activation_fn(),
+                nn.Linear(layers[6], layers[7]),
+                activation_fn(),
+                nn.Linear(layers[7], layers[8]),
+                activation_fn(),
+                nn.Linear(layers[8], layers[9]),
+                activation_fn(),
+                nn.Linear(layers[9], 1)
             )
 
         self.loss = loss_fn()
@@ -123,6 +222,11 @@ def createModel():
     layers.append(config["n3"])
     layers.append(config["n4"])
     layers.append(config["n5"])
+    layers.append(config["n6"])
+    layers.append(config["n7"])
+    layers.append(config["n8"])
+    layers.append(config["n9"])
+    layers.append(config["n10"])
     activation_fn = eval(config["activation_fn"])
     loss_fn = eval(config["loss_fn"])
     optimizer_fn = eval(config["optimizer_fn"])
