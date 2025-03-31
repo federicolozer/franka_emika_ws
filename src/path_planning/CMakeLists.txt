@@ -74,7 +74,7 @@ target_link_libraries(computeWorkspace
 
 catkin_install_python(PROGRAMS
   scripts/main.py
-  scripts/control_tools.py
+  scripts/controller.py
   scripts/Panda_trajectory_planner.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

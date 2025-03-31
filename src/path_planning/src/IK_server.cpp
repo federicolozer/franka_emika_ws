@@ -41,9 +41,9 @@ void server(int mode) {
     serverAddress.sin_addr.s_addr = INADDR_ANY;
 
     bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+    listen(serverSocket, 5);
 
     while (true) {
-        listen(serverSocket, 5);
         int new_socket = accept(serverSocket, nullptr, nullptr);
 
         std::chrono::time_point<std::chrono::system_clock> t_start = std::chrono::system_clock::now();

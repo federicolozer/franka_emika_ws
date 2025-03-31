@@ -144,39 +144,41 @@ def save_config():
 
 
 if __name__ == "__main__":
-    epochs = 10
+    epochs = 100
     batch_list = [1000]
-    n1_list = [30, 35]
-    n2_list = [65, 70, 75]
+    n1_list = [30]
+    n2_list = [70]
     n3_list = [60, 65, 70]
     n4_list = [60, 65, 70]
-    n5_list = [35, 40, 45]
-    n6_list = [0, 10, 20, 30]
-    n7_list = [0, 10, 20, 30]
-    n8_list = [0, 10, 20, 30]
-    n9_list = [0, 10, 20, 30]
-    n10_list = [0, 10, 20, 30]
+    n5_list = [60, 65, 70]
+    n6_list = [55]
+    n7_list = [35]
+    n8_list = [10, 15, 20]
+    n9_list = [0, 5, 10]
+    n10_list = [0, 5, 10]
     activation_list = ["nn.Tanh"]
     loss_list = ["nn.MSELoss"]
     optimizer_list = ["optim.Adam"]
     lr_list = [0.01]
 
-    epochs = 200
+
+    epochs = 100
     batch_list = [1000]
     n1_list = [30]
     n2_list = [70]
-    n3_list = [65]
-    n4_list = [65]
-    n5_list = [40]
-    n6_list = [0]
-    n7_list = [0]
-    n8_list = [0]
-    n9_list = [0]
+    n3_list = [60]
+    n4_list = [70]
+    n5_list = [60]
+    n6_list = [55]
+    n7_list = [35]
+    n8_list = [20]
+    n9_list = [10]
     n10_list = [0]
     activation_list = ["nn.Tanh"]
     loss_list = ["nn.MSELoss"]
     optimizer_list = ["optim.Adam"]
     lr_list = [0.01]
+
 
     layers_list = []
     for n1 in n1_list:

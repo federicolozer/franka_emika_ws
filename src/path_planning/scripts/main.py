@@ -9,7 +9,7 @@ import NN_engine as nn
 from copy import deepcopy
 import numpy as np
 from math import pi, nan
-import control_tools as controller
+import controller
 import json
 import time
 import socket
@@ -27,9 +27,7 @@ def IK_fromQuater_client(data):
 
     client_socket.send(b"1")
 
-    data = np.array(data, dtype=np.double)
-    request = data.tobytes()
-    
+    request = np.array(data, dtype=np.double).tobytes()
     client_socket.send(request)
 
     response = []
@@ -44,9 +42,28 @@ def IK_fromQuater_client(data):
 
 
 
-def endTransmission():
+def controller_client(data):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('localhost', 8080))
+    client_socket.connect(('localhost', 8081))
+
+    client_socket.send(b"1")
+
+    request = np.array(data[0], dtype=np.double).tobytes()
+    client_socket.send(request)
+
+    #request = np.array(data[1], dtype=np.double).tobytes()
+    #client_socket.send(request)
+#
+    #request = data[2]
+    #client_socket.send(request)
+    
+    client_socket.close()
+
+
+
+def endTransmission(port):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('localhost', port))
 
     client_socket.send(b"0")
 
@@ -89,7 +106,8 @@ def sel_mode():
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] == "--close":
-            endTransmission()
+            endTransmission(8080)
+            #endTransmission(8081)
         else:
             raise ValueError("wrong argument")
         quit()
@@ -111,6 +129,7 @@ if __name__ == '__main__':
         with open(f'/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/waypoints_{nt}.json', "r") as file:
             trajectory = json.load(file)
 
+            cnt = 0
             for waypoint in trajectory["waypoints"]:
                 if waypoint["type"] == "EE_pose":
                     quater = np.array([float(waypoint["Qx"]), float(waypoint["Qy"]), float(waypoint["Qz"]), float(waypoint["Qw"])])
@@ -147,10 +166,11 @@ if __name__ == '__main__':
                     q_array = optMove(response, q_actual_array)
 
                     if not len(q_array) == 0:
-                        t.append(waypoint["t"]*5)
+                        t.append(waypoint["t"]*3)
                         q.append(q_array)
                         q_actual_array = q_array
                         print("\nq_array = ", q_array)
+                        cnt += 1
                     else:
                         #t.append(None)     iot ce fa di chescj
                         #q.append(None)
@@ -170,12 +190,11 @@ if __name__ == '__main__':
             print("\n===============================================================")
             print("\tTrajectory planning")
             print("===============================================================")
-            print("t = ", t)
-            print("q = ", q)
 
+            print(f"Solutions found: {cnt}/{len(trajectory['waypoints'])}")
+
+            #controller_client((t, q, ttype))
             controller.launch_trajectory(t, q, ttype)
-
-            time.sleep(5)
 
     except:
         raise ValueError("selected trajectory does not exist")

@@ -12,7 +12,7 @@ from path_planning.srv import IK_fromFrame, IK_fromQuater
 import Panda_trajectory_planner as planner
 from progress.bar import IncrementalBar as Bar
 import time
-import threading
+import socket
 
 
 status = None
@@ -221,51 +221,40 @@ def launch_trajectory(t, q, ttype):
             exec_trajectory(t_temp, q_temp, ttype)
 
 
-"""def exec_grasping(t, q):
-    for i in range(len(t)):
-        if q[i] == "open_gripper":
-            time.sleep(t[i])
-            print("open_gripper")
-            open_gripper()
-        elif q[i] == "close_gripper":
-            time.sleep(t[i])
-            print("close_gripper")
-            close_gripper()
+
+def controller_client():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.settimeout(None)
+    server_socket.bind(('localhost', 8081))
+
+    server_socket.listen(5)
+
+    while True:
+        new_socket, addr = server_socket.accept()
+
+        msg = new_socket.recv(1).decode()
+
+        if msg == "0":
+            server_socket.close()
+            break
+
+        res = np.frombuffer(server_socket.recv(1024), dtype=np.double)
+        print("response = ", res)
+
+        #launch_trajectory(t, q, ttype)
+    
+    server_socket.close()
 
 
-def launch_trajectory(t, q, ttype):
-    if len(q) > 0:
-        homing(q[0], ttype)
-        if not len(q) == 1:
-            t_arm = []
-            q_arm = []
-            t_gripper = []
-            q_gripper = []
-            for i in range(len(t)):
-                if q[i].__class__.__name__ == "list":
-                    t_arm.append(t[i])
-                    q_arm.append(q[i])
-                else:
-                    t_gripper.append(t[i])
-                    q_gripper.append(q[i])
-            
-            print("-------------")
-            print(t_arm)
-            print(q_arm)
-            print("-------------")
-            print(t_gripper)
-            print(q_gripper)
 
-            t1 = threading.Thread(target=exec_trajectory, args=(t_arm, q_arm, ttype))
-            t2 = threading.Thread(target=exec_grasping, args=(t_gripper, q_gripper))
 
-            t1.start()
-            t2.start()
+if __name__ == '__main__':
+    #rospy.init_node("main")
 
-            time.sleep(5)
+    print("Ready")
+    controller_client()
 
-            t1.join()
-            t2.join()"""
+    
 
 
     

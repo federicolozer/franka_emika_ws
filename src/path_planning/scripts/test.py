@@ -9,7 +9,7 @@ import rospy
 from copy import deepcopy
 import numpy as np
 from math import pi, nan
-import control_tools as controller
+import path_planning.scripts.controller as controller
 import csv
 import time
 import socket

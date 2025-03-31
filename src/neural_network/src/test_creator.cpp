@@ -9,7 +9,7 @@
 #include <Python.h>
 #include <ros/package.h>
 
-int skip = 10;
+int skip = 2;
 boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};
 std::string yaml_path = ros::package::getPath("path_planning") + "/config/mode.yaml";
 
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
 
     file1.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/test.csv");
     file1 << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
-    file2.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/waypoints_3.json");
+    file2.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/waypoints.json");
     file2 << "{\n\t\"waypoints\":[" << std::endl;
 
     Py_Initialize();
