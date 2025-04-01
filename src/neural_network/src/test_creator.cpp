@@ -114,14 +114,12 @@ int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, 
 
 
 
-int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file1, std::ofstream* file2, std::vector<std::string> tracking_data) {
+int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file1, std::ofstream* file2, std::string tracking_data) {
     PyObject* pFuncReader = PyObject_GetAttrString(pModule, "reader");
     if(pFuncReader && PyCallable_Check(pFuncReader)) {
         PyObject* pTuple = PyTuple_New(1);
         PyObject* pList = PyList_New(0);
-        for (int i=0; i<tracking_data.size(); i++) {
-            PyList_Append(pList, PyUnicode_FromString(tracking_data[i].c_str()));
-        }
+        PyList_Append(pList, PyUnicode_FromString(tracking_data.c_str()));
 
         PyTuple_SetItem(pTuple, 0, pList);
 
@@ -139,8 +137,6 @@ int main(int argc, char** argv) {
 
     file1.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/test.csv");
     file1 << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
-    file2.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/waypoints.json");
-    file2 << "{\n\t\"waypoints\":[" << std::endl;
 
     Py_Initialize();
     
@@ -151,12 +147,15 @@ int main(int argc, char** argv) {
     Eigen::Matrix4d frame;
 
     if (pModule) {
-        if (argc > 1) {
-            std::vector<std::string> tracking_data(argc-1);
-            for (int i=1; i<argc; i++) {
-                tracking_data[i-1] = argv[i];
-            }
+        if (argc = 2) {
+            std::string tracking_data = argv[1];
+            file2.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/"+tracking_data.substr(5,tracking_data.length()-9)+".json");
+            file2 << "{\n\t\"waypoints\":[" << std::endl;
+
             execPython(pModule, frame, &file1, &file2, tracking_data);
+        }
+        else if (argc > 2) {
+            std::cout << "Error: only one argument required" << std::endl;
         }
         else {
             std::cout << "Error: missing argument" << std::endl;

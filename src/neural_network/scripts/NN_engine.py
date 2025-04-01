@@ -201,8 +201,14 @@ class DS(Dataset):
 
     def __len__(self): 
         return self.n_samples 
-
+    
     def create_dataset(self, batch_size):
+        sz = int(0.2*len(self))
+        eval_data, train_data = random_split(self, [sz, len(self)-sz]) 
+        self.eval_dataloader = DataLoader(dataset=eval_data, batch_size=batch_size, shuffle=True)
+        self.train_dataloader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
+
+    def create_dataset_OLD(self, batch_size):
         sz = int(0.2*len(self))
         test_data, eval_data, train_data = random_split(self, [sz, sz, len(self)-2*sz])
         self.test_dataloader = DataLoader(dataset=test_data, batch_size=batch_size, shuffle=True) 

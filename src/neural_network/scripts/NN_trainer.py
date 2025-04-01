@@ -144,15 +144,15 @@ def save_config():
 
 
 if __name__ == "__main__":
-    epochs = 100
+    epochs = 20
     batch_list = [1000]
     n1_list = [30]
     n2_list = [70]
     n3_list = [60, 65, 70]
     n4_list = [60, 65, 70]
     n5_list = [60, 65, 70]
-    n6_list = [55]
-    n7_list = [35]
+    n6_list = [50, 55, 60]
+    n7_list = [30, 35, 40]
     n8_list = [10, 15, 20]
     n9_list = [0, 5, 10]
     n10_list = [0, 5, 10]
@@ -171,8 +171,8 @@ if __name__ == "__main__":
     n5_list = [60]
     n6_list = [55]
     n7_list = [35]
-    n8_list = [20]
-    n9_list = [10]
+    n8_list = [15]
+    n9_list = [5]
     n10_list = [0]
     activation_list = ["nn.Tanh"]
     loss_list = ["nn.MSELoss"]
@@ -283,6 +283,6 @@ if __name__ == "__main__":
         summary(model, input_size=(1, 7))
 
         print("\n--------- Testing NN -----------\n")
-        evaluation(dataset.test_dataloader)
+        evaluation(dataset.eval_dataloader)
 
         save_config()

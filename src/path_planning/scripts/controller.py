@@ -13,6 +13,7 @@ import Panda_trajectory_planner as planner
 from progress.bar import IncrementalBar as Bar
 import time
 import socket
+import threading
 
 
 status = None
@@ -78,9 +79,9 @@ def wait_execution(t_tot):
 
     bar = Bar('Execution', max=100)
     for i in range(100):
-        t = rospy.get_time()
-        while (t-t0)/t_tot*100 < i:
-            t = rospy.get_time()
+        t_n = rospy.get_time()
+        while (t_n-t0)/t_tot*100 < i:
+            t_n = rospy.get_time()
             pass
         bar.next()
         
@@ -145,6 +146,9 @@ def exec_trajectory(t, q, ttype):
 
         msg = planner.build_execute_trajectory(t, q)
     
+    print("----------ARM----------------")
+    print(rospy.get_time())
+
     control_publisher.publish(msg)
 
     print("Starting trajectory\n")
@@ -197,53 +201,97 @@ def close_gripper():
 
 
 
-def launch_trajectory(t, q, ttype):
+"""def launch_trajectory(t, q, ttype):
     if len(q) > 0:
         homing(q[0], ttype)
         if not len(q) == 1:
             t_temp = [t[0]]
             q_temp = [q[0]]
             for i in range(1, len(t)):
-                if q[i] == "open_gripper":
-                    exec_trajectory(t_temp, q_temp, ttype)
-                    open_gripper()
-                    t_temp = [t[i]]
-                    q_temp = [q_temp[-1]]
-                elif q[i] == "close_gripper":
-                    exec_trajectory(t_temp, q_temp, ttype)
-                    close_gripper()
-                    t_temp = [t[i]]
-                    q_temp = [q_temp[-1]]
+                if len(q[i]) == 2:
+                    if q[i][0] == 0:
+                        exec_trajectory(t_temp, q_temp, ttype)
+                        close_gripper()
+                        t_temp = [t[i]]
+                        q_temp = [q_temp[-1]]
+                    elif q[i][0] == 1:
+                        exec_trajectory(t_temp, q_temp, ttype)
+                        open_gripper()
+                        t_temp = [t[i]]
+                        q_temp = [q_temp[-1]]
                 else:
                     t_temp.append(t[i])
                     q_temp.append(q[i])
             
-            exec_trajectory(t_temp, q_temp, ttype)
+            exec_trajectory(t_temp, q_temp, ttype)"""
 
 
 
-def controller_client():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.settimeout(None)
-    server_socket.bind(('localhost', 8081))
 
-    server_socket.listen(5)
 
-    while True:
-        new_socket, addr = server_socket.accept()
 
-        msg = new_socket.recv(1).decode()
+def exec_grasping(t, q):
+    t0 = rospy.get_time()
+    print("----------GRIPPER----------------")
+    print(rospy.get_time())
 
-        if msg == "0":
-            server_socket.close()
-            break
+    for i in range(len(t)):
+        t_n = rospy.get_time()
+        
+        while (t_n-t0) <= t[i]:
+            t_n = rospy.get_time()
+            pass
 
-        res = np.frombuffer(server_socket.recv(1024), dtype=np.double)
-        print("response = ", res)
+        print(t_n-t0)
 
-        #launch_trajectory(t, q, ttype)
-    
-    server_socket.close()
+        if q[i] == 0:
+            print("close_gripper")
+            open_gripper()
+        elif q[i] == 1:
+            print("open_gripper")
+            close_gripper()
+
+
+def launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype):
+    if len(q_arm) > 0:
+        print(q_arm[0])
+        homing(q_arm[0], ttype)
+        if not len(q_arm) == 1:
+            t1 = threading.Thread(target=exec_trajectory, args=(t_arm, q_arm, ttype))
+            t2 = threading.Thread(target=exec_grasping, args=(t_gripper, q_gripper))
+
+            reset_time = rospy.Time(0)
+
+            t1.start()
+            t2.start()
+
+            t1.join()
+            t2.join()
+
+
+
+#def controller_client():
+#    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#    server_socket.settimeout(None)
+#    server_socket.bind(('localhost', 8081))
+#
+#    server_socket.listen(5)
+#
+#    while True:
+#        new_socket, addr = server_socket.accept()
+#
+#        msg = new_socket.recv(1).decode()
+#
+#        if msg == "0":
+#            server_socket.close()
+#            break
+#
+#        res = np.frombuffer(server_socket.recv(1024), dtype=np.double)
+#        print("response = ", res)
+#
+#        #launch_trajectory(t, q, ttype)
+#    
+#    server_socket.close()
 
 
 
@@ -252,7 +300,7 @@ if __name__ == '__main__':
     #rospy.init_node("main")
 
     print("Ready")
-    controller_client()
+    #controller_client()
 
     
 
