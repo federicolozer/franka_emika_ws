@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   xacro
   roslib
+  scipy
 )
 
 find_package(Eigen3 REQUIRED)

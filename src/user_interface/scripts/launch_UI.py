@@ -13,9 +13,9 @@ app = Flask(__name__)
 def callDatasetCreator(data):
     msg = "rosrun neural_network dataset_creator"
     for elem in data:
-        msg += (" " + elem)
+        msg_tmp = (f"{msg} {elem}")
     
-    res = os.system(msg)
+    res = os.system(msg_tmp)
 
     return(res)
 
@@ -23,12 +23,13 @@ def callDatasetCreator(data):
 
 def callTestCreator(data):
     msg = "rosrun neural_network test_creator"
+    res = 0
     for elem in data:
-        msg += (" " + elem)
+        msg_tmp = (f"{msg} {elem}")
 
-    os.makedirs(f"/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{elem[5:-4]}")
-    
-    res = os.system(msg)
+        os.makedirs(f"/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{elem[5:-4]}")
+        
+        res += os.system(msg_tmp)
     
     return(res)
 
