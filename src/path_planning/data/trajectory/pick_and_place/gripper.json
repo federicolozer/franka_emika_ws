@@ -1,7 +1,7 @@
 {
 	"waypoints":[
 		{
-            "t": 1.81,
+            "t": 1.8,
             "action": "close"
         },
 		{
@@ -9,7 +9,7 @@
             "action": "open"
         },
 		{
-            "t": 4,
+            "t": 4.7,
             "action": "close"
         },
 		{

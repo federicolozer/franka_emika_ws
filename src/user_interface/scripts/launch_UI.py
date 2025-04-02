@@ -25,6 +25,8 @@ def callTestCreator(data):
     msg = "rosrun neural_network test_creator"
     for elem in data:
         msg += (" " + elem)
+
+    os.makedirs(f"/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{elem[5:-4]}")
     
     res = os.system(msg)
     

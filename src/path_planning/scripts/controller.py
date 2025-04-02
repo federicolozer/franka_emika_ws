@@ -15,7 +15,7 @@ import time
 import socket
 import threading
 
-
+t_0 = None
 status = None
 error_log = None
 q_reg = []
@@ -73,14 +73,12 @@ def IK_fromQuater_client(quater, O_EE, q7, q_actual_array, horz):
 
 
 def wait_execution(t_tot):
-    global status
-
-    t0 = rospy.get_time()
+    global t_0, status
 
     bar = Bar('Execution', max=100)
     for i in range(100):
         t_n = rospy.get_time()
-        while (t_n-t0)/t_tot*100 < i:
+        while (t_n-t_0)/t_tot*100 < i:
             t_n = rospy.get_time()
             pass
         bar.next()
@@ -132,7 +130,7 @@ def homing(q_last, ttype):
 
 
 def exec_trajectory(t, q, ttype):
-    global status, error_log
+    global t_0, status, error_log
 
     if ttype == "follow_joint":
         result_subscriber = rospy.Subscriber('/position_joint_trajectory_controller/follow_joint_trajectory/result', FollowJointTrajectoryActionResult, CallbackResult)
@@ -146,12 +144,11 @@ def exec_trajectory(t, q, ttype):
 
         msg = planner.build_execute_trajectory(t, q)
     
-    print("----------ARM----------------")
-    print(rospy.get_time())
-
     control_publisher.publish(msg)
 
     print("Starting trajectory\n")
+    if not t_0:
+        t_0 = rospy.get_time()
     wait_execution((t[-1]-t[0]))
 
     if status == 3:
@@ -231,25 +228,24 @@ def close_gripper():
 
 
 def exec_grasping(t, q):
-    t0 = rospy.get_time()
-    print("----------GRIPPER----------------")
-    print(rospy.get_time())
+    global t_0
+
+    if not t_0:
+        t_0 = rospy.get_time()
 
     for i in range(len(t)):
         t_n = rospy.get_time()
         
-        while (t_n-t0) <= t[i]:
+        while (t_n-t_0) <= t[i]:
             t_n = rospy.get_time()
             pass
 
-        print(t_n-t0)
-
         if q[i] == 0:
-            print("close_gripper")
-            open_gripper()
-        elif q[i] == 1:
-            print("open_gripper")
             close_gripper()
+        elif q[i] == 1:
+            open_gripper()
+            
+            
 
 
 def launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype):

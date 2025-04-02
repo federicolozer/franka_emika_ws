@@ -19,7 +19,7 @@ import os
 
 dispFrame = False
 ttype = "follow_joint"
-traj = "pick_and_place"
+traj = "pick_and_place_1"
 t_arm = []
 q_arm = []
 t_gripper = []
@@ -96,6 +96,13 @@ def optMove(q_array_list, q_actual_array):
 
 
 
+def smooth(y, box_pts):
+    box = np.ones(box_pts)/box_pts
+    y_smooth = np.convolve(y, box, mode='same')
+    return y_smooth
+
+
+
 def sel_mode():
     with open(yaml_path, 'r') as file:
         param = yaml.safe_load(file)["mode"]
@@ -135,13 +142,15 @@ if __name__ == '__main__':
                     q_array = 0
                 elif waypoint["action"] == "open":
                     q_array = 1
-                t_gripper.append(waypoint["t"])
+                t_gripper.append(waypoint["t"]*3)
                 q_gripper.append(q_array)
             
         with open(f'/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{traj}/arm.json', "r") as file:
             trajectory = json.load(file)
 
             cnt = 0
+            inputData_array = []
+            q7_array = []
             for waypoint in trajectory["waypoints"]:
                 quater = np.array([float(waypoint["Qx"]), float(waypoint["Qy"]), float(waypoint["Qz"]), float(waypoint["Qw"])])
                 O_EE = np.array([float(waypoint["x"]), float(waypoint["y"]), float(waypoint["z"])])
@@ -160,6 +169,15 @@ if __name__ == '__main__':
                 print(q7)
                 print("---------------------------------------------------------------")
 
+                inputData_array.append(deepcopy(inputData))
+                q7_array.append(deepcopy(q7))
+
+            smooth(q7_array, int(0.1*len(q7_array)))
+
+            for i in range(len(inputData_array)):
+                inputData = inputData_array[i]
+                q7 = q7_array[i]
+
                 # Inverse kinematics -----------------------------------------------------------------
 
                 print("\n===============================================================")
@@ -177,7 +195,7 @@ if __name__ == '__main__':
                 q_array = optMove(response, q_actual_array)
 
                 if not len(q_array) == 0:
-                    t_arm.append(waypoint["t"])
+                    t_arm.append(waypoint["t"]*3)
                     q_arm.append(q_array)
                     q_actual_array = q_array
                     print("\nq_array = ", q_array)
@@ -195,8 +213,12 @@ if __name__ == '__main__':
 
             print(f"Solutions found: {cnt}/{len(trajectory['waypoints'])}")
 
+            
+
             #controller_client((t, q, ttype))
-            controller.launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype)
+            while True:
+                input("Go")
+                controller.launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype)
 
     except:
         raise ValueError("selected trajectory does not exist")

@@ -9,7 +9,7 @@
 #include <Python.h>
 #include <ros/package.h>
 
-int skip = 2;
+int skip = 4;
 boost::array<double, 7> q_actual_array = {{0, -0.785398163397, 0, -2.3561944899, 0, 1.57079632679, 0.785398163397}};
 std::string yaml_path = ros::package::getPath("path_planning") + "/config/mode.yaml";
 
@@ -64,6 +64,8 @@ int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, 
         mode = 2;
     }           
 
+    double t0;
+    int doOnce = 1;
     int cnt = 0;
     for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i+=skip) {
         frame = Eigen::Matrix4d::Identity();
@@ -76,7 +78,7 @@ int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, 
         for (int j=0; j<skip; j++) {
             bar.update();
         }
-
+        
         // Call solver function
         PyObject* pFuncSolver = PyObject_GetAttrString(pModule, "solver");
         if(pFuncSolver && PyCallable_Check(pFuncSolver)) {
@@ -102,10 +104,15 @@ int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, 
                 continue;
             }
 
+            if (doOnce) {
+                t0 = t;
+                doOnce--;
+            }
+
             // Write line in dataset file
             Eigen::Quaterniond quater = frameToQuaternion(frame);
             *file1 << quater.x() << "," << quater.y() << "," << quater.z() << "," << quater.w() << "," << frame(0,3) << "," << frame(1,3) << "," << frame(2,3) << "," << q7 << std::endl;
-            *file2 << "\n\t\t{\n\t\t\t\"t\": " << t << ",\n\t\t\t\"type\": \"EE_pose\",\n\t\t\t\"Qx\": " << quater.x() << ",\n\t\t\t\"Qy\": " << quater.y() << ",\n\t\t\t\"Qz\": " << quater.z() << ",\n\t\t\t\"Qw\": " << quater.w() << ",\n\t\t\t\"x\": " << frame(0,3) << ",\n\t\t\t\"y\": " << frame(1,3) << ",\n\t\t\t\"z\": " << frame(2,3) << "\n\t\t},";
+            *file2 << "\n\t\t{\n\t\t\t\"t\": " << t-t0 << ",\n\t\t\t\"Qx\": " << quater.x() << ",\n\t\t\t\"Qy\": " << quater.y() << ",\n\t\t\t\"Qz\": " << quater.z() << ",\n\t\t\t\"Qw\": " << quater.w() << ",\n\t\t\t\"x\": " << frame(0,3) << ",\n\t\t\t\"y\": " << frame(1,3) << ",\n\t\t\t\"z\": " << frame(2,3) << "\n\t\t},";
         }
     }
 
@@ -134,6 +141,7 @@ int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file1, s
 int main(int argc, char** argv) {
     std::ofstream file1;
     std::ofstream file2;
+    std::ofstream file3;
 
     file1.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/test.csv");
     file1 << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
@@ -149,8 +157,10 @@ int main(int argc, char** argv) {
     if (pModule) {
         if (argc = 2) {
             std::string tracking_data = argv[1];
-            file2.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/"+tracking_data.substr(5,tracking_data.length()-9)+".json");
+            file2.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/"+tracking_data.substr(5,tracking_data.length()-9)+"/arm.json");
             file2 << "{\n\t\"waypoints\":[" << std::endl;
+            file3.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/"+tracking_data.substr(5,tracking_data.length()-9)+"/gripper.json");
+            file3 << "{\n\t\"waypoints\":[" << std::endl;
 
             execPython(pModule, frame, &file1, &file2, tracking_data);
         }
@@ -167,12 +177,16 @@ int main(int argc, char** argv) {
 	
 	Py_Finalize();
 
-    int pos = file2.tellp();
-    file2.seekp(pos - 1);
+    int pos2 = file2.tellp();
+    file2.seekp(pos2 - 1);
     file2 << "\n\t]\n}" << std::endl;
+    int pos3 = file3.tellp();
+    file3.seekp(pos3 - 1);
+    file3 << "\n\t]\n}" << std::endl;
 
     file1.close();
     file2.close();
+    file3.close();
 
     return 0;
 }
