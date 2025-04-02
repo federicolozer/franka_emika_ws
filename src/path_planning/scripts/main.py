@@ -135,7 +135,7 @@ if __name__ == '__main__':
                     q_array = 0
                 elif waypoint["action"] == "open":
                     q_array = 1
-                t_gripper.append(waypoint["t"]*3)
+                t_gripper.append(waypoint["t"]*2)
                 q_gripper.append(q_array)
             
         with open(f'/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{traj}/arm.json', "r") as file:
@@ -177,7 +177,7 @@ if __name__ == '__main__':
                 q_array = optMove(response, q_actual_array)
 
                 if not len(q_array) == 0:
-                    t_arm.append(waypoint["t"]*3)
+                    t_arm.append(waypoint["t"]*2)
                     q_arm.append(q_array)
                     q_actual_array = q_array
                     print("\nq_array = ", q_array)
@@ -196,9 +196,7 @@ if __name__ == '__main__':
             print(f"Solutions found: {cnt}/{len(trajectory['waypoints'])}")
 
             #controller_client((t, q, ttype))
-            while True:
-                input("Go")
-                controller.launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype)
+            controller.launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype)
 
     except:
         raise ValueError("selected trajectory does not exist")

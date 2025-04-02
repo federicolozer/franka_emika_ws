@@ -32,8 +32,6 @@ def CallbackJointStates(data):
 
 def CallbackResult(data):
     global status, error_log
-
-    print(data)
     
     status = data.status.status
     error_log = data.result.error_code
@@ -115,11 +113,8 @@ def homing(q_last, ttype):
 
         msg = planner.build_execute_trajectory(t, q)
     
-    print("msg = ", msg)
-    time.sleep(1)
     control_publisher.publish(msg)
 
-    close_gripper()
     open_gripper()
 
     print("Homing\n")

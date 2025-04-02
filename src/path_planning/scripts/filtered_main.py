@@ -20,7 +20,7 @@ from scipy.signal import savgol_filter
 
 dispFrame = False
 ttype = "follow_joint"
-traj = "pick_and_place_1"
+traj = "screw"
 t_arm = []
 q_arm = []
 t_gripper = []
@@ -138,7 +138,7 @@ if __name__ == '__main__':
                     q_array = 0
                 elif waypoint["action"] == "open":
                     q_array = 1
-                t_gripper.append(waypoint["t"]*3)
+                t_gripper.append(waypoint["t"]*2)
                 q_gripper.append(q_array)
         
         with open(f'/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{traj}/arm.json', "r") as file:
@@ -170,7 +170,7 @@ if __name__ == '__main__':
             print(f"Elapsed time for having a solution from NN: {(tn-t0):>4f} s")
             print("---------------------------------------------------------------")
 
-            q7_array = savgol_filter(q7_array, window_length=5, polyorder=3)
+            q7_array = savgol_filter(q7_array, window_length=int(0.2*len(q7_array)), polyorder=3)
 
             # Inverse kinematics -----------------------------------------------------------------
 
@@ -189,7 +189,7 @@ if __name__ == '__main__':
                 q_array = optMove(response, q_actual_array)
 
                 if not len(q_array) == 0:
-                    t_arm.append(t_array[i]*3)
+                    t_arm.append(t_array[i]*2)
                     q_arm.append(q_array)
                     q_actual_array = q_array
                     cnt += 1
