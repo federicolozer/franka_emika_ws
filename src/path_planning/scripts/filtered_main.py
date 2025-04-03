@@ -20,7 +20,8 @@ from scipy.signal import savgol_filter
 
 dispFrame = False
 ttype = "follow_joint"
-traj = "screw"
+traj = "pick_and_place_3"
+#traj = "screw"
 t_arm = []
 q_arm = []
 t_gripper = []

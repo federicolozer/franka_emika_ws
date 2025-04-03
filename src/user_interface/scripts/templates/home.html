@@ -5,26 +5,45 @@
     <link rel="stylesheet" href="static/style.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script src="static/script.js"></script>
+
+    <script>
+        var dataset_list = new Set();
+        var tests_list = new Set();
+        interface();
+    </script>
 </head>
 
 <body>
-    <h1>CREATE DATASET</h1>
-    <div id="inst" class="msg">
-        <div id="dall">
-            <p id="instmsg">Select data to include in the dataset</p>
-            <button id="chall" value="Add" onclick="changeAll(self)">Add</button>
-        </div>
-    </div>
-    <script>
-        var data_set = new Set();
-        interface();
-    </script>
-    <div id="btn" class="msg">
+    <h1 class="title">DATA MANAGER</h1>
+
+    <div id="btnsec" class="main2">
         <p id="msg">...</p>
-        <div>
+        <div id="btn">
             <button class="out" onclick="createDataset()">Create dataset</button>
-            <button class="out" onclick="createTest()">Create test</button>
+            <button class="out" onclick="createTest()">Create tests</button>
             <button class="out" onclick="trainNN()">Train NN</button>
         </div>
     </div>
+
+    <div>
+        <div class="main">
+            <h2 class="title">DATASET</h2>
+            <div id="dataset" class="main2">
+                <div>
+                    <p class="inst">Select data to include in the dataset</p>
+                    <button id="challd" value="Add" onclick="changeAll('dataset')">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <h2 class="title">TESTS</h2>
+            <div id="tests" class="main2">
+                <div>
+                    <p class="inst">Select data to export as a test</p>
+                    <button id="challt" value="Add" onclick="changeAll('tests')">Add</button>
+                </div>
+            </div>
+        </div>  
+    </div> 
 </body>

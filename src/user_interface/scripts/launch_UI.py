@@ -12,10 +12,15 @@ app = Flask(__name__)
 
 def callDatasetCreator(data):
     msg = "rosrun neural_network dataset_creator"
-    for elem in data:
-        msg_tmp = (f"{msg} {elem}")
+    if len(data) > 0:
+        for elem in data:
+            msg += f" {elem}"
+
+        print(msg)
     
-    res = os.system(msg_tmp)
+        res = os.system(msg)
+    else:
+        res = 1
 
     return(res)
 
@@ -24,12 +29,21 @@ def callDatasetCreator(data):
 def callTestCreator(data):
     msg = "rosrun neural_network test_creator"
     res = 0
-    for elem in data:
-        msg_tmp = (f"{msg} {elem}")
+    if len(data) > 0:
+        for elem in data:
+            msg_tmp = (f"{msg} {elem}")
+            print(msg_tmp)
 
-        os.makedirs(f"/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{elem[5:-4]}")
-        
-        res += os.system(msg_tmp)
+            path = f"/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{elem[5:-4]}"
+
+            if not os.path.exists(path):
+                os.makedirs(path)
+            
+            res += os.system(msg_tmp)
+    else:
+        res = 1
+
+    print(res)
     
     return(res)
 
@@ -67,6 +81,7 @@ def getData():
 def getTest():
     data = request.get_json()
     res = callTestCreator(data)
+    print(res)
     return jsonify(result=res)
 
 

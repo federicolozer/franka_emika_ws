@@ -1,0 +1,19 @@
+{
+    "loss": 0.0016823268537832932,
+    "epochs": 100,
+    "batch_size": 1000,
+    "n1": 30,
+    "n2": 70,
+    "n3": 60,
+    "n4": 70,
+    "n5": 60,
+    "n6": 55,
+    "n7": 35,
+    "n8": 15,
+    "n9": 5,
+    "n10": 0,
+    "activation_fn": "nn.Tanh",
+    "loss_fn": "nn.MSELoss",
+    "optimizer_fn": "optim.Adam",
+    "lr": 0.01
+}

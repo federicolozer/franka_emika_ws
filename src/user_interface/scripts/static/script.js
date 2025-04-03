@@ -30,63 +30,117 @@ function createSection(key, val, count) {
     button.value = "Add";
     button.innerHTML = button.value;
     button.id = "bt_" + count;
-    defineButtonBehavior(button, val, count);
+    
 
-    document.getElementById("inst").appendChild(div);
+    if (val.substr(0,4) == "test") {
+        defineButtonBehavior(button, "test", val, count);
+        document.getElementById("tests").appendChild(div);
+        div.className = "tests"
+    }
+    else {
+        defineButtonBehavior(button, "dataset", val, count);
+        document.getElementById("dataset").appendChild(div);
+        div.className = "dataset"
+    }
     document.getElementById("d_" + count).appendChild(p1);
     document.getElementById("d_" + count).appendChild(p2);
     document.getElementById("d_" + count).appendChild(button);
 
-    div.className = "data"
     p1.className = "ndata"
     p2.className = "dataname"
 }
 
 
 
-function defineButtonBehavior(button, val, count) {
+function defineButtonBehavior(button, type, val, count) {
     button.addEventListener("click", function() {
-        if (button.value == "Add") {
-            data_set.add(val);
-            button.value = "Remove";
-            button.innerHTML = button.value;
-            document.getElementById("d_" + count).setAttribute('style', 'background-color: rgb(86, 180, 86);');
+        if (type == "dataset") {
+            if (button.value == "Add") {
+                dataset_list.add(val);
+                button.value = "Remove";
+                button.innerHTML = button.value;
+                document.getElementById("d_" + count).setAttribute('style', 'background-color: rgb(86, 180, 86);');
+            }
+            else if (button.value == "Remove") {
+                dataset_list.delete(val);
+                button.value = "Add";
+                button.innerHTML = button.value;
+                document.getElementById("d_" + count).setAttribute('style', '');
+            }
         }
-        else if (button.value == "Remove") {
-            data_set.delete(val);
-            button.value = "Add";
-            button.innerHTML = button.value;
-            document.getElementById("d_" + count).setAttribute('style', '');
+        else if (type == "test") {
+            if (button.value == "Add") {
+                tests_list.add(val);
+                button.value = "Remove";
+                button.innerHTML = button.value;
+                
+                document.getElementById("d_" + count).setAttribute('style', 'background-color: rgb(86, 180, 86);');
+            }
+            else if (button.value == "Remove") {
+                tests_list.delete(val);
+                button.value = "Add";
+                button.innerHTML = button.value;
+                document.getElementById("d_" + count).setAttribute('style', '');
+            }
         }
     });
 }
 
 
 
-function changeAll() {
-    button = document.getElementById("chall");
-    if (button.value == "Add") {
-        button.value = "Remove";
-        button.innerHTML = button.value;
-        divs = document.getElementsByClassName("data");
-        for (let i=0; i<divs.length; i++) {
-            data_set.add(divs[i].children[1].innerHTML);
-            divs[i].children[2].value = "Remove";
-            divs[i].children[2].innerHTML = button.value;
-            divs[i].setAttribute('style', 'background-color: rgb(86, 180, 86);');
+function changeAll(type) {
+    if (type == "dataset") {
+        button = document.getElementById("challd");
+        if (button.value == "Add") {
+            button.value = "Remove";
+            button.innerHTML = button.value;
+            divs = document.getElementsByClassName("dataset");
+            for (let i=0; i<divs.length; i++) {
+                dataset_list.add(divs[i].children[1].innerHTML);
+                divs[i].children[2].value = "Remove";
+                divs[i].children[2].innerHTML = button.value;
+                divs[i].setAttribute('style', 'background-color: rgb(86, 180, 86);');
+            }
+        }
+        else if (button.value == "Remove") {
+            button.value = "Add";
+            button.innerHTML = button.value;
+            divs = document.getElementsByClassName("dataset");
+            for (let i=0; i<divs.length; i++) {
+                dataset_list.delete(divs[i].children[1].innerHTML);
+                divs[i].children[2].value = "Add";
+                divs[i].children[2].innerHTML = button.value;
+                divs[i].setAttribute('style', '');
+            }
         }
     }
-    else if (button.value == "Remove") {
-        button.value = "Add";
-        button.innerHTML = button.value;
-        divs = document.getElementsByClassName("data");
-        for (let i=0; i<divs.length; i++) {
-            data_set.delete(divs[i].children[1].innerHTML);
-            divs[i].children[2].value = "Add";
-            divs[i].children[2].innerHTML = button.value;
-            divs[i].setAttribute('style', '');
+    else if (type == "tests") {
+        button = document.getElementById("challt");
+        if (button.value == "Add") {
+            button.value = "Remove";
+            button.innerHTML = button.value;
+            divs = document.getElementsByClassName("tests");
+            for (let i=0; i<divs.length; i++) {
+                tests_list.add(divs[i].children[1].innerHTML);
+                divs[i].children[2].value = "Remove";
+                divs[i].children[2].innerHTML = button.value;
+                divs[i].setAttribute('style', 'background-color: rgb(86, 180, 86);');
+            }
+        }
+        else if (button.value == "Remove") {
+            button.value = "Add";
+            button.innerHTML = button.value;
+            divs = document.getElementsByClassName("tests");
+            for (let i=0; i<divs.length; i++) {
+                tests_list.delete(divs[i].children[1].innerHTML);
+                divs[i].children[2].value = "Add";
+                divs[i].children[2].innerHTML = button.value;
+                divs[i].setAttribute('style', '');
+            }
         }
     }
+    
+    
 }
 
 
@@ -104,10 +158,13 @@ function createDataset() {
         url: '/sendDatasetCreatorRequest',
         type: 'SEND',
         contentType: 'application/json',
-        data: JSON.stringify(Array.from(data_set)),
+        data: JSON.stringify(Array.from(dataset_list)),
         success: function(response) {
             if (response.result == 0) {
                 document.getElementById('msg').innerHTML = "Dataset created correctly";
+            }
+            else if (response.result == 1) {
+                document.getElementById('msg').innerHTML = "No data selected";
             }
             else {
                 document.getElementById('msg').innerHTML = "Error: failed to create dataset";
@@ -130,13 +187,16 @@ function createTest() {
         url: '/sendTestCreatorRequest',
         type: 'SEND',
         contentType: 'application/json',
-        data: JSON.stringify(Array.from(data_set)),
+        data: JSON.stringify(Array.from(tests_list)),
         success: function(response) {
             if (response.result == 0) {
                 document.getElementById('msg').innerHTML = "Test created correctly";
             }
+            else if (response.result == 1) {
+                document.getElementById('msg').innerHTML = "No data selected";
+            }
             else {
-                document.getElementById('msg').innerHTML = "Error: failed to create test";
+                document.getElementById('msg').innerHTML = "Error: failed to create tests";
             }
             restoreMsg();
         },
