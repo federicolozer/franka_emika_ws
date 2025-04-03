@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
         mode = list(yaml.values())[0]
 
-        msg = f"roslaunch path_planning gazebo_panda_control.launch mode:={mode}"
+        msg = f"roslaunch path_planning main.launch mode:={mode}"
         os.system(msg)
 
     

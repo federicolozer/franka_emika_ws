@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
             file2.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/"+tracking_data.substr(5,tracking_data.length()-9)+"/arm.json");
             file2 << "{\n\t\"waypoints\":[" << std::endl;
             file3.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/"+tracking_data.substr(5,tracking_data.length()-9)+"/gripper.json");
-            file3 << "{\n\t\"waypoints\":[" << std::endl;
+            file3 << "{\n\t\"waypoints\":[\n\t\t{\n\t\t\t\"t\": 0,\n\t\t\t\"action\": \"open\"\n\t\t},";
 
             execPython(pModule, frame, &file1, &file2, tracking_data);
         }

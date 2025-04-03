@@ -266,28 +266,36 @@ def launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype):
 
 
 
-#def controller_client():
-#    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#    server_socket.settimeout(None)
-#    server_socket.bind(('localhost', 8081))
-#
-#    server_socket.listen(5)
-#
-#    while True:
-#        new_socket, addr = server_socket.accept()
-#
-#        msg = new_socket.recv(1).decode()
-#
-#        if msg == "0":
-#            server_socket.close()
-#            break
-#
-#        res = np.frombuffer(server_socket.recv(1024), dtype=np.double)
-#        print("response = ", res)
-#
-#        #launch_trajectory(t, q, ttype)
-#    
-#    server_socket.close()
+def controller_client():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.settimeout(None)
+    server_socket.bind(('localhost', 8081))
+
+    server_socket.listen(5)
+
+    while True:
+        new_socket, addr = server_socket.accept()
+
+        msg = np.frombuffer(new_socket.recv(1024), dtype=np.double)
+
+        if msg == "0":
+            new_socket.close()
+            break
+        else:
+            print("msg = ", msg)
+            ln = int(msg[0])
+
+        print("ln = ", ln)
+
+        res = np.frombuffer(new_socket.recv(1024), dtype=np.double)
+        print("response = ", res)
+
+        res = np.frombuffer(new_socket.recv(1024), dtype=np.double)
+        print("response = ", res)
+
+        #launch_trajectory(t, q, ttype)
+    
+    server_socket.close()
 
 
 

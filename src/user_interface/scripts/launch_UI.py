@@ -15,8 +15,6 @@ def callDatasetCreator(data):
     if len(data) > 0:
         for elem in data:
             msg += f" {elem}"
-
-        print(msg)
     
         res = os.system(msg)
     else:
@@ -32,7 +30,6 @@ def callTestCreator(data):
     if len(data) > 0:
         for elem in data:
             msg_tmp = (f"{msg} {elem}")
-            print(msg_tmp)
 
             path = f"/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{elem[5:-4]}"
 

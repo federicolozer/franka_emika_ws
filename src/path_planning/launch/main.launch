@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+
+<launch>  
+    <arg name="mode" default="ceil" />
+
+
+
+    <include file="$(find path_planning)/launch/gazebo_panda_control.launch">
+        <arg name="mode" value="$(arg mode)"/>
+    </include>
+
+    <node name="server" pkg="path_planning" type="IK_server"/>
+
+    <node name="client" pkg="path_planning" type="main.py" output="screen" />
+</launch>

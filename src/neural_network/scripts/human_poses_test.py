@@ -74,7 +74,6 @@ def adjust(ee_frame, ah, bh):
 
 
 def solver(cPose):
-    base_frame = np.identity(4)
     ee_frame = np.identity(4)
     rMat = np.array([[1, 0, 0],
                     [0, 0, -1],
@@ -87,6 +86,9 @@ def solver(cPose):
         cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
         cPose[i][2] += base_height
     
+    print()
+    print(np.sqrt(np.dot(cPose[0]-cPose[1], cPose[0]-cPose[1])))
+
     O_ee = np.array((cPose[0]+cPose[1])/2)
     hand = np.array(cPose[2])
     elbow = np.array(cPose[3])

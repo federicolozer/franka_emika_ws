@@ -23,6 +23,6 @@
   <depend>rospy</depend>
   <depend>std_msgs</depend>
   <depend>franka_gazebo</depend> 
-  <depend>scipy</depend>  
+  <!-- <depend>scipy</depend> -->
 
 </package>

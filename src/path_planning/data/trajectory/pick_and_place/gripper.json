@@ -1,4 +1,20 @@
 {
 	"waypoints":[
+		{
+			"t": 1.8,
+			"action": "close"
+		},
+		{
+			"t": 3.2,
+			"action": "open"
+		},
+		{
+			"t": 4.7,
+			"action": "close"
+		},
+		{
+			"t": 6.1,
+			"action": "open"
+		}
 	]
 }
