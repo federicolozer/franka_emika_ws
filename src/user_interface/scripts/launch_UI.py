@@ -39,8 +39,6 @@ def callTestCreator(data):
             res += os.system(msg_tmp)
     else:
         res = 1
-
-    print(res)
     
     return(res)
 

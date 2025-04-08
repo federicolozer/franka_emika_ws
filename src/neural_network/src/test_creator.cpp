@@ -67,6 +67,7 @@ int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, 
     double t0;
     int doOnce = 1;
     int cnt = 0;
+    std::vector<double> grip_wid_array;
     for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i+=skip) {
         frame = Eigen::Matrix4d::Identity();
 
@@ -99,6 +100,8 @@ int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, 
             Eigen::Map< Eigen::Matrix4d > O_T_EE(frame.data());
             double q7 = PyFloat_AsDouble(PyList_GetItem(pList, 4));
             double t = PyFloat_AsDouble(PyList_GetItem(pList, 5));
+            double grip_wid = PyFloat_AsDouble(PyList_GetItem(pList, 6));
+            grip_wid_array.push_back(grip_wid);
             if (!IK_check(O_T_EE, q7, mode)) {
                 cnt++;
                 continue;
@@ -115,6 +118,31 @@ int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, 
             *file2 << "\n\t\t{\n\t\t\t\"t\": " << t-t0 << ",\n\t\t\t\"Qx\": " << quater.x() << ",\n\t\t\t\"Qy\": " << quater.y() << ",\n\t\t\t\"Qz\": " << quater.z() << ",\n\t\t\t\"Qw\": " << quater.w() << ",\n\t\t\t\"x\": " << frame(0,3) << ",\n\t\t\t\"y\": " << frame(1,3) << ",\n\t\t\t\"z\": " << frame(2,3) << "\n\t\t},";
         }
     }
+
+
+
+
+
+
+    
+
+    double sum = 0;
+    for (auto pnt=grip_wid_array.begin(); pnt<grip_wid_array.end(); pnt++) {
+        std::cout << *pnt << std::endl;
+        sum += *pnt;
+    };
+    double mean = sum/grip_wid_array.size();
+
+    std::cout << mean << std::endl;
+
+    for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i+=skip) {
+        //...
+    }
+
+
+
+
+
 
     std::cout << std::endl << "Discarded data due to IK inconsistency: " << cnt*100/PyList_Size(pHumanPoses) << "%" << std::endl;
 }
@@ -143,9 +171,6 @@ int main(int argc, char** argv) {
     std::ofstream file2;
     std::ofstream file3;
 
-    file1.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/test.csv");
-    file1 << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
-
     Py_Initialize();
     
     PyRun_SimpleString("import sys");
@@ -157,6 +182,8 @@ int main(int argc, char** argv) {
     if (pModule) {
         if (argc = 2) {
             std::string tracking_data = argv[1];
+            file1.open("/home/lozer/franka_emika_ws/src/neural_network/data/dataset/"+tracking_data.substr(5,tracking_data.length()-9)+".csv");
+            file1 << "Qx, Qy, Qz, Qw, x, y, z, q7" << std::endl;
             file2.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/"+tracking_data.substr(5,tracking_data.length()-9)+"/arm.json");
             file2 << "{\n\t\"waypoints\":[" << std::endl;
             file3.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/"+tracking_data.substr(5,tracking_data.length()-9)+"/gripper.json");

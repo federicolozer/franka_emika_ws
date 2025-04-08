@@ -15,11 +15,13 @@ import time
 import socket
 import yaml
 import rospkg
+import csv
 import os
+import signal
 from scipy.signal import savgol_filter
 
 dispFrame = False
-ttype = b"follow_joint"
+ttype = "follow_joint"
 t_arm = []
 q_arm = []
 t_gripper = []
@@ -131,34 +133,38 @@ def sel_mode():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        if sys.argv[1] == "--close":
-            endTransmission(8080)
-            #endTransmission(8081)
-        else:
-            raise ValueError("wrong argument")
-        quit()
-
     rospy.init_node("main")
 
     mode = sel_mode()
 
     model = nn.createModel()
 
-    traj = ""
-    while traj != "quit":
+    while True:
         t_arm = []
         q_arm = []
         t_gripper = []
         q_gripper = []
         inputData_array = []
         q7_array = []
+        q7_real_array = []
 
         print("\n===============================================================")
         traj = input("Select trajectory to perform or type quit to exit:\n")
-        traj = "screw"
+
+        if traj == "quit":
+            endTransmission(8080)
+            break
         
         try:
+            with open(f'/home/lozer/franka_emika_ws/src/neural_network/data/dataset/{traj}.csv') as file:
+                doOnce = True
+                for line in csv.reader(file):
+                    if doOnce:
+                        doOnce = False
+                        continue
+
+                    q7_real_array.append(float(line[7]))
+                
             with open(f'/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{traj}/gripper.json', "r") as file:
                 trajectory = json.load(file)
 
@@ -173,9 +179,7 @@ if __name__ == '__main__':
             with open(f'/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{traj}/arm.json', "r") as file:
                 trajectory = json.load(file)
 
-
                 t_array = []
-
 
                 # Neural network ---------------------------------------------------------------------
 
@@ -199,7 +203,9 @@ if __name__ == '__main__':
                 print(f"Elapsed time for having a solution from NN: {(tn-t0):>4f} s")
                 print("---------------------------------------------------------------")
 
-                q7_array = savgol_filter(q7_array, window_length=int(0.1*len(q7_array)), polyorder=3)
+                # Savitzky-Golay filter -----------------------------------------------------------------
+
+                q7_array = savgol_filter(q7_array, window_length=int(0.1*len(q7_array)), polyorder=5)
 
                 # Inverse kinematics -----------------------------------------------------------------
 
@@ -230,6 +236,18 @@ if __name__ == '__main__':
                 tn = time.time()
                 print(f"Elapsed time for having a solution from IK client: {(tn-t0):>4f} s")
                 print("---------------------------------------------------------------")
+
+                # Test evaluation ----------------------------------------------------------------
+
+                diff = 0
+                for i in range(len(q7_array)):
+                    comp = (q7_array[i]-q7_real_array[i])**2
+                    diff += comp
+
+                diff /= len(q7_array)
+                rmse = np.sqrt(diff)
+
+                print(f"RMSE: {(rmse):>0.4f}rad - {(rmse/(2*2.8973)*100):>0.1f}%")
 
                 # Trajectory planning ----------------------------------------------------------------
 

@@ -86,8 +86,7 @@ def solver(cPose):
         cPose[i] = deepcopy(np.dot(rMat, np.array(cPose[i])))
         cPose[i][2] += base_height
     
-    print()
-    print(np.sqrt(np.dot(cPose[0]-cPose[1], cPose[0]-cPose[1])))
+    grip_wid = np.sqrt(np.dot(cPose[0]-cPose[1], cPose[0]-cPose[1]))
 
     O_ee = np.array((cPose[0]+cPose[1])/2)
     hand = np.array(cPose[2])
@@ -116,6 +115,6 @@ def solver(cPose):
 
     ee_frame = adjust(ee_frame, np.linalg.norm(segm_hand_elbow)+np.linalg.norm(segm_hand_ee), np.linalg.norm(segm_elbow_shoulder))
 
-    res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7, t]
+    res = [list(ee_frame[0:3, 0]), list(ee_frame[0:3, 1]), list(ee_frame[0:3, 2]), list(ee_frame[0:3, 3]), q7, t, grip_wid]
 
     return res
