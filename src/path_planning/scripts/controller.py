@@ -149,6 +149,7 @@ def exec_trajectory(t, q, ttype):
     print("Starting trajectory\n")
     if not t0:
         t0 = rospy.get_time()
+    
     wait_execution((t[-1]-t[0]))
 
     if status == 3:
@@ -232,14 +233,14 @@ def exec_grasping(t, q):
 
     if not t0:
         t0 = rospy.get_time()
-
+    
     for i in range(len(t)):
         tn = rospy.get_time()
         
         while (tn-t0) <= t[i]:
             tn = rospy.get_time()
             pass
-
+        
         if q[i] == 0:
             close_gripper()
         elif q[i] == 1:
@@ -249,6 +250,8 @@ def exec_grasping(t, q):
 
 
 def launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype):
+    global t0
+
     if len(q_arm) > 0:
         print(q_arm[0])
         homing(q_arm[0], ttype)
@@ -256,13 +259,13 @@ def launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype):
             t1 = threading.Thread(target=exec_trajectory, args=(t_arm, q_arm, ttype))
             t2 = threading.Thread(target=exec_grasping, args=(t_gripper, q_gripper))
 
-            reset_time = rospy.Time(0)
-
             t1.start()
             t2.start()
 
             t1.join()
             t2.join()
+
+        t0 = None
 
 
 

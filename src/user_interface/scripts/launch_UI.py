@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf-8
  
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from gen_json import gen_json
 import webbrowser
 import os
@@ -20,7 +20,7 @@ def callDatasetCreator(data):
     else:
         res = 1
 
-    return(res)
+    return res
 
 
 
@@ -40,7 +40,7 @@ def callTestCreator(data):
     else:
         res = 1
     
-    return(res)
+    return res
 
 
 
@@ -48,13 +48,41 @@ def callTrainNN():
     msg = "rosrun neural_network NN_trainer.py"
     res = os.system(msg)
 
-    return(res)
+    return res
 
+
+
+def callExecTraj(data):
+    print(data)
+    res = data
+
+    return res 
+
+
+
+@app.route('/')
+def trajectory():
+    print("sei sctade clamade")
+
+    with app.app_context():
+        return render_template('home.html')
 
 
 @app.route('/')
 def home():
     return render_template('home.html')
+
+
+
+@app.route('/page1')
+def page1():
+    return render_template('page1.html')
+
+
+
+@app.route('/page2')
+def page2():
+    return render_template('page2.html')
 
 
 
@@ -83,8 +111,16 @@ def getTest():
 
 @app.route('/sendTrainingNNRequest', methods=['SEND'])
 def startTraining():
-    request.get_json()
+    #request.get_json()
     res = callTrainNN()
+    return jsonify(result=res)
+
+
+
+@app.route('/sendExecuteTrajectoryRequest', methods=['SEND'])
+def exec():
+    data = request.get_json()
+    res = callExecTraj(data)
     return jsonify(result=res)
 
 

@@ -3,6 +3,38 @@
 		{
 			"t": 0,
 			"action": "open"
+		},
+		{
+			"t": 1.06667,
+			"action": "close"
+		},
+		{
+			"t": 1.33333,
+			"action": "open"
+		},
+		{
+			"t": 2,
+			"action": "close"
+		},
+		{
+			"t": 3.66667,
+			"action": "open"
+		},
+		{
+			"t": 4.66667,
+			"action": "close"
+		},
+		{
+			"t": 6.2,
+			"action": "open"
+		},
+		{
+			"t": 6.93333,
+			"action": "close"
+		},
+		{
+			"t": 7.93333,
+			"action": "open"
 		}
 	]
 }

@@ -3,6 +3,7 @@
 
 import sys
 sys.path.append('/home/lozer/franka_emika_ws/src/neural_network/scripts')
+sys.path.append('/home/lozer/franka_emika_ws/src/user_interface/scripts')
 
 import rospy
 import NN_engine as nn
@@ -19,6 +20,7 @@ import csv
 import os
 import signal
 from scipy.signal import savgol_filter
+from launch_UI import trajectory as interface
 
 dispFrame = False
 ttype = "follow_joint"
@@ -133,6 +135,10 @@ def sel_mode():
 
 
 if __name__ == '__main__':
+    interface()
+    quit()
+
+
     rospy.init_node("main")
 
     mode = sel_mode()
@@ -205,7 +211,7 @@ if __name__ == '__main__':
 
                 # Savitzky-Golay filter -----------------------------------------------------------------
 
-                q7_array = savgol_filter(q7_array, window_length=int(0.1*len(q7_array)), polyorder=5)
+                q7_array = savgol_filter(q7_array, window_length=int(0.15*len(q7_array)), polyorder=3)
 
                 # Inverse kinematics -----------------------------------------------------------------
 
@@ -260,4 +266,4 @@ if __name__ == '__main__':
                 #controller_client((t_arm, q_arm, t_gripper, q_gripper, ttype))
                 controller.launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype)
         except:
-            raise ValueError("selected trajectory does not exist")
+            print("Selected trajectory does not exist..")

@@ -8,6 +8,9 @@ div.main{
 div.main2{
     display: block;
 }
+#traj{
+    width: 50%;
+}
 #btnsec{
     height: 100;
     text-align: center;
@@ -34,6 +37,9 @@ button {
 }
 button.out {
     width: 120;
+}
+button.traj {
+    width: 25%;
 }
 .ndata {
     width: 10%;

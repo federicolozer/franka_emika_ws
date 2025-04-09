@@ -5,45 +5,13 @@
     <link rel="stylesheet" href="static/style.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script src="static/script.js"></script>
-
-    <script>
-        var dataset_list = new Set();
-        var tests_list = new Set();
-        interface();
-    </script>
 </head>
 
 <body>
-    <h1 class="title">DATA MANAGER</h1>
-
-    <div id="btnsec" class="main2">
-        <p id="msg">...</p>
-        <div id="btn">
-            <button class="out" onclick="createDataset()">Create dataset</button>
-            <button class="out" onclick="createTest()">Create tests</button>
-            <button class="out" onclick="trainNN()">Train NN</button>
-        </div>
-    </div>
+    <h1 class="title">HUMAN-LIKE MOVING ROBOT</h1>
 
     <div>
-        <div class="main">
-            <h2 class="title">DATASET</h2>
-            <div id="dataset" class="main2">
-                <div>
-                    <p class="inst">Select data to include in the dataset</p>
-                    <button id="challd" value="Add" onclick="changeAll('dataset')">Add</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="main">
-            <h2 class="title">TESTS</h2>
-            <div id="tests" class="main2">
-                <div>
-                    <p class="inst">Select data to export as a test</p>
-                    <button id="challt" value="Add" onclick="changeAll('tests')">Add</button>
-                </div>
-            </div>
-        </div>  
-    </div> 
+        <img src="static/Panda.png" width="50%" alt="Panda robot">
+        <button onclick="window.location.href='/page1'">Start</button>
+    </div>
 </body>

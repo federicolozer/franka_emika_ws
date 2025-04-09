@@ -40,7 +40,7 @@ bool IK_check(Eigen::Map< Eigen::Matrix4d > O_T_EE, double q7, int mode) {
 
 
 
-int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, std::ofstream* file1, std::ofstream* file2) {
+int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, std::ofstream* file1, std::ofstream* file2, std::ofstream* file3) {
     progressbar bar(PyList_Size(pHumanPoses));
     bar.set_niter(PyList_Size(pHumanPoses));
     bar.reset();
@@ -67,7 +67,8 @@ int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, 
     double t0;
     int doOnce = 1;
     int cnt = 0;
-    std::vector<double> grip_wid_array;
+    double grip_sum = 0;
+    std::vector<std::array<double, 2>> grip_wid_array;
     for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i+=skip) {
         frame = Eigen::Matrix4d::Identity();
 
@@ -100,16 +101,18 @@ int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, 
             Eigen::Map< Eigen::Matrix4d > O_T_EE(frame.data());
             double q7 = PyFloat_AsDouble(PyList_GetItem(pList, 4));
             double t = PyFloat_AsDouble(PyList_GetItem(pList, 5));
-            double grip_wid = PyFloat_AsDouble(PyList_GetItem(pList, 6));
-            grip_wid_array.push_back(grip_wid);
-            if (!IK_check(O_T_EE, q7, mode)) {
-                cnt++;
-                continue;
-            }
 
             if (doOnce) {
                 t0 = t;
                 doOnce--;
+            }
+
+            double grip_wid = PyFloat_AsDouble(PyList_GetItem(pList, 6));
+            grip_wid_array.push_back({grip_wid, t-t0});
+            grip_sum += grip_wid;
+            if (!IK_check(O_T_EE, q7, mode)) {
+                cnt++;
+                continue;
             }
 
             // Write line in dataset file
@@ -119,37 +122,30 @@ int createTest(PyObject* pModule, PyObject* pHumanPoses, Eigen::Matrix4d frame, 
         }
     }
 
+    // Write gripper file
+    double mean = grip_sum/grip_wid_array.size();
 
+    //auto minmax = std::minmax_element(grip_wid_array.begin(), grip_wid_array.end());
+    //double mean = ((*minmax.first)[0]+(*minmax.second)[0])/2;
 
-
-
-
-    
-
-    double sum = 0;
+    int grip_status = 1;
     for (auto pnt=grip_wid_array.begin(); pnt<grip_wid_array.end(); pnt++) {
-        std::cout << *pnt << std::endl;
-        sum += *pnt;
-    };
-    double mean = sum/grip_wid_array.size();
-
-    std::cout << mean << std::endl;
-
-    for (Py_ssize_t i=0; i<PyList_Size(pHumanPoses); i+=skip) {
-        //...
+        if (grip_status == 1 && (*pnt)[0] < mean) {
+            *file3 << "\n\t\t{\n\t\t\t\"t\": " << (*pnt)[1] << ",\n\t\t\t\"action\": \"close\"\n\t\t},";
+            grip_status = 0;
+        }
+        else if (grip_status == 0 && (*pnt)[0] > mean) {
+            *file3 << "\n\t\t{\n\t\t\t\"t\": " << (*pnt)[1] << ",\n\t\t\t\"action\": \"open\"\n\t\t},";
+            grip_status = 1;
+        }
     }
-
-
-
-
-
 
     std::cout << std::endl << "Discarded data due to IK inconsistency: " << cnt*100/PyList_Size(pHumanPoses) << "%" << std::endl;
 }
 
 
 
-int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file1, std::ofstream* file2, std::string tracking_data) {
+int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file1, std::ofstream* file2, std::ofstream* file3, std::string tracking_data) {
     PyObject* pFuncReader = PyObject_GetAttrString(pModule, "reader");
     if(pFuncReader && PyCallable_Check(pFuncReader)) {
         PyObject* pTuple = PyTuple_New(1);
@@ -159,7 +155,7 @@ int execPython(PyObject* pModule, Eigen::Matrix4d frame, std::ofstream* file1, s
         PyTuple_SetItem(pTuple, 0, pList);
 
         PyObject* pHumanPoses = PyObject_CallObject(pFuncReader, pTuple);
-        createTest(pModule, pHumanPoses, frame, file1, file2);
+        createTest(pModule, pHumanPoses, frame, file1, file2, file3);
     }
 }
 
@@ -189,7 +185,7 @@ int main(int argc, char** argv) {
             file3.open("/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/"+tracking_data.substr(5,tracking_data.length()-9)+"/gripper.json");
             file3 << "{\n\t\"waypoints\":[\n\t\t{\n\t\t\t\"t\": 0,\n\t\t\t\"action\": \"open\"\n\t\t},";
 
-            execPython(pModule, frame, &file1, &file2, tracking_data);
+            execPython(pModule, frame, &file1, &file2, &file3, tracking_data);
         }
         else if (argc > 2) {
             std::cout << "Error: only one argument required" << std::endl;
