@@ -20,7 +20,6 @@ import csv
 import os
 import signal
 from scipy.signal import savgol_filter
-from launch_UI import trajectory as interface
 
 dispFrame = False
 ttype = "follow_joint"
@@ -53,6 +52,36 @@ def IK_fromQuater_client(data):
     client_socket.close()
 
     return response
+
+
+
+def UI_client():
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('localhost', 8081))
+
+    client_socket.send(b"1")
+
+    client_socket.close()
+
+
+
+def UI_server():
+    global server_socket, new_socket
+
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.settimeout(None)
+    server_socket.bind(('localhost', 8082))
+
+    server_socket.listen(5)
+
+    new_socket, addr = server_socket.accept()
+
+    msg = new_socket.recv(1024)
+
+    new_socket.close()
+    server_socket.close()
+
+    return msg.decode()
 
 
 
@@ -135,11 +164,7 @@ def sel_mode():
 
 
 if __name__ == '__main__':
-    interface()
-    quit()
-
-
-    rospy.init_node("main")
+    #rospy.init_node("main")
 
     mode = sel_mode()
 
@@ -154,11 +179,21 @@ if __name__ == '__main__':
         q7_array = []
         q7_real_array = []
 
+        try:
+            UI_client()
+        except:
+            pass
+
         print("\n===============================================================")
-        traj = input("Select trajectory to perform or type quit to exit:\n")
+        print("Select trajectory to perform or type quit to exit:\n")
+        
+        traj = UI_server()
+        print(traj)
 
         if traj == "quit":
             endTransmission(8080)
+            endTransmission(8081)
+            endTransmission(8082)
             break
         
         try:

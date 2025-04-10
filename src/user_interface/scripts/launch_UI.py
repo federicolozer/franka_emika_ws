@@ -5,8 +5,14 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for
 from gen_json import gen_json
 import webbrowser
 import os
+import socket
 
 app = Flask(__name__)
+traj = None
+page = None
+server_socket = None
+new_socket = None
+
 
 
 
@@ -52,20 +58,43 @@ def callTrainNN():
 
 
 
-def callExecTraj(data):
-    print(data)
-    res = data
+def UI_server():
+    global server_socket, new_socket
 
-    return res 
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.settimeout(None)
+    server_socket.bind(('localhost', 8081))
+
+    server_socket.listen(5)
+
+    new_socket, addr = server_socket.accept()
+
+    msg = new_socket.recv(1024)
+    print("msg = ", msg.decode())
+
+    new_socket.close()
+    server_socket.close()
+
+    return msg.decode()
 
 
 
-@app.route('/')
-def trajectory():
-    print("sei sctade clamade")
+def UI_client(data):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('localhost', 8082))
 
-    with app.app_context():
-        return render_template('home.html')
+    
+    if not data == "quit":
+        data = data[5:-4]
+
+    traj = data.encode()
+    print("Traj = ", traj)
+    client_socket.send(traj)
+
+    client_socket.close()
+
+    return 1
+        
 
 
 @app.route('/')
@@ -83,6 +112,13 @@ def page1():
 @app.route('/page2')
 def page2():
     return render_template('page2.html')
+
+
+
+@app.route('/goToPage', methods=['POST'])
+def goToPage():
+    res = UI_server()
+    return jsonify(result=res)
 
 
 
@@ -120,7 +156,8 @@ def startTraining():
 @app.route('/sendExecuteTrajectoryRequest', methods=['SEND'])
 def exec():
     data = request.get_json()
-    res = callExecTraj(data)
+    print("Data = ", data)
+    res = UI_client(data)
     return jsonify(result=res)
 
 

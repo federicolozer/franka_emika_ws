@@ -1,27 +1,18 @@
-function interface() {
-    $.ajax({
-        url: '/getJson',
+async function interface() {
+    await $.ajax({
+        url: '/goToPage',
         type: 'GET',
         contentType: 'application/json',
         success: function(data) {
-            const json = data;
-
-            let count = 1;
-            for (var key in json) {
-                createSection(json[key], count++);
-            }
-            createSection("quit", count++);
+            alert(data.result);
         },
-        error: function() {
-            document.getElementById("msg").innerHTML = "Error: failed to load data";
-        }
     });
 }
 
 
 
 function createSection(val, count) {
-    if (val.substr(0,4) == "test" || val == "quit") {
+    if (val.substr(0,4) == "test") {
         const button = document.createElement("button");
         button.innerHTML = val;
         button.id = "bt_" + count;
@@ -51,6 +42,7 @@ function restoreMsg() {
 
 
 function executeTrajectory(val) {
+    alert(val)
     document.getElementById('msg').innerHTML = "Executing trajectory...";
     
     $.ajax({
@@ -59,10 +51,10 @@ function executeTrajectory(val) {
         contentType: 'application/json',
         data: JSON.stringify(val),
         success: function(response) {
-            if (response.result == 1) {
-                document.getElementById('msg').innerHTML = "Trajectory executed correctly";
+            if (response.result != "") {
+                document.getElementById('msg').innerHTML = "Trajectory "+response.result+"executed correctly";
             }
-            else if (response.result == 0) {
+            else if (response.result == "") {
                 document.getElementById('msg').innerHTML = "No trajectory found";
             }
             else {
