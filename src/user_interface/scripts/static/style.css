@@ -1,22 +1,21 @@
 div {
     display: flex;
 }
-div.main{
+div.main {
     display: block;
     width: 50%;
 }
-div.main2{
+div.main2 {
     display: block;
 }
-#traj{
-    width: 50%;
+#tests {
+    height: 50%;
 }
-#btnsec{
+#btnsec {
     height: 100;
     text-align: center;
-    
 }
-#btn{
+#btn {
     width: 500;
     margin: 0 auto;
 }
@@ -39,7 +38,8 @@ button.out {
     width: 120;
 }
 button.traj {
-    width: 25%;
+    float: left;
+    width: 20%;
 }
 .ndata {
     width: 10%;

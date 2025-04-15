@@ -55,72 +55,6 @@ def IK_fromQuater_client(data):
 
 
 
-def UI_client():
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('localhost', 8081))
-
-    client_socket.send(b"1")
-
-    client_socket.close()
-
-
-
-def UI_server():
-    global server_socket, new_socket
-
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.settimeout(None)
-    server_socket.bind(('localhost', 8082))
-
-    server_socket.listen(5)
-
-    new_socket, addr = server_socket.accept()
-
-    msg = new_socket.recv(1024)
-
-    new_socket.close()
-    server_socket.close()
-
-    return msg.decode()
-
-
-
-def controller_client(data):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('localhost', 8081))
-
-    requests = []
-    requests.append(np.array(data[0], dtype=np.double).tobytes())
-    requests.append(np.array(data[1], dtype=np.double).tobytes())
-    requests.append(np.array(data[2], dtype=np.double).tobytes())
-    requests.append(np.array(data[3], dtype=np.double).tobytes())
-    requests.append(data[4])
-    
-    ln = 0
-    for request in requests:
-        print(len(request))
-        if len(request) > ln:
-            ln = len(request)
-
-    length = np.array(ln, dtype=np.double).tobytes()
-
-    client_socket.send(length)
-
-    print(data[0][-1])
-    print(data[1][-1])
-    client_socket.send(requests[0])
-    client_socket.send(requests[1])
-
-    #request = np.array(data[1], dtype=np.double).tobytes()
-    #client_socket.send(request)
-#
-    #request = data[2]
-    #client_socket.send(request)
-    
-    client_socket.close()
-
-
-
 def endTransmission(port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect(('localhost', port))
@@ -182,30 +116,24 @@ if __name__ == '__main__':
         q7_array = []
         q7_real_array = []
 
-        try:
-            UI_client()
-        except:
-            pass
-
         print("\n===============================================================")
-        print("Select the trajectory to perform or quit to exit:\n")
-        
-        traj = UI_server()
-        print(traj)
+        traj = input("Type the trajectory to perform or quit to exit:\n")
 
         if traj == "quit":
             #endTransmission(8080)
             break
         
-        #try:
-        with open(f'/home/lozer/franka_emika_ws/src/neural_network/data/dataset/{traj}.csv') as file:
-            doOnce = True
-            for line in csv.reader(file):
-                if doOnce:
-                    doOnce = False
-                    continue
+        try:
+            with open(f'/home/lozer/franka_emika_ws/src/neural_network/data/dataset/{traj}.csv') as file:
+                doOnce = True
+                for line in csv.reader(file):
+                    if doOnce:
+                        doOnce = False
+                        continue
 
-                q7_real_array.append(float(line[7]))
+                    q7_real_array.append(float(line[7]))
+        except:
+            print("Selected trajectory does not exist..")
             
         with open(f'/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{traj}/gripper.json', "r") as file:
             trajectory = json.load(file)
@@ -215,7 +143,7 @@ if __name__ == '__main__':
                     q_array = 0
                 elif waypoint["action"] == "open":
                     q_array = 1
-                t_gripper.append(waypoint["t"]*2)
+                t_gripper.append(waypoint["t"]*4)
                 q_gripper.append(q_array)
         
         with open(f'/home/lozer/franka_emika_ws/src/path_planning/data/trajectory/{traj}/arm.json', "r") as file:
@@ -266,7 +194,7 @@ if __name__ == '__main__':
                 q_array = optMove(response, q_actual_array)
 
                 if not len(q_array) == 0:
-                    t_arm.append(t_array[i]*2)
+                    t_arm.append(t_array[i]*4)
                     q_arm.append(q_array)
                     q_actual_array = q_array
                     cnt += 1
@@ -299,7 +227,5 @@ if __name__ == '__main__':
 
             print(f"Solutions found: {cnt}/{len(trajectory['waypoints'])}")
 
-            #controller_client((t_arm, q_arm, t_gripper, q_gripper, ttype))
             controller.launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype)
-        #except:
-        #    print("Selected trajectory does not exist..")
+        

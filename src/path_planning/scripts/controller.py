@@ -199,35 +199,6 @@ def close_gripper():
 
 
 
-"""def launch_trajectory(t, q, ttype):
-    if len(q) > 0:
-        homing(q[0], ttype)
-        if not len(q) == 1:
-            t_temp = [t[0]]
-            q_temp = [q[0]]
-            for i in range(1, len(t)):
-                if len(q[i]) == 2:
-                    if q[i][0] == 0:
-                        exec_trajectory(t_temp, q_temp, ttype)
-                        close_gripper()
-                        t_temp = [t[i]]
-                        q_temp = [q_temp[-1]]
-                    elif q[i][0] == 1:
-                        exec_trajectory(t_temp, q_temp, ttype)
-                        open_gripper()
-                        t_temp = [t[i]]
-                        q_temp = [q_temp[-1]]
-                else:
-                    t_temp.append(t[i])
-                    q_temp.append(q[i])
-            
-            exec_trajectory(t_temp, q_temp, ttype)"""
-
-
-
-
-
-
 def exec_grasping(t, q):
     global t0
 
@@ -245,15 +216,13 @@ def exec_grasping(t, q):
             close_gripper()
         elif q[i] == 1:
             open_gripper()
-            
-            
+                       
 
 
 def launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype):
     global t0
 
     if len(q_arm) > 0:
-        print(q_arm[0])
         homing(q_arm[0], ttype)
         if not len(q_arm) == 1:
             t1 = threading.Thread(target=exec_trajectory, args=(t_arm, q_arm, ttype))
@@ -266,49 +235,6 @@ def launch_trajectory(t_arm, q_arm, t_gripper, q_gripper, ttype):
             t2.join()
 
         t0 = None
-
-
-
-def controller_client():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.settimeout(None)
-    server_socket.bind(('localhost', 8081))
-
-    server_socket.listen(5)
-
-    while True:
-        new_socket, addr = server_socket.accept()
-
-        msg = np.frombuffer(new_socket.recv(1024), dtype=np.double)
-
-        if msg == "0":
-            new_socket.close()
-            break
-        else:
-            print("msg = ", msg)
-            ln = int(msg[0])
-
-        print("ln = ", ln)
-
-        res = np.frombuffer(new_socket.recv(1024), dtype=np.double)
-        print("response = ", res)
-
-        res = np.frombuffer(new_socket.recv(1024), dtype=np.double)
-        print("response = ", res)
-
-        #launch_trajectory(t, q, ttype)
-    
-    server_socket.close()
-
-
-
-
-if __name__ == '__main__':
-    #rospy.initnode("main")
-
-    print("Ready")
-    #controller_client()
-
     
 
 

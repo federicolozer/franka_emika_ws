@@ -10,7 +10,6 @@ function interface() {
             for (var key in json) {
                 createSection(json[key], count++);
             }
-            createSection("quit", count++);
         },
         error: function() {
             document.getElementById("msg").innerHTML = "Error: failed to load data";
@@ -27,7 +26,7 @@ function createSection(val, count) {
         button.id = "bt_" + count;
 
         defineButtonBehavior(button, val);
-        document.getElementById("traj").appendChild(button);
+        document.getElementById("tests").appendChild(button);
         button.className = "traj"
     }
 }

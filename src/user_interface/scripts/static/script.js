@@ -25,10 +25,6 @@ function createSection(val, count) {
 
 
 
-//function defineButtonBehavior(button, val) {
-//    button.addEventListener("click", executeTrajectory(val));
-//}
-
 function defineButtonBehavior(button, val) {
     button.addEventListener("click", function() {executeTrajectory(val)});
 }

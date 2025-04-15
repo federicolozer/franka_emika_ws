@@ -61,21 +61,27 @@ def callTrainNN():
 def UI_server():
     global server_socket, new_socket
 
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.settimeout(None)
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #server_socket.settimeout(None)
     server_socket.bind(('localhost', 8081))
 
-    server_socket.listen(5)
+    #server_socket.listen(5)
 
-    new_socket, addr = server_socket.accept()
+    #new_socket, addr = server_socket.accept()
 
-    msg = new_socket.recv(1024)
-    print("msg = ", msg.decode())
+    while True:
+        data, addr = server_socket.recvfrom(1024)
+        msg = data.decode()
+        print("msg = ", msg)
 
-    new_socket.close()
+        if msg:
+            break
+
+
+    #new_socket.close()
     server_socket.close()
 
-    return msg.decode()
+    return msg
 
 
 
