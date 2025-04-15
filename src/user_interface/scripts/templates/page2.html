@@ -6,20 +6,6 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script src="static/script2.js"></script>
     <script>
-        async function waitGoToPage() {
-            let res = $.ajax({
-                url: '/goToPage',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(1),
-                success: function(response) {
-                    window.location.href = "/page2"
-                    return response.result;
-                },
-            });
-        }
-    </script>
-    <script>
         interface();
     </script>
 </head>
@@ -48,5 +34,5 @@
         </div>
     </div>
 
-    <button id="quit" class="out" onclick="executeTrajectory('quit')">Quit</button>
+    <!-- <button id="quit" class="out" onclick="executeTrajectory('quit')">Quit</button> -->
 </body>

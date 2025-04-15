@@ -1,16 +1,3 @@
-async function interface() {
-    await $.ajax({
-        url: '/goToPage',
-        type: 'GET',
-        contentType: 'application/json',
-        success: function(data) {
-            alert(data.result);
-        },
-    });
-}
-
-
-
 function createSection(val, count) {
     if (val.substr(0,4) == "test") {
         const button = document.createElement("button");

@@ -6,23 +6,8 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script src="static/script1.js"></script>
     <script>
-        async function waitGoToPage() {
-            let res = $.ajax({
-                url: '/goToPage',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(1),
-                success: function(response) {
-                    window.location.href = "/page2"
-                    return response.result;
-                },
-            });
-        }
-    </script>
-    <script>
         var dataset_list = new Set();
         var tests_list = new Set();
-        waitGoToPage();
         interface();
     </script>
 </head>
